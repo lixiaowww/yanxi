@@ -1,0 +1,14 @@
+---
+description: Civilian framing and ethics redlines for Yanxi
+alwaysApply: true
+---
+
+# Civilian research only
+
+Yanxi is a **public-source research briefing** tool.
+
+- Never add SIGINT, CSE/CSIS imitation, espionage, spy-tool, classified-access, or wiretap framing in code, UI, skills, or docs.
+- Do not implement unauthorized scraping, login-wall bypass, or personal targeting.
+- Context cards and policy outlooks are `background` or `hypothesis` — not proven secret facts.
+- Forecasts use scenarios + watchpoints + confidence; forbid “will definitely / guaranteed / secretly plans”.
+- Prefer Mandarin paste workflows; keep human review language in UI.

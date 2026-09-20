@@ -1,0 +1,56 @@
+:root {
+  --bg: #0f1419;
+  --panel: #1a222c;
+  --text: #e7ecf1;
+  --muted: #8b9aab;
+  --accent: #3d8bfd;
+  --ok: #3ecf8e;
+  --bad: #f07178;
+  --border: #2a3542;
+  font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: radial-gradient(1200px 600px at 10% -10%, #1b2a3d, var(--bg));
+  color: var(--text);
+  min-height: 100vh;
+}
+.wrap { max-width: 1100px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+header h1 { font-size: 1.6rem; margin: 0 0 0.35rem; letter-spacing: -0.02em; }
+header p { margin: 0; color: var(--muted); line-height: 1.5; max-width: 62ch; }
+.badge {
+  display: inline-block; margin-top: 0.75rem; padding: 0.2rem 0.55rem;
+  border: 1px solid var(--border); border-radius: 999px; color: var(--muted); font-size: 0.75rem;
+}
+.grid { display: grid; gap: 1rem; margin-top: 1.5rem; }
+@media (min-width: 900px) { .grid { grid-template-columns: 1fr 1fr; } }
+.panel {
+  background: color-mix(in srgb, var(--panel) 92%, black);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem;
+}
+label { display: block; font-size: 0.8rem; color: var(--muted); margin-bottom: 0.4rem; }
+textarea, input {
+  width: 100%; background: #0c1117; color: var(--text);
+  border: 1px solid var(--border); border-radius: 8px; padding: 0.75rem; font: inherit;
+}
+textarea { min-height: 220px; resize: vertical; }
+.row { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 0.75rem; align-items: center; }
+button {
+  background: var(--accent); color: white; border: 0; border-radius: 8px;
+  padding: 0.55rem 1rem; font-weight: 600; cursor: pointer;
+}
+button.secondary { background: transparent; border: 1px solid var(--border); color: var(--text); }
+button:disabled { opacity: 0.5; cursor: wait; }
+pre {
+  white-space: pre-wrap; word-break: break-word; background: #0c1117;
+  border-radius: 8px; padding: 0.75rem; border: 1px solid var(--border);
+  font-size: 0.82rem; line-height: 1.45; max-height: 70vh; overflow: auto;
+}
+.meta { font-size: 0.85rem; color: var(--muted); margin-bottom: 0.5rem; }
+.ok { color: var(--ok); }
+.bad { color: var(--bad); }
+.footer { margin-top: 1.5rem; color: var(--muted); font-size: 0.8rem; line-height: 1.45; }

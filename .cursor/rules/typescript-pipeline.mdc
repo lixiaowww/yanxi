@@ -1,0 +1,14 @@
+---
+description: Pipeline and API conventions
+globs: src/**/*.ts,server.ts,scripts/**/*.ts
+alwaysApply: false
+---
+
+# Pipeline conventions
+
+- Entry: `runBriefingPipeline` in `src/lib/pipeline.ts`.
+- Product id in health/API: `yanxi`.
+- Default: offline when no `LLM_API_KEY` or `forceOffline`.
+- On LLM failure: degrade to offline; never leave the demo broken.
+- Gate: hard findings block PASS; soft findings warn only.
+- Do not persist user pastes (MVP has no DB).

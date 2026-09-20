@@ -1,0 +1,13 @@
+---
+description: Prefer Markdown skills over hard-coded domain prose
+globs: src/**/*.{ts,tsx},skills/**/*.md
+alwaysApply: false
+---
+
+# Skills-first domain knowledge
+
+- Put China history / politics / culture glosses in `skills/context-cards/*.md` with `match: "关键词"` frontmatter.
+- Put method and honesty rules in `skills/briefing-writer/SKILL.md`.
+- Put hard redlines in `skills/ethics-sandbox/SKILL.md` **and** mirror hard checks in `src/lib/gate.ts`.
+- TypeScript should load and compose Markdown — do not embed long lexicon tables in TS.
+- After card edits, run `npm run demo` to confirm keyword hits and gate PASS.

@@ -1,0 +1,31 @@
+{
+  "name": "yanxi",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Yanxi — civilian open-source Mandarin→English contextual briefing with China context cards and claim gates.",
+  "scripts": {
+    "dev": "tsx server.ts",
+    "build": "vite build",
+    "lint": "tsc --noEmit",
+    "demo": "tsx scripts/demo-offline.ts",
+    "harness:brief": "tsx scripts/cursor-harness-brief.ts"
+  },
+  "dependencies": {
+    "@cursor/sdk": "^1.0.0",
+    "@vitejs/plugin-react": "^5.0.4",
+    "dotenv": "^17.2.3",
+    "express": "^4.21.2",
+    "react": "^19.0.1",
+    "react-dom": "^19.0.1",
+    "vite": "^6.2.3"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^22.14.0",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
+    "tsx": "^4.21.0",
+    "typescript": "~5.8.2"
+  }
+}
