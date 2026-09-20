@@ -1,0 +1,69 @@
+{
+  "version": 1,
+  "framing": "civilian-public-source-subscriptions",
+  "subscriptions": [
+    {
+      "id": "job-fit-domain-battery",
+      "title": "FLIA-relevant domain battery (public fixtures)",
+      "description": "Combined briefing across macro/foreign/tech/finance/rural/ideology/social public Mandarin fixtures.",
+      "keywords": [],
+      "sourceIds": [
+        "domain-macro-cewc",
+        "domain-macro-instrument",
+        "domain-foreign-affairs",
+        "domain-industrial-tech",
+        "domain-finance-risk",
+        "domain-rural-food",
+        "domain-ideology-party",
+        "domain-dual-circulation",
+        "domain-social-governance",
+        "domain-defense-public",
+        "domain-canada-nexus"
+      ],
+      "scheduleCron": "0 8 * * 1",
+      "scheduleHuman": "Mondays 08:00 local",
+      "delivery": ["outbox", "rss"],
+      "forceOffline": true,
+      "maxItemsPerRun": 12,
+      "mergeMode": "combined",
+      "active": true
+    },
+    {
+      "id": "desk-by-section",
+      "title": "Briefing desk — five civilian sections",
+      "description": "总体目标 / 经济投资 / 外交 / 国防公开表述 / 社会治理 — one combined pack for human review.",
+      "keywords": [],
+      "sourceIds": [
+        "domain-macro-cewc",
+        "domain-industrial-tech",
+        "domain-finance-risk",
+        "domain-foreign-affairs",
+        "domain-canada-nexus",
+        "domain-defense-public",
+        "domain-social-governance",
+        "domain-ideology-party"
+      ],
+      "scheduleCron": "0 7 * * 1-5",
+      "scheduleHuman": "Weekdays 07:00 local",
+      "delivery": ["outbox", "rss"],
+      "forceOffline": true,
+      "maxItemsPerRun": 8,
+      "mergeMode": "per-item",
+      "active": true
+    },
+    {
+      "id": "macro-public-digest",
+      "title": "PRC macro policy — meeting + instrument",
+      "description": "Merge CEWC-style language with implementing notice language.",
+      "keywords": ["中央经济工作会议", "高质量发展", "新质生产力", "通知", "实施方案"],
+      "sourceIds": ["domain-macro-cewc", "domain-macro-instrument"],
+      "scheduleCron": "0 9 * * 1",
+      "scheduleHuman": "Mondays 09:00 local",
+      "delivery": ["outbox", "rss"],
+      "forceOffline": true,
+      "maxItemsPerRun": 5,
+      "mergeMode": "combined",
+      "active": true
+    }
+  ]
+}

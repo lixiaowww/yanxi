@@ -1,7 +1,12 @@
 ---
 name: cultural-semantics
+type: lexicon
+desk: all
 match: "面子" "关系" "和谐" "稳定压倒一切" "家国情怀" "内卷" "躺平" "小粉红" "舆论" "正能量" "主旋律"
 description: Cultural and discourse semantics that affect tone and audience reading.
+tag: background
+updated: 2026-09-20
+sources: Public cultural/discourse terms appearing in open Mandarin media
 ---
 
 # Context card: Cultural / discourse semantics (background)

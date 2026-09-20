@@ -1,7 +1,12 @@
 ---
 name: foreign-policy-discourse
+type: lexicon
+desk: foreign_affairs
 match: "外交部" "和平共处五项原则" "多边主义" "单边主义" "霸权主义" "中美" "中欧" "周边外交" "全球治理" "人类命运共同体" "一带一路" "制裁"
 description: Background on public PRC foreign-policy discourse terms — not classified analysis.
+tag: background
+updated: 2026-09-20
+sources: Public MFA-style diplomatic framing vocabulary
 ---
 
 # Context card: Foreign-policy discourse (background)
@@ -19,4 +24,4 @@ description: Background on public PRC foreign-policy discourse terms — not cla
 - Public rhetoric can coexist with pragmatic engagement; do not treat slogans as operational plans.
 - Watchpoints: subsequent MFA briefings, joint statements, trade data releases — all **public**.
 
-**Discipline:** No espionage, targeting, or classified-capability language.
+**Discipline:** Do not invent targeting or classified-capability language. Stick to public MFA wording.

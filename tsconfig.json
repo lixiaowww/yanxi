@@ -13,5 +13,5 @@
     "esModuleInterop": true,
     "types": ["node"]
   },
-  "include": ["src", "server.ts", "scripts", "vite.config.ts"]
+  "include": ["src", "server.ts", "scripts", "vite.config.ts", "vendor/grantwright"]
 }

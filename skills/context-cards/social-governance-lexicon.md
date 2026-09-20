@@ -1,7 +1,12 @@
 ---
 name: social-governance-lexicon
+type: lexicon
+desk: social_governance
 match: "社会治理" "基层治理" "维稳" "信访" "平安中国" "网格化" "共同富裕" "民生" "就业优先" "乡村振兴" "意识形态"
 description: Background glosses for social governance and livelihood policy vocabulary.
+tag: background
+updated: 2026-09-20
+sources: Public social-governance / livelihood vocabulary
 ---
 
 # Context card: Social governance lexicon (background)

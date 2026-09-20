@@ -1,7 +1,12 @@
 ---
 name: historical-analogy-discipline
+type: history_frame
+desk: all
 match: "改革开放" "入世" "WTO" "十一届三中全会" "南巡" "供给侧" "高质量发展" "新质生产力" "百年未有" "中华民族伟大复兴"
 description: How to use historical analogies without overclaiming.
+tag: hypothesis
+updated: 2026-09-20
+sources: Open historical frames commonly used in public PRC economic narratives (1978–)
 ---
 
 # Context card: Historical analogy discipline (hypothesis only)

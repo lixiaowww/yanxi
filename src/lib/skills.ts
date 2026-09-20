@@ -1,6 +1,7 @@
 // GrantWright-style skill loader: markdown instruction units composed at runtime.
 import fs from "fs";
 import path from "path";
+import { matchOntologyLite, type OntologyLiteResult } from "./ontology-lite.js";
 
 const SKILLS_DIR = path.join(process.cwd(), "skills");
 
@@ -14,59 +15,73 @@ function readBody(file: string): string {
   }
 }
 
-function readFrontmatter(file: string): Record<string, string> {
-  try {
-    const raw = fs.readFileSync(file, "utf8");
-    const m = raw.match(/^---\n([\s\S]*?)\n---/);
-    if (!m) return {};
-    const out: Record<string, string> = {};
-    for (const line of m[1].split("\n")) {
-      const i = line.indexOf(":");
-      if (i > 0) out[line.slice(0, i).trim()] = line.slice(i + 1).trim();
-    }
-    return out;
-  } catch {
-    return {};
-  }
-}
-
-export function detectContextCards(sourceText: string): { names: string[]; bodies: string[] } {
-  const dir = path.join(SKILLS_DIR, "context-cards");
-  const hay = sourceText || "";
-  const names: string[] = [];
-  const bodies: string[] = [];
-  try {
-    for (const f of fs.readdirSync(dir)) {
-      if (!f.endsWith(".md")) continue;
-      const full = path.join(dir, f);
-      const fm = readFrontmatter(full);
-      const keywords = (String(fm.match || "").match(/"([^"]+)"/g) || []).map((s) =>
-        s.replace(/"/g, "")
-      );
-      if (keywords.some((k) => hay.includes(k))) {
-        names.push(fm.name || f.replace(/\.md$/, ""));
-        bodies.push(readBody(full));
-      }
-    }
-  } catch {
-    /* missing dir */
-  }
-  return { names, bodies };
+/** @deprecated prefer matchOntologyLite — kept for simple name/body lists */
+export function detectContextCards(sourceText: string): {
+  names: string[];
+  bodies: string[];
+  ontology?: OntologyLiteResult;
+} {
+  const ontology = matchOntologyLite(sourceText);
+  return { names: ontology.names, bodies: ontology.bodies, ontology };
 }
 
 export function composeBriefingSystemPrompt(sourceText: string): {
   prompt: string;
   matchedCards: string[];
+  ontology: OntologyLiteResult;
 } {
   const writer = readBody(path.join(SKILLS_DIR, "briefing-writer", "SKILL.md"));
   const ethics = readBody(path.join(SKILLS_DIR, "ethics-sandbox", "SKILL.md"));
-  const { names, bodies } = detectContextCards(sourceText);
+  const ontology = matchOntologyLite(sourceText);
+  const { names, bodies } = ontology;
+
+  const catalogHint =
+    ontology.hits.length > 0
+      ? ontology.hits
+          .map(
+            (h) =>
+              `- ${h.id} [${h.type}/${h.tag}] desk=${h.desk.join("|")} keys=${h.matched_keywords.join(",")}`
+          )
+          .join("\n")
+      : "(none)";
 
   const outputSpec = `# Output task
 Return ONLY valid JSON with this shape:
 {
-  "source_digest_zh": [{"point": "...", "quote": "..."}],
+  "source_digest_zh": [{"point": "...", "quote": "...", "source_label": "paste-1"}],
   "context_notes": [{"card": "...", "note": "...", "tag": "background|hypothesis"}],
+  "info_triage": {
+    "framing": "civilian-public-source-triage",
+    "kinds": [{"kind": "macro_policy|implementing_instrument|industrial_tech_policy|foreign_affairs|defense_public|social_governance|economic_data|press_commentary|leadership_meeting|local_policy|other_public_text", "label_zh": "...", "score": 0.0, "evidence": "short quote or cue"}],
+    "primary_kind": "leadership_meeting",
+    "importance": {
+      "grade": "P1|P2|P3|P4",
+      "label_zh": "...",
+      "score_0_to_1": 0.0,
+      "rationale": "...",
+      "drivers": ["..."],
+      "tag": "hypothesis"
+    },
+    "tag": "hypothesis"
+  },
+  "signaling_scorecard": {
+    "method": "enumerate-then-weight",
+    "framing": "civilian-public-media-heuristics",
+    "rules": [
+      {"id": "...", "category": "...", "label_zh": "...", "label_en": "...", "weight": 0.0, "status": "hit|miss|unclear", "raw_score": 0, "weighted_score": 0, "tag": "hypothesis"}
+    ],
+    "weighted_total": 0.0,
+    "weight_sum": 1.0,
+    "band": "low|medium|high",
+    "calibration": "...",
+    "tag": "hypothesis"
+  },
+  "signaling_valves": {
+    "sequence": {"status": "observed|unclear|absent", "observation": "...", "reading": "...", "tag": "hypothesis"},
+    "implementing_detail": {"status": "present|absent|unclear", "observation": "...", "reading": "...", "tag": "hypothesis"},
+    "press_placement": {"status": "observed|unclear|absent", "observation": "...", "reading": "...", "tag": "hypothesis"},
+    "calibration": "roll-up of scorecard"
+  },
   "briefing_en": {
     "what": "...",
     "context": "...",
@@ -85,23 +100,31 @@ Return ONLY valid JSON with this shape:
 }
 
 Rules:
-- Quotes in source_digest_zh must be short substrings of the user Mandarin text.
-- context_notes must cite which loaded context card they use; tag honestly.
-- policy_outlook is optional but preferred for policy-related sources; every scenario tag MUST be "hypothesis".
+- Quotes in source_digest_zh must be short substrings of the matching source_label text (or any source if unlabeled).
+- When multiple sources are provided, set source_label on every digest row.
+- Context cards are Civic Ontology Lite (background/hypothesis). Do not treat them as proven secret facts.
+- Prefer cards aligned to the desk section; do not dump unrelated world-models into the briefing.
+- info_triage: assign 信息种类 (kinds, multi-label OK) + 重要性分级 P1–P4. This is research priority triage — NEVER secrecy markings (TOP SECRET/SECRET/密级).
+- ALWAYS enumerate the full heuristic catalog from policy-signaling-valves BEFORE weighting; do not skip rows.
+- status: hit|miss|unclear; raw_score hit=1 unclear=0.4 miss=0; weighted_score=weight*raw_score.
+- signaling_valves are category roll-ups of sequence / implementing_detail / press_placement.
+- The runtime may replace signaling_scorecard, info_triage, and ontology_lite with deterministic scorers — still fill them honestly.
+- policy_outlook preferred for policy sources; every scenario tag MUST be "hypothesis".
 - Use may/could/if-then — never will-definitely / guaranteed / secretly-plans.
-- briefing_en.so_what must not invent forecasts beyond the sources + tagged hypotheses.
 - If unsure, lower confidence and add open_questions.`;
 
   const prompt = [
     writer,
     ethics,
-    bodies.length
-      ? `# Matched context cards\n\n${bodies.join("\n\n---\n\n")}`
-      : "# Matched context cards\n\n(none matched — do not invent institutional jargon)",
+    `# Civic Ontology Lite (matched)\n\nDesk primary: ${ontology.desk_primary || "n/a"}\n${catalogHint}\n\n${
+      bodies.length
+        ? bodies.join("\n\n---\n\n")
+        : "(none matched — do not invent institutional jargon)"
+    }`,
     outputSpec,
   ]
     .filter(Boolean)
     .join("\n\n---\n\n");
 
-  return { prompt, matchedCards: names };
+  return { prompt, matchedCards: names, ontology };
 }

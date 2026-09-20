@@ -1,0 +1,25 @@
+{
+  "id": "finance-risk-single",
+  "title_zh": "金融风险单源：有红线语、缺工具 → 印证弱",
+  "framing": "civilian-public-style-chain",
+  "notes": "Public-style synthetic excerpt.",
+  "stages": [
+    {
+      "id": "t0_risk_language",
+      "sources": [
+        {
+          "label": "finance-meeting-style",
+          "text": "有关会议强调，要统筹发展和安全，稳妥化解地方债与隐性债务风险，持续做好保交楼工作，促进房地产市场平稳健康发展，坚决守住不发生系统性金融风险的底线，同时防止资本无序扩张。"
+        }
+      ],
+      "expect": {
+        "gate": true,
+        "desk_primary_in": ["economy_investment"],
+        "primary_kind_in": ["finance_risk"],
+        "corroboration_max": 1,
+        "confidence_max": "medium",
+        "missing_includes_any": ["具名通知", "第二公开源", "落实文件"]
+      }
+    }
+  ]
+}

@@ -1,7 +1,12 @@
 ---
 name: party-state-lexicon
+type: lexicon
+desk: all
 match: "党中央" "国务院" "两会" "全国人大" "政协" "中央经济工作会议" "改革开放" "中国特色社会主义" "依法治国" "共同富裕" "一带一路" "人类命运共同体"
 description: Lexicon for common PRC political terms — background only.
+tag: background
+updated: 2026-09-20
+sources: Common open PRC Party–state institutional terms
 ---
 
 # Context card: Party–state lexicon (background)

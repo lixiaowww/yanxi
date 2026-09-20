@@ -1,0 +1,45 @@
+{
+  "id": "cewc-to-instrument",
+  "title_zh": "中央经济工作会议方向语 → 国办通知细则",
+  "framing": "civilian-public-style-chain",
+  "notes": "Synthetic public-style Mandarin modeled on open reporting patterns. Not a classified record.",
+  "stages": [
+    {
+      "id": "t0_meeting_only",
+      "sources": [
+        {
+          "label": "xinhua-cewc-style",
+          "text": "据新华社北京电，近日召开的中央经济工作会议强调，要坚持高质量发展，因地制宜发展新质生产力，继续推进改革开放，在发展中保障和改善民生，维护社会和谐稳定。会议指出，当前外部环境复杂多变，要增强忧患意识，同时坚定信心，推动经济持续回升向好。会议要求实施积极的财政政策和稳健的货币政策，着力扩大内需，稳增长。"
+        }
+      ],
+      "expect": {
+        "gate": true,
+        "substance_band_in": ["thin", "mixed"],
+        "corroboration_max": 1,
+        "confidence_max": "medium",
+        "desk_primary_in": ["overall_goals", "economy_investment"],
+        "primary_kind_in": ["leadership_meeting", "macro_policy"]
+      }
+    },
+    {
+      "id": "t1_meeting_plus_instrument",
+      "sources": [
+        {
+          "label": "xinhua-cewc-style",
+          "text": "据新华社北京电，近日召开的中央经济工作会议强调，要坚持高质量发展，因地制宜发展新质生产力，继续推进改革开放，在发展中保障和改善民生，维护社会和谐稳定。会议要求实施积极的财政政策和稳健的货币政策，着力扩大内需，稳增长。"
+        },
+        {
+          "label": "gov-notice-style",
+          "text": "国务院办公厅近日印发通知，要求有关部门制定实施方案，因地制宜推进新质生产力相关试点，并强调在发展中保障和改善民生。通知指出，要做好政策解读，适时出台配套办法，确保中央经济工作会议关于高质量发展、稳增长的部署落到实处。"
+        }
+      ],
+      "expect": {
+        "gate": true,
+        "corroboration_min": 2,
+        "corroboration_gt_stage": "t0_meeting_only",
+        "confidence_min": "medium",
+        "substance_band_in": ["mixed", "dense"]
+      }
+    }
+  ]
+}

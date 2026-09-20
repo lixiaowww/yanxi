@@ -1,0 +1,24 @@
+{
+  "id": "social-commentary-cap",
+  "title_zh": "社交转述/大V：置信度硬封顶 low，不得当印证主源",
+  "framing": "civilian-public-style-chain",
+  "notes": "Paste-only social rumor demo — not for whitelist collect.",
+  "stages": [
+    {
+      "id": "t0_social",
+      "sources": [
+        {
+          "label": "paste-social-rumor-demo",
+          "text": "网传有视频显示某地出现大规模聚集，推特账号李老师不是你老师转发称情况属实，自媒体博主称已有千人响应。此消息尚未经官方证实，仅作舆情备忘示例。"
+        }
+      ],
+      "expect": {
+        "gate": true,
+        "source_class": "social_commentary",
+        "confidence_eq": "low",
+        "corroboration_max": 1,
+        "caps_include_any": ["social_commentary_hard_cap_low"]
+      }
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "id": "defense-public-discourse",
+  "title_zh": "国防公开表述：归入国防栏，不作作战情报",
+  "framing": "civilian-public-style-chain",
+  "notes": "Public MFA/MND-style synthetic language only.",
+  "stages": [
+    {
+      "id": "t0_mnd",
+      "sources": [
+        {
+          "label": "mnd-press-style",
+          "text": "国防部例行记者会上，有关负责人表示，军队将持续推进强军目标，加强练兵备战与演训，提升战备水平，同时强调中国坚持防御性国防政策，愿在相互尊重基础上开展国际军事交流。公开报道称，有关军工企业要提升关键领域自主可控能力，服务国防建设与经济社会发展。"
+        }
+      ],
+      "expect": {
+        "gate": true,
+        "desk_primary_in": ["defense_public"],
+        "primary_kind_in": ["defense_public"],
+        "confidence_max": "medium",
+        "source_class_not": "social_commentary"
+      }
+    }
+  ]
+}

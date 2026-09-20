@@ -20,17 +20,20 @@ Civilian open-source Mandarin → English contextual briefing. Not an intelligen
 
 | Change type | Location |
 |-------------|----------|
-| Domain vocabulary / China context | `skills/context-cards/*.md` |
+| Domain vocabulary / China context | `skills/context-cards/*.md` + `docs/ONTOLOGY-LITE.md` |
 | Briefing method / honesty | `skills/briefing-writer/SKILL.md` |
 | Hard redlines | `skills/ethics-sandbox/SKILL.md` + `src/lib/gate.ts` |
 | Pipeline orchestration | `src/lib/pipeline.ts` |
+| Ontology lite matcher | `src/lib/ontology-lite.ts` |
+| Source tier priors | `src/lib/source-tier.ts` + `docs/RELIABILITY.md` |
+| Whitelist collect / subscribe | `config/*.json` + `src/lib/collector.ts` + `docs/COLLECT.md` |
 | Cursor agent rules | `.cursor/rules/*.mdc` |
 | Programmatic Cursor agent | `scripts/cursor-harness-brief.ts` |
 
 ## Verify
 
 ```bash
-npm run lint && npm run demo
+npm run lint && npm run demo && npm run collect
 ```
 
 ## Docs root

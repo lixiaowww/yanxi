@@ -1,0 +1,24 @@
+{
+  "id": "canada-trade-policy-link",
+  "title_zh": "中加经贸公开表述 → 加拿大关联 + 公开政策主题对照",
+  "framing": "civilian-public-style-chain",
+  "notes": "Public-style synthetic MFA/MOFCOM-style language.",
+  "stages": [
+    {
+      "id": "t0_bilateral",
+      "sources": [
+        {
+          "label": "mofcom-gac-style",
+          "text": "商务部有关负责人就中加经贸关系答记者问时表示，中方一贯主张通过对话协商解决贸易分歧。近期加方在菜籽油、软木等产品上的措施引发关注，双方应在相互尊重基础上维护中加务实合作，推动双边关系健康稳定发展。外交部发言人指出，加方应客观理性看待中国发展。"
+        }
+      ],
+      "expect": {
+        "gate": true,
+        "desk_primary_in": ["foreign_affairs"],
+        "canada_nexus_in": ["direct"],
+        "canada_policy_in": ["topical", "named_instrument"],
+        "confidence_max": "medium"
+      }
+    }
+  ]
+}

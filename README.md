@@ -13,11 +13,21 @@
 ## 本地运行
 
 ```bash
-npm install && npm run demo && npm run dev
+npm install && npm run demo && npm run portfolio && npm run dev
 # → http://localhost:5179
+# → http://localhost:5179/portfolio
 ```
 
 可选 LLM（OpenAI-compatible）：复制 `.env.example` → `.env` 并填入 `LLM_API_KEY`。未配置时默认 **offline** 引擎。
+
+可选自动采集与订阅：
+
+```bash
+npm run collect              # 白名单源 → 英文简报 → outbox + RSS
+npm run collect:daemon       # 定期运行（COLLECT_INTERVAL_MINUTES）
+```
+
+详见 [docs/COLLECT.md](docs/COLLECT.md)。订阅源示例：`http://localhost:5179/feeds/macro-public-digest.xml`。
 
 可选 Cursor Agent harness：设置 `CURSOR_API_KEY` 后运行 `npm run harness:brief`（见 `docs/HARNESS.md`）。
 
@@ -30,8 +40,13 @@ npm install && npm run demo && npm run dev
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | 技术架构 |
 | [docs/ETHICS.md](docs/ETHICS.md) | 伦理与红线 |
 | [docs/JOB-FIT.md](docs/JOB-FIT.md) | 岗位对齐范围（内部） |
+| [docs/COLLECT.md](docs/COLLECT.md) | 白名单采集与 RSS 订阅 |
 | [docs/HARNESS.md](docs/HARNESS.md) | Cursor harness（rules / skills / SDK） |
 | [docs/ROADMAP.md](docs/ROADMAP.md) | 路线图 |
+| [docs/PORTFOLIO.md](docs/PORTFOLIO.md) | Portfolio 一页（面试/自用叙事） |
+| [docs/ONTOLOGY-LITE.md](docs/ONTOLOGY-LITE.md) | Civic Ontology Lite（民用背景层 · 非 OWL） |
+| [docs/RELIABILITY.md](docs/RELIABILITY.md) | 置信度 / 印证 / 加国对照 / 社交降权 |
+| [docs/DEPLOY.md](docs/DEPLOY.md) | **免费部署**（Render Free） |
 | [AGENTS.md](AGENTS.md) | Agent 入口约定 |
 
 ## 命名释义

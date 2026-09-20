@@ -1,0 +1,42 @@
+{
+  "id": "industrial-then-instrument",
+  "title_zh": "产业方向语 → 叠加部委通知后印证上升",
+  "framing": "civilian-public-style-chain",
+  "notes": "Public-style synthetic MIIT + notice language.",
+  "stages": [
+    {
+      "id": "t0_industry_talk",
+      "sources": [
+        {
+          "label": "miit-talk-style",
+          "text": "工业和信息化部有关负责人指出，要加快关键核心技术攻关，提升芯片与半导体产业链供应链韧性和安全可控水平，支持专精特新企业发展，推动人工智能赋能制造业转型升级，避免在关键领域出现卡脖子风险。"
+        }
+      ],
+      "expect": {
+        "gate": true,
+        "desk_primary_in": ["economy_investment"],
+        "corroboration_max": 1,
+        "substance_band_in": ["thin", "mixed"]
+      }
+    },
+    {
+      "id": "t1_with_notice",
+      "sources": [
+        {
+          "label": "miit-talk-style",
+          "text": "工业和信息化部有关负责人指出，要加快关键核心技术攻关，提升芯片与半导体产业链供应链韧性和安全可控水平，支持专精特新企业发展，推动人工智能赋能制造业转型升级，避免在关键领域出现卡脖子风险。"
+        },
+        {
+          "label": "miit-notice-style",
+          "text": "工业和信息化部近日印发通知，要求有关单位制定实施方案，围绕芯片与半导体中小企业试点安排专项支持，并于2026年底前出台配套办法，严禁挪用专项资金。"
+        }
+      ],
+      "expect": {
+        "gate": true,
+        "corroboration_min": 2,
+        "corroboration_gt_stage": "t0_industry_talk",
+        "substance_band_in": ["mixed", "dense"]
+      }
+    }
+  ]
+}

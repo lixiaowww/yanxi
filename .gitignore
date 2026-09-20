@@ -6,3 +6,14 @@ dist/
 .vercel
 .cursor/hooks/state/
 *.tsbuildinfo
+outbox/briefs/*.json
+outbox/briefs/*.md
+outbox/feeds/*.xml
+!outbox/briefs/.gitkeep
+!outbox/feeds/.gitkeep
+outbox/test-reports/*.md
+outbox/test-reports/*.json
+!outbox/test-reports/.gitkeep
+
+outbox/audit/*.jsonl
+!outbox/audit/.gitkeep

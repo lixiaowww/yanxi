@@ -1,7 +1,12 @@
 ---
 name: macro-policy-cycle
+type: institution
+desk: overall_goals,economy_investment
 match: "中央经济工作会议" "高质量发展" "新质生产力" "稳增长" "扩大内需" "积极的财政政策" "稳健的货币政策" "宏观调控" "经济工作会议" "政府工作报告"
 description: Background on PRC macro policy-cycle vocabulary and cautious outlook discipline.
+tag: background
+updated: 2026-09-20
+sources: Public CEWC / work-report vocabulary conventions
 ---
 
 # Context card: Macro policy cycle (background)

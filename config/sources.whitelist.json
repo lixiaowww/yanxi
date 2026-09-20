@@ -1,0 +1,113 @@
+{
+  "version": 1,
+  "framing": "civilian-public-whitelist-only",
+  "notes": "Local domain fixtures for FLIA-relevant topic testing. Live URL entries stay disabled by default.",
+  "allowedHosts": [
+    "www.gov.cn",
+    "english.news.cn",
+    "www.news.cn",
+    "www.xinhuanet.com"
+  ],
+  "entries": [
+    {
+      "id": "domain-macro-cewc",
+      "type": "local_json",
+      "path": "examples/domains/macro-cewc.json",
+      "label": "domain-macro-cewc",
+      "topics": ["macro_policy", "leadership_meeting"]
+    },
+    {
+      "id": "domain-macro-instrument",
+      "type": "local_json",
+      "path": "examples/domains/macro-instrument.json",
+      "label": "domain-macro-instrument",
+      "topics": ["implementing_instrument", "macro_policy"]
+    },
+    {
+      "id": "domain-foreign-affairs",
+      "type": "local_json",
+      "path": "examples/domains/foreign-affairs.json",
+      "label": "domain-foreign-bri",
+      "topics": ["foreign_affairs"]
+    },
+    {
+      "id": "domain-industrial-tech",
+      "type": "local_json",
+      "path": "examples/domains/industrial-tech.json",
+      "label": "domain-tech-chips",
+      "topics": ["industrial_tech_policy"]
+    },
+    {
+      "id": "domain-finance-risk",
+      "type": "local_json",
+      "path": "examples/domains/finance-risk.json",
+      "label": "domain-finance-property",
+      "topics": ["finance_risk"]
+    },
+    {
+      "id": "domain-rural-food",
+      "type": "local_json",
+      "path": "examples/domains/rural-food.json",
+      "label": "domain-rural-food",
+      "topics": ["rural_revitalization"]
+    },
+    {
+      "id": "domain-ideology-party",
+      "type": "local_json",
+      "path": "examples/domains/ideology-party.json",
+      "label": "domain-ideology-study",
+      "topics": ["ideology_party"]
+    },
+    {
+      "id": "domain-dual-circulation",
+      "type": "local_json",
+      "path": "examples/domains/dual-circulation.json",
+      "label": "domain-dual-circulation",
+      "topics": ["dual_circulation"]
+    },
+    {
+      "id": "domain-social-governance",
+      "type": "local_json",
+      "path": "examples/domains/social-governance.json",
+      "label": "domain-social-stability",
+      "topics": ["social_governance"]
+    },
+    {
+      "id": "domain-defense-public",
+      "type": "local_json",
+      "path": "examples/domains/defense-public.json",
+      "label": "domain-defense-public",
+      "topics": ["defense_public"]
+    },
+    {
+      "id": "domain-canada-nexus",
+      "type": "local_json",
+      "path": "examples/domains/canada-nexus.json",
+      "label": "domain-canada-canola",
+      "topics": ["foreign_affairs", "canada_nexus"]
+    },
+    {
+      "id": "sample-xinhua-local",
+      "type": "local_json",
+      "path": "examples/sample-input.json",
+      "label": "sample-xinhua-style-excerpt",
+      "topics": ["macro_policy", "leadership_meeting"]
+    },
+    {
+      "id": "sample-instrument-local",
+      "type": "local_json",
+      "path": "examples/sample-instrument.json",
+      "label": "sample-policy-instrument-excerpt",
+      "topics": ["implementing_instrument", "macro_policy"]
+    },
+    {
+      "id": "govcn-policy-index",
+      "type": "url",
+      "url": "https://www.gov.cn/zhengce/zuixin/",
+      "label": "gov.cn-latest-policies",
+      "topics": ["macro_policy", "implementing_instrument"],
+      "enabled": false,
+      "note": "Disabled by default — enable only when you accept live public fetch."
+    }
+  ]
+}

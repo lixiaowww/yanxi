@@ -1,0 +1,38 @@
+{
+  "id": "bagu-then-nugget",
+  "title_zh": "党八股骨架 → 同篇插入可核验干货后升档",
+  "framing": "civilian-public-style-chain",
+  "notes": "Same excerpt family: formula-only vs formula+nuggets. Public-style synthetic text.",
+  "stages": [
+    {
+      "id": "t0_formula_only",
+      "sources": [
+        {
+          "label": "local-study-style",
+          "text": "各地各部门要提高政治站位，深入贯彻落实新发展理念，坚持高质量发展，推动经济社会持续健康发展，凝心聚力、砥砺前行，不断增强四个意识，坚定四个自信，做到两个维护，弘扬正能量，维护社会和谐稳定。"
+        }
+      ],
+      "expect": {
+        "gate": true,
+        "substance_band_in": ["thin"],
+        "corroboration_max": 1,
+        "confidence_max": "medium"
+      }
+    },
+    {
+      "id": "t1_with_nuggets",
+      "sources": [
+        {
+          "label": "local-study-plus-nugget",
+          "text": "各地各部门要提高政治站位，深入贯彻落实新发展理念，坚持高质量发展，推动经济社会持续健康发展，凝心聚力、砥砺前行，不断增强四个意识，坚定四个自信，做到两个维护，弘扬正能量，维护社会和谐稳定。会议同时要求有关部门于2026年底前出台配套办法，安排专项资金不少于50亿元支持芯片与半导体中小企业试点，严禁挪用，守住不发生系统性风险的底线。"
+        }
+      ],
+      "expect": {
+        "gate": true,
+        "substance_band_in": ["dense", "mixed"],
+        "substance_gt_stage": "t0_formula_only",
+        "corroboration_gt_stage": "t0_formula_only"
+      }
+    }
+  ]
+}

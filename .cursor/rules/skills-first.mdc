@@ -9,5 +9,6 @@ alwaysApply: false
 - Put China history / politics / culture glosses in `skills/context-cards/*.md` with `match: "关键词"` frontmatter.
 - Put method and honesty rules in `skills/briefing-writer/SKILL.md`.
 - Put hard redlines in `skills/ethics-sandbox/SKILL.md` **and** mirror hard checks in `src/lib/gate.ts`.
-- TypeScript should load and compose Markdown — do not embed long lexicon tables in TS.
+- Reuse GrantWright SSRF/fetch via `vendor/grantwright/` — do not reimplement urlSafety.
+- Do not import GrantWright grant-domain modules (`programs`, digest mailer, LoginGate).
 - After card edits, run `npm run demo` to confirm keyword hits and gate PASS.

@@ -1,0 +1,721 @@
+{
+  "product": "yanxi",
+  "framing": "civilian-open-source-research-portfolio",
+  "title": "研析 Yanxi",
+  "tagline_zh": "公开中文材料 → 英文研究简报草稿（人在回路）",
+  "tagline_en": "Public Mandarin → English research briefing drafts for human review",
+  "not_zh": "不是情报产品、不是监听工具、不针对加拿大人或在加人士",
+  "method": {
+    "pillar1_zh": "潜规则 = 公开报道启发式：先枚举再加权（signaling scorecard）",
+    "pillar2_zh": "多源印证 = corroboration 0–3；缺源清单；栏内配对合并实测",
+    "confidence_zh": "因子化置信度（substance × 印证 × 出处 × 源类）；社交转述硬封顶 low",
+    "substance_zh": "八股剥离 → 只留数字/时限/工具/责任主体等可核验干货",
+    "canada_zh": "加拿大关联 + 公开政策/法规 URL 对照（非法律意见）",
+    "ontology_zh": "Civic Ontology Lite：栏目优先背景卡 ≤8；非 OWL/情报本体"
+  },
+  "columns": [
+    {
+      "id": "overall_goals",
+      "label_zh": "总体目标",
+      "label_en": "Overall goals & direction",
+      "blurb_zh": "中央会议、五年规划、高质量发展等方向性公开表述",
+      "itemCount": 2,
+      "maxCorr": 0,
+      "items": [
+        {
+          "fixtureId": "dual-circulation",
+          "kind": "dual_circulation",
+          "importance": "P3",
+          "substance": "thin",
+          "corr": 0,
+          "conf": "low",
+          "what": "The Mandarin source discusses: 相关文件提出，加快构建以国内大循环为主体、国内国际双循环相互促进的新发展格局，建设全国统一大市场，提升产业链供应链安全可控能力，推进国产替代，畅通国内大循环",
+          "soWhat": "Substance cut=thin (干货偏薄（套话/方向语为主）). Dual-circulation / unified-market language points to domestic market integration and supply-chain resilience themes — keep claims inside the excerpt. Use info_triage (kinds + P1–P4) and the full signaling_scorecard; offline mode does not inven",
+          "canada": "none",
+          "canadaPolicy": "none",
+          "outlook": [
+            {
+              "label": "Dual-circulation vocabulary continues alongside industrial-security cues",
+              "likelihood": "medium"
+            },
+            {
+              "label": "Unified-market rhetoric without anti-protection / flow-facilitation measures",
+              "likelihood": "medium"
+            },
+            {
+              "label": "Instruments name market-integration or substitution steps",
+              "likelihood": "low"
+            }
+          ]
+        },
+        {
+          "fixtureId": "macro-cewc",
+          "kind": "leadership_meeting",
+          "importance": "P1",
+          "substance": "thin",
+          "corr": 0,
+          "conf": "low",
+          "what": "The Mandarin source discusses: 据新华社北京电，近日召开的中央经济工作会议强调，要坚持高质量发展，因地制宜发展新质生产力，继续推进改革开放，在发展中保障和改善民生，维护社会和谐稳定",
+          "soWhat": "Substance cut=thin (干货偏薄（套话/方向语为主）). Treat as high-salience direction language. Separate stated priorities from any implementing detail; do not equate meeting vocabulary with operational rollout. Use info_triage (kinds + P1–P4) and the full signaling_scorecard; offline mode does ",
+          "canada": "none",
+          "canadaPolicy": "none",
+          "outlook": [
+            {
+              "label": "Public messaging continues to repeat the same priority set from the meeting excerpt",
+              "likelihood": "medium"
+            },
+            {
+              "label": "Follow-on coverage thins or shifts vocabulary before 细则 appear",
+              "likelihood": "medium"
+            },
+            {
+              "label": "Later notices/methods reuse the same priority terms",
+              "likelihood": "low"
+            }
+          ]
+        }
+      ],
+      "next_steps_zh": [
+        "栏内最高印证 < 2：优先补「方向语 + 细则语」配对或第二公开源",
+        "已有会议/方向语，缺具名通知/办法/细则",
+        "存在 substance=thin 条目：优先找带数字/时限/责任主体的公开摘录"
+      ]
+    },
+    {
+      "id": "economy_investment",
+      "label_zh": "经济投资",
+      "label_en": "Economy & investment",
+      "blurb_zh": "财政货币、产业投资、地方债/房地产、营商与专项资金等公开线索",
+      "itemCount": 3,
+      "maxCorr": 3,
+      "items": [
+        {
+          "fixtureId": "finance-risk",
+          "kind": "finance_risk",
+          "importance": "P3",
+          "substance": "mixed",
+          "corr": 0,
+          "conf": "low",
+          "what": "The Mandarin source discusses: 有关会议强调，要统筹发展和安全，稳妥化解地方债与隐性债务风险，持续做好保交楼工作，促进房地产市场平稳健康发展，坚决守住不发生系统性金融风险的底线，同时防止资本无序扩张",
+          "soWhat": "Substance nuggets: 楼工作，促进房地产市场平稳健康发展，坚决守住不发生系统性金融风险的底线，同时防止 · 发展，坚决守住不发生系统性金融风险的底线，同时防止资本无序扩张。 · 会议强调，要统筹发展和安全，稳妥化解地方债与隐性债务风险，持续做好保交楼工作，. Risk-management language is often precautionary. Separate acknowledgment of risk from evidence of a concrete containment package. Use info_tri",
+          "canada": "none",
+          "canadaPolicy": "none",
+          "outlook": [
+            {
+              "label": "Public risk-management vocabulary continues without abrupt escalation markers",
+              "likelihood": "medium"
+            },
+            {
+              "label": "Risk terms intensify while instruments remain generic",
+              "likelihood": "medium"
+            },
+            {
+              "label": "Named 化债 / property support tools appear with scope limits",
+              "likelihood": "low"
+            }
+          ]
+        },
+        {
+          "fixtureId": "industrial-tech",
+          "kind": "industrial_tech_policy",
+          "importance": "P3",
+          "substance": "mixed",
+          "corr": 0,
+          "conf": "low",
+          "what": "The Mandarin source discusses: 工业和信息化部有关负责人指出，要加快关键核心技术攻关，提升芯片与半导体产业链供应链韧性和安全可控水平，支持专精特新企业发展，推动人工智能赋能制造业转型升级，避免在关键领域出现卡脖子风险",
+          "soWhat": "Substance nuggets: 工业和信息化部有关负责人指出，要加快关键核心技术攻 · 人指出，要加快关键核心技术攻关，提升芯片与半导体产业链供应链韧性和安全可控水 · ，要加快关键核心技术攻关，提升芯片与半导体产业链供应链韧性和安全可控水平，支持. Industrial/tech vocabulary signals priority domains for open-source tracking; avoid inferring capability leaps beyond what the text states. Use info_tr",
+          "canada": "none",
+          "canadaPolicy": "none",
+          "outlook": [
+            {
+              "label": "Tech-industry priority language persists in subsequent public guidance",
+              "likelihood": "medium"
+            },
+            {
+              "label": "Rhetoric outpaces named instruments or funding vehicles in open corpus",
+              "likelihood": "medium"
+            },
+            {
+              "label": "Sector notices name chips/AI/supply-chain measures with concrete tools",
+              "likelihood": "low"
+            }
+          ]
+        },
+        {
+          "fixtureId": "macro-instrument",
+          "kind": "implementing_instrument",
+          "importance": "P1",
+          "substance": "dense",
+          "corr": 3,
+          "conf": "medium",
+          "what": "The Mandarin source discusses: 国务院办公厅近日印发通知，要求有关部门制定实施方案，因地制宜推进新质生产力相关试点，并强调在发展中保障和改善民生",
+          "soWhat": "Substance nuggets: 国务院办公厅近日印发通知，要求有关部门制定实施方案，因地制宜 · 办公厅近日印发通知，要求有关部门制定实施方案，因地制宜推进新质生产力相关试点，并 · 。通知指出，要做好政策解读，适时出台配套办法，确保中央经济工作会议关于高质量发展. Instrument language raises implementation-track confidence vs meeting-only text, but still only within the public excerpt — check scope, timeli",
+          "canada": "none",
+          "canadaPolicy": "none",
+          "outlook": [
+            {
+              "label": "Instrument vocabulary continues to operationalize the same priorities",
+              "likelihood": "medium"
+            },
+            {
+              "label": "Instrument is procedural/empty of timelines or responsible units",
+              "likelihood": "low"
+            },
+            {
+              "label": "Subsequent instruments cite the same measures with measurable targets",
+              "likelihood": "medium"
+            }
+          ]
+        }
+      ],
+      "next_steps_zh": [
+        "栏内已同时具备方向语与工具语：合并跑简报可验证印证是否上升"
+      ]
+    },
+    {
+      "id": "foreign_affairs",
+      "label_zh": "外交",
+      "label_en": "Foreign affairs",
+      "blurb_zh": "外交话语、双边关系、一带一路、制裁/合作等公开表述",
+      "itemCount": 2,
+      "maxCorr": 0,
+      "items": [
+        {
+          "fixtureId": "canada-nexus",
+          "kind": "foreign_affairs",
+          "importance": "P3",
+          "substance": "mixed",
+          "corr": 0,
+          "conf": "low",
+          "what": "The Mandarin source discusses: 商务部有关负责人就中加经贸关系答记者问时表示，中方一贯主张通过对话协商解决贸易分歧",
+          "soWhat": "Substance nuggets: 商务部有关负责人就中加经贸关系答记者问时表 · 务实合作，推动双边关系健康稳定发展。外交部发言人指出，加方应客观理性看待中国发 · 通过对话协商解决贸易分歧。近期加方在菜籽油、软木等产品上的措施引发关注，双方. Map diplomatic framing terms carefully; distinguish ritual greetings from substantive commitments evidenced in the paste. Use info_triage (kinds + P1–P4) a",
+          "canada": "direct",
+          "canadaPolicy": "topical",
+          "outlook": [
+            {
+              "label": "Diplomatic framing vocabulary remains stable in public statements",
+              "likelihood": "medium"
+            },
+            {
+              "label": "Tone hardens or partners named differently without matching deeds in open sources",
+              "likelihood": "medium"
+            },
+            {
+              "label": "Follow-on public MOUs/projects echo the same framing",
+              "likelihood": "low"
+            }
+          ]
+        },
+        {
+          "fixtureId": "foreign-affairs",
+          "kind": "foreign_affairs",
+          "importance": "P3",
+          "substance": "thin",
+          "corr": 0,
+          "conf": "low",
+          "what": "The Mandarin source discusses: 外交部发言人表示，中方愿同各方一道推进高质量共建一带一路，践行人类命运共同体理念，加强国际发展合作",
+          "soWhat": "Substance cut=thin (干货偏薄（套话/方向语为主）). Map diplomatic framing terms carefully; distinguish ritual greetings from substantive commitments evidenced in the paste. Use info_triage (kinds + P1–P4) and the full signaling_scorecard; offline mode does not invent conclusions.",
+          "canada": "none",
+          "canadaPolicy": "topical",
+          "outlook": [
+            {
+              "label": "Diplomatic framing vocabulary remains stable in public statements",
+              "likelihood": "medium"
+            },
+            {
+              "label": "Tone hardens or partners named differently without matching deeds in open sources",
+              "likelihood": "medium"
+            },
+            {
+              "label": "Follow-on public MOUs/projects echo the same framing",
+              "likelihood": "low"
+            }
+          ]
+        }
+      ],
+      "next_steps_zh": [
+        "栏内最高印证 < 2：优先补「方向语 + 细则语」配对或第二公开源",
+        "存在 substance=thin 条目：优先找带数字/时限/责任主体的公开摘录"
+      ]
+    },
+    {
+      "id": "defense_public",
+      "label_zh": "国防（公开表述）",
+      "label_en": "Defense — public discourse only",
+      "blurb_zh": "国防/军队/军工公开报道与白皮书式语言；非作战情报、非目标跟踪",
+      "itemCount": 1,
+      "maxCorr": 0,
+      "items": [
+        {
+          "fixtureId": "defense-public",
+          "kind": "defense_public",
+          "importance": "P3",
+          "substance": "thin",
+          "corr": 0,
+          "conf": "low",
+          "what": "The Mandarin source discusses: 国防部例行记者会上，有关负责人表示，军队将持续推进强军目标，加强练兵备战与演训，提升战备水平，同时强调中国坚持防御性国防政策，愿在相互尊重基础上开展国际军事交流",
+          "soWhat": "Substance cut=thin (干货偏薄（套话/方向语为主）). Read as public defense discourse only. Separate ritual 强军 language from any named exchanges, white-paper lines, or industrial-support cues in the paste — do not invent readiness or ORBAT claims. Use info_triage (kinds + P1–P4) and the full sig",
+          "canada": "none",
+          "canadaPolicy": "none",
+          "outlook": [
+            {
+              "label": "Public defense framing vocabulary continues in routine open reporting",
+              "likelihood": "medium"
+            },
+            {
+              "label": "Readiness/演训 language rises without open instruments or budget cues",
+              "likelihood": "medium"
+            },
+            {
+              "label": "Follow-on public white papers or exchange notices echo the same framing",
+              "likelihood": "low"
+            }
+          ]
+        }
+      ],
+      "next_steps_zh": [
+        "栏内最高印证 < 2：优先补「方向语 + 细则语」配对或第二公开源",
+        "存在 substance=thin 条目：优先找带数字/时限/责任主体的公开摘录"
+      ]
+    },
+    {
+      "id": "social_governance",
+      "label_zh": "社会治理",
+      "label_en": "Social governance",
+      "blurb_zh": "民生、基层治理、舆情、共同富裕、党建教育等公开社会治理表述",
+      "itemCount": 3,
+      "maxCorr": 0,
+      "items": [
+        {
+          "fixtureId": "ideology-party",
+          "kind": "ideology_party",
+          "importance": "P3",
+          "substance": "thin",
+          "corr": 0,
+          "conf": "low",
+          "what": "The Mandarin source discusses: 各地各部门深入开展主题教育，学习贯彻党的二十大精神，加强思想政治工作和党的建设，推进全面从严治党，配合巡视整改，持续净化政治生态，巩固意识形态阵地",
+          "soWhat": "Substance cut=thin (干货偏薄（套话/方向语为主）). Ideology/Party-building language is organizational signaling. Track study campaigns vs discipline/inspection vocabulary separately. Use info_triage (kinds + P1–P4) and the full signaling_scorecard; offline mode does not invent conclusions.",
+          "canada": "none",
+          "canadaPolicy": "none",
+          "outlook": [
+            {
+              "label": "Study/discipline vocabulary continues in routine public reporting",
+              "likelihood": "medium"
+            },
+            {
+              "label": "Inspection/rectification language rises without clarifying scope in the excerpt",
+              "likelihood": "medium"
+            },
+            {
+              "label": "Theme-education language ties explicitly to policy delivery metrics",
+              "likelihood": "low"
+            }
+          ]
+        },
+        {
+          "fixtureId": "rural-food",
+          "kind": "rural_revitalization",
+          "importance": "P3",
+          "substance": "mixed",
+          "corr": 0,
+          "conf": "low",
+          "what": "The Mandarin source discusses: 农业农村部表示，全面推进乡村振兴，守牢耕地红线，夯实粮食安全根基，加快种业振兴，建设高标准农田，巩固拓展脱贫攻坚成果，健全防止返贫监测帮扶机制，做好三农重点工作",
+          "soWhat": "Substance nuggets: 农业农村部表示，全面推进乡村振兴，守牢耕地红线 · 村部表示，全面推进乡村振兴，守牢耕地红线，夯实粮食安全根基，加快种业振兴，建. Rural/food-security language often pairs continuity with seasonal/campaign cues; note whether targets or land/food metrics appear. Use info_triage (kinds + P1–P4) and the full signaling_scorecard",
+          "canada": "none",
+          "canadaPolicy": "none",
+          "outlook": [
+            {
+              "label": "Rural revitalization / food-security priorities stay in the public cycle",
+              "likelihood": "medium"
+            },
+            {
+              "label": "Campaign language without measurable acreage/yield/support tools",
+              "likelihood": "medium"
+            },
+            {
+              "label": "Follow-on notices quantify support or land-protection measures",
+              "likelihood": "low"
+            }
+          ]
+        },
+        {
+          "fixtureId": "social-governance",
+          "kind": "social_governance",
+          "importance": "P3",
+          "substance": "thin",
+          "corr": 0,
+          "conf": "low",
+          "what": "The Mandarin source discusses: 地方会议指出，要加强社会治理创新，回应民生关切，引导网络舆情，弘扬正能量，维护社会和谐稳定，在发展中持续增进共同富裕，提升基层治理效能",
+          "soWhat": "Substance cut=thin (干货偏薄（套话/方向语为主）). Social-governance excerpts often mix livelihood and stability vocabulary; note which side dominates the paste. Use info_triage (kinds + P1–P4) and the full signaling_scorecard; offline mode does not invent conclusions.",
+          "canada": "none",
+          "canadaPolicy": "none",
+          "outlook": [
+            {
+              "label": "Governance/stability framing remains routine in local public messaging",
+              "likelihood": "medium"
+            },
+            {
+              "label": "Stability/舆情 language rises relative to livelihood measures in later texts",
+              "likelihood": "medium"
+            },
+            {
+              "label": "Livelihood/common-prosperity tools appear with concrete local measures",
+              "likelihood": "low"
+            }
+          ]
+        }
+      ],
+      "next_steps_zh": [
+        "栏内最高印证 < 2：优先补「方向语 + 细则语」配对或第二公开源",
+        "已有会议/方向语，缺具名通知/办法/细则",
+        "存在 substance=thin 条目：优先找带数字/时限/责任主体的公开摘录"
+      ]
+    }
+  ],
+  "regress": {
+    "ok": true,
+    "cases": 8,
+    "stages": 11,
+    "failed": 0,
+    "stamp": "2026-09-20-22-57-33",
+    "highlights": [
+      "会议单独 → 弱印证；会议+细则 → 印证上升",
+      "八股+干货 → substance 升档",
+      "社交转述 → confidence 硬封顶 low",
+      "五栏路由 + 加国 nexus/policy 稳定"
+    ]
+  },
+  "canada_policy_catalog": [
+    {
+      "id": "trade_agri_forestry",
+      "theme_zh": "农产品/软木贸易与救济程序",
+      "theme_en": "Agri/forestry trade & remedy processes",
+      "public_refs": [
+        {
+          "title": "CUSMA full text (table of contents)",
+          "url": "https://www.international.gc.ca/trade-commerce/trade-agreements-accords-commerciaux/agr-acc/cusma-aceum/text-texte/toc-tdm.aspx?lang=eng",
+          "publisher": "Global Affairs Canada"
+        },
+        {
+          "title": "SIMA / trade remedies (CBSA)",
+          "url": "https://www.cbsa-asfc.gc.ca/sima-lmsi/menu-eng.html",
+          "publisher": "Canada Border Services Agency"
+        }
+      ]
+    },
+    {
+      "id": "critical_minerals",
+      "theme_zh": "关键矿产与供应链",
+      "theme_en": "Critical minerals & supply chains",
+      "public_refs": [
+        {
+          "title": "Canada’s Critical Minerals Strategy",
+          "url": "https://www.canada.ca/en/campaign/critical-minerals-in-canada/canada-critical-minerals-strategy.html",
+          "publisher": "Government of Canada / NRCan"
+        },
+        {
+          "title": "Investment Canada Act (consolidated)",
+          "url": "https://laws-lois.justice.gc.ca/eng/acts/I-21.8/",
+          "publisher": "Justice Laws Website"
+        }
+      ]
+    },
+    {
+      "id": "arctic",
+      "theme_zh": "北极与北方政策",
+      "theme_en": "Arctic & Northern policy",
+      "public_refs": [
+        {
+          "title": "Canada’s Arctic foreign policy",
+          "url": "https://www.international.gc.ca/world-monde/issues_development-enjeux_developpement/priorities-priorites/arctic-policy-politique-arctique.aspx?lang=eng",
+          "publisher": "Global Affairs Canada"
+        }
+      ]
+    },
+    {
+      "id": "investment_screening",
+      "theme_zh": "外资审查 / Investment Canada",
+      "theme_en": "Investment Canada Act screening (public)",
+      "public_refs": [
+        {
+          "title": "Investment Canada Act (consolidated)",
+          "url": "https://laws-lois.justice.gc.ca/eng/acts/I-21.8/",
+          "publisher": "Justice Laws Website"
+        },
+        {
+          "title": "Investment Review (ISED overview)",
+          "url": "https://ised-isde.canada.ca/site/investment-canada-act/en",
+          "publisher": "Innovation, Science and Economic Development Canada"
+        }
+      ]
+    },
+    {
+      "id": "foreign_influence_transparency",
+      "theme_zh": "外国影响透明度（公开法）",
+      "theme_en": "Foreign influence transparency (public statute themes)",
+      "public_refs": [
+        {
+          "title": "Protecting democracy (public overview)",
+          "url": "https://www.canada.ca/en/democratic-institutions/services/protecting-democracy.html",
+          "publisher": "Democratic Institutions / Canada.ca"
+        },
+        {
+          "title": "Justice Laws Website (search / consolidated acts)",
+          "url": "https://laws-lois.justice.gc.ca/eng/",
+          "publisher": "Justice Laws Website"
+        }
+      ]
+    },
+    {
+      "id": "sanctions_sema",
+      "theme_zh": "制裁 / SEMA 公开清单主题",
+      "theme_en": "Sanctions / SEMA public listing themes",
+      "public_refs": [
+        {
+          "title": "Special Economic Measures Act (consolidated)",
+          "url": "https://laws-lois.justice.gc.ca/eng/acts/S-14.5/",
+          "publisher": "Justice Laws Website"
+        },
+        {
+          "title": "Canadian sanctions (GAC)",
+          "url": "https://www.international.gc.ca/world-monde/international_relations-relations_internationales/sanctions/index.aspx?lang=eng",
+          "publisher": "Global Affairs Canada"
+        }
+      ]
+    },
+    {
+      "id": "ev_tariffs_trade",
+      "theme_zh": "电动车/关税与产业政策",
+      "theme_en": "EV / tariff & industrial policy",
+      "public_refs": [
+        {
+          "title": "Department of Finance Canada",
+          "url": "https://www.canada.ca/en/department-finance.html",
+          "publisher": "Finance Canada"
+        },
+        {
+          "title": "SIMA / trade remedies (CBSA)",
+          "url": "https://www.cbsa-asfc.gc.ca/sima-lmsi/menu-eng.html",
+          "publisher": "Canada Border Services Agency"
+        }
+      ]
+    },
+    {
+      "id": "bilateral_china",
+      "theme_zh": "对华双边关系公开表述",
+      "theme_en": "Canada–China bilateral public framing",
+      "public_refs": [
+        {
+          "title": "Canada–China relations (country page)",
+          "url": "https://www.international.gc.ca/country-pays/china-chine/index.aspx?lang=eng",
+          "publisher": "Global Affairs Canada"
+        },
+        {
+          "title": "Justice Laws Website",
+          "url": "https://laws-lois.justice.gc.ca/eng/",
+          "publisher": "Justice Laws Website"
+        }
+      ]
+    }
+  ],
+  "ontology_catalog": [
+    {
+      "id": "bilateral-trade-friction-compare",
+      "type": "intl_compare",
+      "desk": [
+        "foreign_affairs",
+        "economy_investment"
+      ],
+      "tag": "background",
+      "description": "Background intl_compare for public trade-friction vocabulary (PRC wording vs open multilateral/partner frames).",
+      "updated": "2026-09-20",
+      "sources": "Open trade-policy vocabulary in PRC MOFCOM/MFA-style texts and public WTO/partner discourse labels"
+    },
+    {
+      "id": "boilerplate-vs-substance",
+      "type": "method",
+      "desk": [
+        "all"
+      ],
+      "tag": "hypothesis",
+      "description": "How to strip formulaic party-speak and keep verifiable substance cues (civilian).",
+      "updated": "2026-09-20",
+      "sources": "Civilian reading method for formulaic PRC public prose; not a claim about intent"
+    },
+    {
+      "id": "china-canada-public-discourse",
+      "type": "intl_compare",
+      "desk": [
+        "foreign_affairs",
+        "economy_investment"
+      ],
+      "tag": "background",
+      "description": "Background compare frame for public PRC wording on China–Canada ties (trade/diplomacy) — not targeting.",
+      "updated": "2026-09-20",
+      "sources": "Public MFA/MOFCOM-style bilateral phrasing vs open Canadian policy themes (reader-side compare only)"
+    },
+    {
+      "id": "cultural-semantics",
+      "type": "lexicon",
+      "desk": [
+        "all"
+      ],
+      "tag": "background",
+      "description": "Cultural and discourse semantics that affect tone and audience reading.",
+      "updated": "2026-09-20",
+      "sources": "Public cultural/discourse terms appearing in open Mandarin media"
+    },
+    {
+      "id": "defense-public-discourse",
+      "type": "lexicon",
+      "desk": [
+        "defense_public"
+      ],
+      "tag": "background",
+      "description": "Public defense/military discourse vocabulary — civilian reading only.",
+      "updated": "2026-09-20",
+      "sources": "Public MND press-conference / defense white-paper style vocabulary only"
+    },
+    {
+      "id": "dual-circulation-lexicon",
+      "type": "lexicon",
+      "desk": [
+        "overall_goals",
+        "economy_investment"
+      ],
+      "tag": "background",
+      "description": "Background gloss for dual circulation / supply-chain security public vocabulary.",
+      "updated": "2026-09-20",
+      "sources": "Public dual-circulation / supply-chain vocabulary since ~2020"
+    },
+    {
+      "id": "finance-risk-lexicon",
+      "type": "lexicon",
+      "desk": [
+        "economy_investment"
+      ],
+      "tag": "background",
+      "description": "Background gloss for public finance / property / systemic-risk vocabulary.",
+      "updated": "2026-09-20",
+      "sources": "Public finance/property/systemic-risk vocabulary in open PRC reporting"
+    },
+    {
+      "id": "five-year-plan-lexicon",
+      "type": "institution",
+      "desk": [
+        "overall_goals"
+      ],
+      "tag": "background",
+      "description": "Background gloss for five-year plan / long-horizon planning vocabulary.",
+      "updated": "2026-09-20",
+      "sources": "Public five-year plan / 远景目标 vocabulary in open planning documents"
+    },
+    {
+      "id": "foreign-policy-discourse",
+      "type": "lexicon",
+      "desk": [
+        "foreign_affairs"
+      ],
+      "tag": "background",
+      "description": "Background on public PRC foreign-policy discourse terms — not classified analysis.",
+      "updated": "2026-09-20",
+      "sources": "Public MFA-style diplomatic framing vocabulary"
+    },
+    {
+      "id": "historical-analogy-discipline",
+      "type": "history_frame",
+      "desk": [
+        "all"
+      ],
+      "tag": "hypothesis",
+      "description": "How to use historical analogies without overclaiming.",
+      "updated": "2026-09-20",
+      "sources": "Open historical frames commonly used in public PRC economic narratives (1978–)"
+    },
+    {
+      "id": "ideology-education-lexicon",
+      "type": "lexicon",
+      "desk": [
+        "social_governance"
+      ],
+      "tag": "background",
+      "description": "Background gloss for ideology / Party education / discipline vocabulary in public texts.",
+      "updated": "2026-09-20",
+      "sources": "Public ideology/Party-education vocabulary in open campaigns"
+    },
+    {
+      "id": "industrial-tech-policy",
+      "type": "lexicon",
+      "desk": [
+        "economy_investment"
+      ],
+      "tag": "background",
+      "description": "Background glosses for industrial and tech-policy vocabulary in public PRC sources.",
+      "updated": "2026-09-20",
+      "sources": "Public industrial/tech-policy vocabulary (MIIT-style open statements)"
+    },
+    {
+      "id": "macro-policy-cycle",
+      "type": "institution",
+      "desk": [
+        "overall_goals",
+        "economy_investment"
+      ],
+      "tag": "background",
+      "description": "Background on PRC macro policy-cycle vocabulary and cautious outlook discipline.",
+      "updated": "2026-09-20",
+      "sources": "Public CEWC / work-report vocabulary conventions"
+    },
+    {
+      "id": "party-state-lexicon",
+      "type": "lexicon",
+      "desk": [
+        "all"
+      ],
+      "tag": "background",
+      "description": "Lexicon for common PRC political terms — background only.",
+      "updated": "2026-09-20",
+      "sources": "Common open PRC Party–state institutional terms"
+    },
+    {
+      "id": "policy-signaling-valves",
+      "type": "method",
+      "desk": [
+        "all"
+      ],
+      "tag": "hypothesis",
+      "description": "Enumerated public PRC media heuristics with weights — civilian research calibrators (not secrets).",
+      "updated": "2026-09-20",
+      "sources": "Observable public PRC media/reporting conventions (open press patterns)"
+    },
+    {
+      "id": "rural-revitalization-lexicon",
+      "type": "lexicon",
+      "desk": [
+        "social_governance",
+        "economy_investment"
+      ],
+      "tag": "background",
+      "description": "Background gloss for rural revitalization and food-security public vocabulary.",
+      "updated": "2026-09-20",
+      "sources": "Public rural revitalization / food-security vocabulary"
+    },
+    {
+      "id": "social-governance-lexicon",
+      "type": "lexicon",
+      "desk": [
+        "social_governance"
+      ],
+      "tag": "background",
+      "description": "Background glosses for social governance and livelihood policy vocabulary.",
+      "updated": "2026-09-20",
+      "sources": "Public social-governance / livelihood vocabulary"
+    }
+  ],
+  "ethics": [
+    "Quotes must be substrings of the paste (claim gate)",
+    "Outlook = scenarios + watchpoints; never will-definitely",
+    "Context cards = Civic Ontology Lite (background/hypothesis only)"
+  ],
+  "generatedAt": "2026-09-20T22:59:42.442Z"
+}
