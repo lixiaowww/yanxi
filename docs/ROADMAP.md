@@ -32,4 +32,5 @@
 - [x] 补 `intl_compare` 卡：中加公开话语 + 双边贸易摩擦对照  
 - [x] 策展源档位权重 A–D/U（`source_tier` → confidence caps；非 ML）  
 - [x] 免费部署：Render Blueprint（`render.yaml` + `docs/DEPLOY.md`）  
+- [x] 简报价值：offline 原因可见 + 干货/缺什么优先 UI（`infoValue`）  
 - [ ] 听力 / PDF / SMTP（仍 Later）  

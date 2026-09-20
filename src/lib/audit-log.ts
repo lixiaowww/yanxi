@@ -7,6 +7,8 @@ export type AuditEntry = {
   ts: string;
   product: "yanxi";
   mode: string;
+  offlineReason?: string;
+  infoValueLevel?: string;
   sourceLabel?: string;
   sourceHash: string;
   gatePassed: boolean;
@@ -37,6 +39,8 @@ export function appendGateAudit(
     ts: new Date().toISOString(),
     product: "yanxi",
     mode: result.mode,
+    offlineReason: result.offlineReason,
+    infoValueLevel: result.infoValue?.level,
     sourceLabel: opts.sourceLabel,
     sourceHash: sourceHash(opts.sourceText),
     gatePassed: result.gate.passed,

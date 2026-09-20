@@ -190,6 +190,39 @@ pre {
 }
 .desk-line { margin-top: 0.35rem; }
 
+.mode-banner {
+  border-radius: 8px;
+  padding: 0.7rem 0.85rem;
+  margin: 0 0 0.75rem;
+  border: 1px solid var(--border);
+  background: #121820;
+}
+.mode-banner.mode-offline {
+  border-color: color-mix(in srgb, #c4a35a 55%, var(--border));
+}
+.mode-banner.value-low {
+  border-color: color-mix(in srgb, var(--bad) 45%, var(--border));
+}
+.value-low { color: #f5b0b4; }
+.value-medium { color: #f0e2b8; }
+.value-high { color: #9eecc4; }
+
+.brief-lead,
+.next-panel {
+  margin: 0.65rem 0 0.85rem;
+}
+.meta-fold {
+  margin: 0.75rem 0;
+  padding: 0.5rem 0.65rem;
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+}
+.meta-fold summary {
+  cursor: pointer;
+  color: #9db0c7;
+  margin-bottom: 0.4rem;
+}
+
 .ontology-panel {
   border-radius: 8px;
   padding: 0.65rem 0.75rem;

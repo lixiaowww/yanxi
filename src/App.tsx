@@ -127,6 +127,13 @@ type Briefing = {
 
 type ApiResult = {
   mode: string;
+  offlineReason?: string;
+  llmConfigured?: boolean;
+  infoValue?: {
+    level: string;
+    label_zh: string;
+    next_zh: string[];
+  };
   matchedCards: string[];
   briefing: Briefing;
   gate: { passed: boolean; findings: { severity: string; message: string; evidence: string }[] };
@@ -173,7 +180,7 @@ type DomainRow = {
 export function App() {
   const [sourceText, setSourceText] = useState(SAMPLE);
   const [label, setLabel] = useState("sample-xinhua-style-excerpt");
-  const [forceOffline, setForceOffline] = useState(true);
+  const [forceOffline, setForceOffline] = useState(false);
   const [markSocial, setMarkSocial] = useState(false);
   const [loading, setLoading] = useState(false);
   const [collecting, setCollecting] = useState(false);
@@ -339,7 +346,7 @@ export function App() {
                 checked={forceOffline}
                 onChange={(e) => setForceOffline(e.target.checked)}
               />
-              Force offline engine
+              Force offline（跳过 LLM，只用模板）
             </label>
             <label style={{ display: "flex", gap: "0.4rem", alignItems: "center" }}>
               <input
@@ -373,14 +380,59 @@ export function App() {
             <p className="meta">Structured briefing appears here after a run. Click a digest quote to highlight the source.</p>
           ) : (
             <>
+              {(result.mode === "offline" || result.infoValue?.level === "low") && (
+                <div
+                  className={`mode-banner ${
+                    result.mode === "offline" ? "mode-offline" : ""
+                  } value-${result.infoValue?.level || "medium"}`}
+                >
+                  {result.mode === "offline" ? (
+                    <p>
+                      <strong>当前为 offline 模板简报</strong>
+                      {result.llmConfigured === false
+                        ? "（未配置 LLM）"
+                        : result.offlineReason?.startsWith("force_offline")
+                          ? "（已勾选 Force offline）"
+                          : result.offlineReason?.startsWith("llm_error")
+                            ? "（LLM 调用失败，已回退）"
+                            : ""}
+                      。信息密度通常低于 LLM 路径；请先看下方「干货 / 缺什么」。
+                    </p>
+                  ) : null}
+                  {result.offlineReason ? (
+                    <p className="meta">原因: {result.offlineReason}</p>
+                  ) : null}
+                  {result.infoValue ? (
+                    <p>
+                      <strong>信息价值:</strong> {result.infoValue.label_zh}
+                    </p>
+                  ) : null}
+                  {(result.infoValue?.next_zh || []).length ? (
+                    <ul className="plain-list">
+                      {result.infoValue!.next_zh.map((n, i) => (
+                        <li key={i}>{n}</li>
+                      ))}
+                    </ul>
+                  ) : null}
+                </div>
+              )}
+
               <p className="meta">
-                mode=<strong>{result.mode}</strong> · gate=
-                <strong className={gateClass}>{result.gate.passed ? "PASS" : "FAIL"}</strong> ·
-                triage=
-                <strong>
-                  {b.info_triage?.primary_kind}/{b.info_triage?.importance?.grade}
-                </strong>{" "}
-                · band=<strong>{b.signaling_scorecard?.band}</strong>
+                mode=<strong>{result.mode}</strong>
+                {result.llmConfigured != null
+                  ? ` · llm=${result.llmConfigured ? "configured" : "off"}`
+                  : ""}{" "}
+                · gate=
+                <strong className={gateClass}>{result.gate.passed ? "PASS" : "FAIL"}</strong>
+                {result.infoValue ? (
+                  <>
+                    {" "}
+                    · value=
+                    <strong className={`value-${result.infoValue.level}`}>
+                      {result.infoValue.level}
+                    </strong>
+                  </>
+                ) : null}
                 {b.confidence_factors?.level ? (
                   <>
                     {" "}
@@ -405,7 +457,9 @@ export function App() {
                     ·{" "}
                     <span
                       className={
-                        b.canada_nexus.level === "direct" ? "nexus-badge nexus-direct" : "nexus-badge nexus-possible"
+                        b.canada_nexus.level === "direct"
+                          ? "nexus-badge nexus-direct"
+                          : "nexus-badge nexus-possible"
                       }
                     >
                       {b.canada_nexus.level === "direct" ? "CA" : "CA?"} {b.canada_nexus.label_zh}
@@ -414,153 +468,28 @@ export function App() {
                 ) : null}
               </p>
 
-              {b.desk_section?.label_zh ? (
-                <p className="meta desk-line">
-                  <strong>栏目:</strong> {b.desk_section.label_zh}
-                  {b.desk_section.label_en ? ` · ${b.desk_section.label_en}` : ""}
-                  {(b.desk_section.secondary?.length ?? 0) > 0
-                    ? ` · 次栏: ${(b.desk_section.secondary || []).join(", ")}`
-                    : ""}
-                </p>
-              ) : null}
-
-              {b.ontology_lite?.hits?.length ? (
-                <div className="ontology-panel">
-                  <h3 className="section-title">民用背景层（Civic Ontology Lite）</h3>
-                  <p className="meta">
-                    {b.ontology_lite.calibration ||
-                      "栏目优先挂卡 · background/hypothesis only · 非 OWL/知识图谱"}
-                  </p>
-                  <ul className="ontology-hits">
-                    {b.ontology_lite.hits.map((h, i) => (
-                      <li key={h.id || i}>
-                        <span className="ontology-id">{h.id}</span>
-                        <span className="meta">
-                          {" "}
-                          [{h.type}/{h.tag}] · score={h.score}
-                          {h.matched_keywords?.length
-                            ? ` · ${h.matched_keywords.slice(0, 4).join("、")}`
-                            : ""}
-                        </span>
-                        {h.sources ? <div className="meta ontology-src">{h.sources}</div> : null}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ) : null}
-
-              {b.confidence_factors ? (
-                <div className={`conf-panel conf-${b.confidence_factors.level || "low"}`}>
-                  <h3 className="section-title">置信度（证据质量 · 非事件概率）</h3>
-                  <p className="meta">{b.confidence_factors.rationale}</p>
-                  <p className="meta">
-                    caps={(b.confidence_factors.caps_applied || []).join(", ") || "none"} · score=
-                    {b.confidence_factors.score_0_to_1?.toFixed?.(2)}
-                  </p>
-                  {b.corroboration ? (
-                    <p className="meta">
-                      <strong>印证 {b.corroboration.score_0_to_3}/3</strong> · {b.corroboration.label_zh}
-                      {(b.corroboration.missing || []).length
-                        ? ` · 缺: ${(b.corroboration.missing || []).slice(0, 2).join("；")}`
-                        : ""}
-                    </p>
-                  ) : null}
-                  {b.source_class ? (
-                    <p className="meta">
-                      源类: <strong>{b.source_class.label_zh}</strong> ({b.source_class.class})
-                      {b.confidence_factors?.source_tier ? (
-                        <>
-                          {" "}
-                          · 档位:{" "}
-                          <strong>
-                            {b.confidence_factors.source_tier.tier}
-                          </strong>{" "}
-                          ({b.confidence_factors.source_tier.label_zh}
-                          {b.confidence_factors.source_tier.weight_0_to_1 != null
-                            ? ` · w=${b.confidence_factors.source_tier.weight_0_to_1}`
-                            : ""}
-                          )
-                        </>
-                      ) : null}
-                    </p>
-                  ) : null}
-                </div>
-              ) : null}
-
-              {b.canada_policy_link && b.canada_policy_link.level !== "none" ? (
-                <div className="policy-link-panel">
-                  <h3 className="section-title">加国公开政策对照（非法律意见）</h3>
-                  <p className="meta">{b.canada_policy_link.label_zh}</p>
-                  <p className="meta">{b.canada_policy_link.disclaimer_zh}</p>
-                  <ul className="plain-list">
-                    {(b.canada_policy_link.hits || []).map((h, i) => (
-                      <li key={i}>
-                        <strong>{h.theme_zh}</strong> [{h.level}] · <code>{h.evidence}</code>
-                        <ul className="ref-links">
-                          {(h.public_refs || []).map((ref, j) =>
-                            ref.url ? (
-                              <li key={j}>
-                                <a href={ref.url} target="_blank" rel="noreferrer noopener">
-                                  {ref.title || ref.url}
-                                </a>
-                                {ref.publisher ? (
-                                  <span className="meta"> · {ref.publisher}</span>
-                                ) : null}
-                              </li>
-                            ) : null
-                          )}
-                        </ul>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ) : null}
-
-              {b.canada_nexus && b.canada_nexus.level !== "none" ? (
-                <div
-                  className={
-                    b.canada_nexus.level === "direct" ? "nexus-panel nexus-direct" : "nexus-panel nexus-possible"
-                  }
-                >
-                  <h3 className="section-title">Canada nexus（读者关注 · 非定向）</h3>
-                  <p className="meta">{b.canada_nexus.rationale}</p>
-                  <ul className="plain-list">
-                    {(b.canada_nexus.hits || []).map((h, i) => (
-                      <li key={i}>
-                        <strong>[{h.level}]</strong> {h.cue}: <code>{h.evidence}</code>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ) : null}
-
+              {/* P1: lead with substance + briefing + next checks */}
               {b.substance_cut ? (
                 <div className={`substance-panel substance-${b.substance_cut.band || "thin"}`}>
-                  <h3 className="section-title">干货剥离（八股 vs 可核验）</h3>
+                  <h3 className="section-title">1. 干货（八股剥离）</h3>
                   <p className="meta">
                     <span className={`substance-badge substance-${b.substance_cut.band || "thin"}`}>
                       {b.substance_cut.band}
                     </span>{" "}
                     {b.substance_cut.label_zh} · boilerplate≈
-                    {((b.substance_cut.boilerplate_ratio_0_to_1 || 0) * 100).toFixed(0)}% · substance=
-                    {(b.substance_cut.substance_score_0_to_1 || 0).toFixed(2)}
+                    {((b.substance_cut.boilerplate_ratio_0_to_1 || 0) * 100).toFixed(0)}%
                   </p>
                   <p className="meta">{b.substance_cut.analyst_prompt_zh}</p>
                   {(b.substance_cut.nuggets || []).length ? (
-                    <>
-                      <p className="meta">
-                        <strong>Nuggets</strong>
-                      </p>
-                      <ul className="plain-list">
-                        {(b.substance_cut.nuggets || []).map((n, i) => (
-                          <li key={i}>
-                            <strong>{n.label_zh}</strong> · <code>{n.evidence}</code>
-                          </li>
-                        ))}
-                      </ul>
-                    </>
+                    <ul className="plain-list">
+                      {(b.substance_cut.nuggets || []).map((n, i) => (
+                        <li key={i}>
+                          <strong>{n.label_zh}</strong> · <code>{n.evidence}</code>
+                        </li>
+                      ))}
+                    </ul>
                   ) : (
-                    <p className="meta">未检出数字/时限/工具/责任主体等干货线索。</p>
+                    <p className="meta">未检出数字/时限/工具/责任主体 — 本段信息价值通常偏低。</p>
                   )}
                   {(b.substance_cut.empty_calories || []).length ? (
                     <ul className="plain-list">
@@ -574,19 +503,104 @@ export function App() {
                 </div>
               ) : null}
 
-              {b.info_triage ? (
-                <>
-                  <h3 className="section-title">Info triage (种类 + 优先级)</h3>
+              <div className="brief-lead">
+                <h3 className="section-title">2. 英文简报</h3>
+                <p>
+                  <strong>What:</strong> {b.briefing_en?.what}
+                </p>
+                <p>
+                  <strong>So what:</strong> {b.briefing_en?.so_what}
+                </p>
+                <p className="meta">
+                  <strong>Context:</strong> {b.briefing_en?.context}
+                </p>
+              </div>
+
+              <div className="next-panel">
+                <h3 className="section-title">3. 缺什么 / 下一步核验</h3>
+                {b.corroboration ? (
                   <p className="meta">
-                    {b.info_triage.importance?.label_zh} · score=
-                    {b.info_triage.importance?.score_0_to_1?.toFixed?.(2) ??
-                      b.info_triage.importance?.score_0_to_1}{" "}
-                    · drivers={(b.info_triage.importance?.drivers || []).join(", ") || "—"}
+                    印证 <strong>{b.corroboration.score_0_to_3}/3</strong> · {b.corroboration.label_zh}
                   </p>
+                ) : null}
+                <ul className="plain-list">
+                  {(b.corroboration?.missing || []).map((m, i) => (
+                    <li key={`m-${i}`}>{m}</li>
+                  ))}
+                  {(b.open_questions || []).map((q, i) => (
+                    <li key={`q-${i}`}>{q}</li>
+                  ))}
+                  {(result.infoValue?.next_zh || []).map((n, i) => (
+                    <li key={`n-${i}`}>{n}</li>
+                  ))}
+                </ul>
+                {(b.policy_outlook?.watchpoints || []).length ? (
+                  <>
+                    <p className="meta">
+                      <strong>Watchpoints</strong>
+                    </p>
+                    <ul className="plain-list">
+                      {(b.policy_outlook?.watchpoints || []).map((w, i) => (
+                        <li key={i}>{w}</li>
+                      ))}
+                    </ul>
+                  </>
+                ) : null}
+              </div>
+
+              {b.canada_policy_link && b.canada_policy_link.level !== "none" ? (
+                <div className="policy-link-panel">
+                  <h3 className="section-title">加国公开政策对照（非法律意见）</h3>
+                  <p className="meta">{b.canada_policy_link.label_zh}</p>
                   <ul className="plain-list">
-                    {(b.info_triage.kinds || []).map((k, i) => (
+                    {(b.canada_policy_link.hits || []).map((h, i) => (
                       <li key={i}>
-                        <strong>{k.kind}</strong> ({k.label_zh}) · {k.score} · {k.evidence}
+                        <strong>{h.theme_zh}</strong> [{h.level}]
+                        <ul className="ref-links">
+                          {(h.public_refs || []).map((ref, j) =>
+                            ref.url ? (
+                              <li key={j}>
+                                <a href={ref.url} target="_blank" rel="noreferrer noopener">
+                                  {ref.title || ref.url}
+                                </a>
+                              </li>
+                            ) : null
+                          )}
+                        </ul>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
+
+              <h3 className="section-title">原文摘录（点击高亮）</h3>
+              <ul className="digest-list">
+                {(b.source_digest_zh || []).map((row, idx) => {
+                  const q = row.quote || "";
+                  const ok = q && sourceText.includes(q);
+                  return (
+                    <li key={idx}>
+                      <button
+                        type="button"
+                        className={`digest-btn ${activeQuote === q ? "active" : ""} ${ok ? "" : "missing"}`}
+                        onClick={() => setActiveQuote(q || null)}
+                      >
+                        <span className="digest-point">{row.point}</span>
+                        {q ? <code className="digest-quote">{q}</code> : null}
+                        {!ok && q ? <span className="bad"> not in source</span> : null}
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+
+              {b.policy_outlook?.scenarios?.length ? (
+                <>
+                  <h3 className="section-title">Outlook（hypothesis）</h3>
+                  <ul className="plain-list">
+                    {b.policy_outlook.scenarios.map((s, i) => (
+                      <li key={i}>
+                        <strong>[{s.likelihood}]</strong> {s.label}
                       </li>
                     ))}
                   </ul>
@@ -603,81 +617,57 @@ export function App() {
                 <p className="ok meta">No gate findings.</p>
               )}
 
-              <h3 className="section-title">Source digest (click quote → highlight)</h3>
-              <ul className="digest-list">
-                {(b.source_digest_zh || []).map((row, idx) => {
-                  const q = row.quote || "";
-                  const ok = q && sourceText.includes(q);
-                  return (
-                    <li key={idx}>
-                      <button
-                        type="button"
-                        className={`digest-btn ${activeQuote === q ? "active" : ""} ${ok ? "" : "missing"}`}
-                        onClick={() => setActiveQuote(q || null)}
-                      >
-                        <span className="digest-point">{row.point}</span>
-                        {row.source_label ? (
-                          <span className="meta">source={row.source_label}</span>
-                        ) : null}
-                        {q ? <code className="digest-quote">{q}</code> : null}
-                        {!ok && q ? <span className="bad"> not in source</span> : null}
-                      </button>
-                    </li>
-                  );
-                })}
-              </ul>
-
-              <h3 className="section-title">English briefing</h3>
-              <p>
-                <strong>What:</strong> {b.briefing_en?.what}
-              </p>
-              <p>
-                <strong>Context:</strong> {b.briefing_en?.context}
-              </p>
-              <p>
-                <strong>So what:</strong> {b.briefing_en?.so_what}
-              </p>
-              <p className="meta">
-                confidence={b.briefing_en?.confidence} · cards=
-                {result.matchedCards.join(", ") || "(none)"}
-              </p>
-
-              {b.policy_outlook?.scenarios?.length ? (
-                <>
-                  <h3 className="section-title">Policy outlook (hypothesis)</h3>
-                  <ul className="plain-list">
-                    {b.policy_outlook.scenarios.map((s, i) => (
-                      <li key={i}>
-                        <strong>[{s.likelihood}]</strong> {s.label}
-                        <div className="meta">{s.basis}</div>
+              <details className="meta-fold">
+                <summary>元数据（分诊 / 置信度 / 背景卡 / 调节阀）— 默认折叠</summary>
+                {b.desk_section?.label_zh ? (
+                  <p className="meta desk-line">
+                    栏目: {b.desk_section.label_zh}
+                    {b.desk_section.label_en ? ` · ${b.desk_section.label_en}` : ""}
+                  </p>
+                ) : null}
+                {b.info_triage ? (
+                  <p className="meta">
+                    triage={b.info_triage.primary_kind}/{b.info_triage.importance?.grade} · band=
+                    {b.signaling_scorecard?.band}
+                  </p>
+                ) : null}
+                {b.confidence_factors ? (
+                  <div className={`conf-panel conf-${b.confidence_factors.level || "low"}`}>
+                    <p className="meta">{b.confidence_factors.rationale}</p>
+                    <p className="meta">
+                      caps={(b.confidence_factors.caps_applied || []).join(", ") || "none"}
+                      {b.confidence_factors.source_tier
+                        ? ` · tier=${b.confidence_factors.source_tier.tier}`
+                        : ""}
+                    </p>
+                  </div>
+                ) : null}
+                {b.ontology_lite?.hits?.length ? (
+                  <ul className="ontology-hits">
+                    {b.ontology_lite.hits.map((h, i) => (
+                      <li key={h.id || i}>
+                        <span className="ontology-id">{h.id}</span>
+                        <span className="meta">
+                          {" "}
+                          [{h.type}/{h.tag}]
+                        </span>
                       </li>
                     ))}
                   </ul>
-                </>
-              ) : null}
-
-              {b.signaling_valves ? (
-                <>
-                  <h3 className="section-title">Signaling valves</h3>
+                ) : null}
+                {b.canada_nexus && b.canada_nexus.level !== "none" ? (
+                  <p className="meta">{b.canada_nexus.rationale}</p>
+                ) : null}
+                {b.signaling_valves ? (
                   <p className="meta">{b.signaling_valves.calibration}</p>
-                </>
-              ) : null}
-
-              {b.open_questions?.length ? (
-                <>
-                  <h3 className="section-title">Open questions</h3>
-                  <ul className="plain-list">
-                    {b.open_questions.map((q, i) => (
-                      <li key={i}>{q}</li>
-                    ))}
-                  </ul>
-                </>
-              ) : null}
+                ) : null}
+                <p className="meta">cards={result.matchedCards.join(", ") || "(none)"}</p>
+              </details>
 
               <button type="button" className="secondary" onClick={() => setShowRaw((v) => !v)}>
                 {showRaw ? "Hide raw JSON" : "Show raw JSON"}
               </button>
-              {showRaw ? <pre>{JSON.stringify(b, null, 2)}</pre> : null}
+              {showRaw ? <pre>{JSON.stringify({ ...result, briefing: b }, null, 2)}</pre> : null}
             </>
           )}
         </section>

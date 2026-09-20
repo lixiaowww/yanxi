@@ -31,12 +31,60 @@ export type BriefRequest = {
 
 export type BriefResponse = {
   mode: "llm" | "offline";
+  /** Why offline, or empty when LLM succeeded. */
+  offlineReason?: string;
+  llmConfigured: boolean;
+  /** Research draft usefulness hint (not event probability). */
+  infoValue: {
+    level: "low" | "medium" | "high";
+    label_zh: string;
+    next_zh: string[];
+  };
   matchedCards: string[];
   briefing: BriefingJson;
   gate: { passed: boolean; findings: ReturnType<typeof runClaimGate> };
   systemPromptChars: number;
   sourceCount: number;
 };
+
+function buildInfoValue(briefing: BriefingJson): BriefResponse["infoValue"] {
+  const band = briefing.substance_cut?.band || "thin";
+  const corr = briefing.corroboration?.score_0_to_3 ?? 0;
+  const missing = briefing.corroboration?.missing || [];
+  const next: string[] = [];
+  if (band === "thin" || corr < 2) {
+    next.push("补同主题公开细则/通知，与会议语合并再跑");
+  }
+  if (corr < 1) {
+    next.push("增加第二公开源（通稿之外的落实文件或地方复述）");
+  }
+  if (missing.length) {
+    next.push(...missing.slice(0, 2));
+  }
+  if (!next.length) {
+    next.push("核验数字/时限/责任主体是否可在公开页复核");
+  }
+
+  if (band === "dense" && corr >= 2) {
+    return {
+      level: "high",
+      label_zh: "信息密度较高（干货 + 印证线索）",
+      next_zh: next.slice(0, 3),
+    };
+  }
+  if (band === "thin" && corr <= 1) {
+    return {
+      level: "low",
+      label_zh: "信息价值偏低（套话/单源为主）— 建议先补细则再读简报",
+      next_zh: next.slice(0, 4),
+    };
+  }
+  return {
+    level: "medium",
+    label_zh: "信息价值中等（有部分干货或双线索）",
+    next_zh: next.slice(0, 3),
+  };
+}
 
 export function normalizeSources(req: BriefRequest): SourceInput[] {
   if (req.sources?.length) {
@@ -59,21 +107,33 @@ export async function runBriefingPipeline(req: BriefRequest): Promise<BriefRespo
 
   const joined = sources.map((s) => s.text).join("\n");
   const { prompt, matchedCards } = composeBriefingSystemPrompt(joined);
-  const useLlm = !req.forceOffline && llmConfigured();
+  const configured = llmConfigured();
+  const useLlm = !req.forceOffline && configured;
 
   let briefing: BriefingJson;
   let mode: "llm" | "offline" = "offline";
+  let offlineReason: string | undefined;
 
-  if (useLlm) {
+  if (req.forceOffline) {
+    briefing = offlineBriefing(joined, matchedCards, sources[0].label, sources);
+    offlineReason = "force_offline: UI/API requested template engine";
+  } else if (!configured) {
+    briefing = offlineBriefing(joined, matchedCards, sources[0].label, sources);
+    offlineReason =
+      "llm_not_configured: set LLM_API_KEY + LLM_BASE_URL + LLM_MODEL (or keep offline)";
+  } else if (useLlm) {
     try {
       briefing = await callLlmJson(prompt, userMessage(sources));
       mode = "llm";
-    } catch {
+      offlineReason = undefined;
+    } catch (e) {
       briefing = offlineBriefing(joined, matchedCards, sources[0].label, sources);
       mode = "offline";
+      offlineReason = `llm_error: ${e instanceof Error ? e.message.slice(0, 180) : String(e).slice(0, 180)}`;
     }
   } else {
     briefing = offlineBriefing(joined, matchedCards, sources[0].label, sources);
+    offlineReason = "offline_fallback";
   }
 
   briefing = applyDeterministicLayers(briefing, joined, {
@@ -90,8 +150,12 @@ export async function runBriefingPipeline(req: BriefRequest): Promise<BriefRespo
   }
 
   const findings = runClaimGate(briefing, joined, sources);
+  const infoValue = buildInfoValue(briefing);
   const result: BriefResponse = {
     mode,
+    offlineReason,
+    llmConfigured: configured,
+    infoValue,
     matchedCards: finalCards,
     briefing,
     gate: { passed: gatePassed(findings), findings },
