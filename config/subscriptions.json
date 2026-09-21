@@ -5,7 +5,7 @@
     {
       "id": "job-fit-domain-battery",
       "title": "FLIA-relevant domain battery (public fixtures)",
-      "description": "Combined briefing across macro/foreign/tech/finance/rural/ideology/social public Mandarin fixtures.",
+      "description": "Combined briefing across hot-topic/macro/foreign/tech/finance/rural/ideology/social public Mandarin fixtures.",
       "keywords": [],
       "sourceIds": [
         "domain-macro-cewc",
@@ -18,22 +18,28 @@
         "domain-dual-circulation",
         "domain-social-governance",
         "domain-defense-public",
-        "domain-canada-nexus"
+        "domain-canada-nexus",
+        "domain-hot-taiwan-strait",
+        "domain-hot-electric-vehicles",
+        "domain-hot-china-ai"
       ],
       "scheduleCron": "0 8 * * 1",
       "scheduleHuman": "Mondays 08:00 local",
       "delivery": ["outbox", "rss"],
       "forceOffline": true,
-      "maxItemsPerRun": 12,
+      "maxItemsPerRun": 14,
       "mergeMode": "combined",
       "active": true
     },
     {
       "id": "desk-by-section",
       "title": "Briefing desk — five civilian sections",
-      "description": "总体目标 / 经济投资 / 外交 / 国防公开表述 / 社会治理 — one combined pack for human review.",
+      "description": "Hot topics / economy & investment / foreign affairs / defense (public discourse) / social governance — one pack per desk section for human review.",
       "keywords": [],
       "sourceIds": [
+        "domain-hot-taiwan-strait",
+        "domain-hot-electric-vehicles",
+        "domain-hot-china-ai",
         "domain-macro-cewc",
         "domain-industrial-tech",
         "domain-finance-risk",
@@ -47,7 +53,7 @@
       "scheduleHuman": "Weekdays 07:00 local",
       "delivery": ["outbox", "rss"],
       "forceOffline": true,
-      "maxItemsPerRun": 8,
+      "maxItemsPerRun": 11,
       "mergeMode": "per-item",
       "active": true
     },

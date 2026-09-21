@@ -87,6 +87,27 @@
       "topics": ["foreign_affairs", "canada_nexus"]
     },
     {
+      "id": "domain-hot-taiwan-strait",
+      "type": "local_json",
+      "path": "examples/domains/hot-taiwan-strait.json",
+      "label": "domain-hot-taiwan",
+      "topics": ["hot_topics", "taiwan_strait", "foreign_affairs"]
+    },
+    {
+      "id": "domain-hot-electric-vehicles",
+      "type": "local_json",
+      "path": "examples/domains/hot-electric-vehicles.json",
+      "label": "domain-hot-ev",
+      "topics": ["hot_topics", "electric_vehicles", "industrial_tech_policy"]
+    },
+    {
+      "id": "domain-hot-china-ai",
+      "type": "local_json",
+      "path": "examples/domains/hot-china-ai.json",
+      "label": "domain-hot-ai",
+      "topics": ["hot_topics", "china_ai", "industrial_tech_policy"]
+    },
+    {
       "id": "sample-xinhua-local",
       "type": "local_json",
       "path": "examples/sample-input.json",

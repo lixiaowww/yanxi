@@ -9,6 +9,7 @@ import { runAllActiveSubscriptions } from "./src/lib/collector.js";
 import { listOutboxBriefs } from "./src/lib/outbox.js";
 import { loadWhitelistPublic } from "./src/lib/public-fetch.js";
 import { listDomainFixtures } from "./src/lib/domains.js";
+import { DESK_CATALOG, HOT_THEME_CATALOG, assignDeskSection } from "./src/lib/briefing-desk.js";
 
 const PORT = Number(process.env.PORT || 5179);
 const PUBLIC_BASE_URL = process.env.PUBLIC_BASE_URL || `http://localhost:${PORT}`;
@@ -48,14 +49,22 @@ async function main() {
   app.get("/api/domains", (_req, res) => {
     res.json({
       framing: "civilian-job-fit-domain-fixtures",
-      domains: listDomainFixtures().map((d) => ({
-        id: d.id,
-        domain: d.domain,
-        sourceLabel: d.sourceLabel,
-        preview: d.sourceText.slice(0, 80) + (d.sourceText.length > 80 ? "…" : ""),
-        chars: d.sourceText.length,
-        file: d.file,
-      })),
+      deskSections: DESK_CATALOG.map((s) => ({ id: s.id, label_en: s.label_en })),
+      hotThemeCatalog: HOT_THEME_CATALOG.map((t) => ({ id: t.id, label_en: t.label_en })),
+      domains: listDomainFixtures().map((d) => {
+        const desk = assignDeskSection(d.sourceText);
+        return {
+          id: d.id,
+          domain: d.domain,
+          sourceLabel: d.sourceLabel,
+          preview: d.sourceText.slice(0, 80) + (d.sourceText.length > 80 ? "…" : ""),
+          chars: d.sourceText.length,
+          file: d.file,
+          deskPrimary: desk.primary,
+          deskLabel: desk.label_en,
+          hotThemes: desk.hot_themes.map((h) => ({ id: h.id, label_en: h.label_en })),
+        };
+      }),
     });
   });
 

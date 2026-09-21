@@ -18,6 +18,12 @@ Civilian **whitelist** collection → English briefing → outbox + **RSS subscr
 1. **Sources** — `config/sources.whitelist.json`  
 2. **Subscriptions** — `config/subscriptions.json` (keywords, sourceIds, cron hint, delivery)
 
+New local fixtures under `examples/domains/` show up in the UI picker automatically (the directory is
+globbed by `listDomainFixtures`), but they must also be added to `config/sources.whitelist.json` to be
+usable as a subscription `sourceId` or to appear in `GET /api/sources`. Hot-topic fixtures are
+registered as `domain-hot-taiwan-strait`, `domain-hot-electric-vehicles`, and `domain-hot-china-ai`,
+and are included in the `job-fit-domain-battery` and `desk-by-section` subscriptions.
+
 Delivery channels:
 
 | Channel | Behavior |

@@ -183,7 +183,12 @@ type DomainRow = {
   domain: string;
   sourceLabel: string;
   preview: string;
+  deskPrimary?: string;
+  deskLabel?: string;
+  hotThemes?: { id?: string; label_en?: string }[];
 };
+
+type ThemeRow = { id?: string; label_en?: string };
 
 export function App() {
   const [sourceText, setSourceText] = useState(SAMPLE);
@@ -197,6 +202,7 @@ export function App() {
   const [subs, setSubs] = useState<SubRow[]>([]);
   const [outbox, setOutbox] = useState<OutboxRow[]>([]);
   const [domains, setDomains] = useState<DomainRow[]>([]);
+  const [hotThemeCatalog, setHotThemeCatalog] = useState<ThemeRow[]>([]);
   const [domainId, setDomainId] = useState("");
   const [activeQuote, setActiveQuote] = useState<string | null>(null);
   const [showRaw, setShowRaw] = useState(false);
@@ -205,6 +211,24 @@ export function App() {
     () => highlightSource(sourceText, activeQuote),
     [sourceText, activeQuote]
   );
+
+  // Group the fixture picker by desk channel so Hot topics packs are findable.
+  const domainGroups = useMemo(() => {
+    const order = ["hot_topics", "economy_investment", "foreign_affairs", "defense_public", "social_governance"];
+    const groups = new Map<string, { label: string; rows: DomainRow[] }>();
+    for (const d of domains) {
+      const key = d.deskPrimary || "other";
+      if (!groups.has(key)) groups.set(key, { label: d.deskLabel || "Other", rows: [] });
+      groups.get(key)!.rows.push(d);
+    }
+    return [...groups.entries()]
+      .sort((a, b) => {
+        const ai = order.indexOf(a[0]);
+        const bi = order.indexOf(b[0]);
+        return (ai < 0 ? order.length : ai) - (bi < 0 ? order.length : bi);
+      })
+      .map(([id, g]) => ({ id, ...g }));
+  }, [domains]);
 
   async function refreshSubs() {
     const [s, o, d] = await Promise.all([
@@ -215,6 +239,7 @@ export function App() {
     setSubs(s.subscriptions || []);
     setOutbox(o.briefs || []);
     setDomains(d.domains || []);
+    setHotThemeCatalog(d.hotThemeCatalog || []);
   }
 
   async function loadDomain(id: string) {
@@ -314,12 +339,26 @@ export function App() {
             }}
           >
             <option value="">— select domain pack —</option>
-            {domains.map((d) => (
-              <option key={d.id} value={d.id}>
-                {d.domain} · {d.id}
-              </option>
+            {domainGroups.map((g) => (
+              <optgroup key={g.id} label={g.label}>
+                {g.rows.map((d) => (
+                  <option key={d.id} value={d.id}>
+                    {d.domain} · {d.id}
+                    {(d.hotThemes || []).length
+                      ? ` · ${(d.hotThemes || []).map((t) => t.label_en || t.id).join(", ")}`
+                      : ""}
+                  </option>
+                ))}
+              </optgroup>
             ))}
           </select>
+          {hotThemeCatalog.length ? (
+            <p className="meta desk-line">
+              Hot topics channel tracks:{" "}
+              {hotThemeCatalog.map((t) => t.label_en || t.id).join(" · ")}. Matching pastes route to the
+              Hot topics desk and show theme chips on the brief.
+            </p>
+          ) : null}
           <label htmlFor="src" style={{ marginTop: "0.75rem" }}>
             Public Mandarin source (paste)
           </label>
