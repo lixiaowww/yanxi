@@ -1,12 +1,7 @@
 import fs from "fs";
 import path from "path";
 import type { BriefResponse } from "./pipeline.js";
-import {
-  HEURISTIC_BASIS_NOTE,
-  corroborationLineEn,
-  sourceTierLineEn,
-  substanceBasisEn,
-} from "./score-bands.js";
+import { formatBriefResponseMarkdown } from "./brief-markdown.js";
 import type { CollectedItem } from "./public-fetch.js";
 import type { Subscription } from "./subscriptions.js";
 
@@ -30,116 +25,18 @@ function slug(s: string): string {
 }
 
 function toMarkdown(rec: Omit<OutboxRecord, "markdownPath" | "jsonPath">): string {
-  const b = rec.result.briefing;
-  const triage = b.info_triage;
-  const en = b.briefing_en;
-  const nexus = b.canada_nexus;
-  const nexusLine =
-    nexus && nexus.level && nexus.level !== "none"
-      ? `- **Canada nexus:** ${nexus.label_zh || nexus.level} · ${(nexus.hits || [])
-          .map((h) => h.cue)
-          .filter(Boolean)
-          .slice(0, 4)
-          .join(", ")}`
-      : null;
-  return [
-    `# ${nexus && nexus.level === "direct" ? "[CA] " : nexus && nexus.level === "possible" ? "[CA?] " : ""}${rec.subscriptionTitle}`,
-    "",
-    `- **id:** ${rec.id}`,
-    `- **created:** ${rec.createdAt}`,
-    `- **source:** ${rec.source.label}${rec.source.url ? ` · ${rec.source.url}` : ""}`,
-    ...(b.temporal
-      ? [
-          `- **temporal:** briefed ${b.temporal.briefed_at?.slice(0, 19) || "?"} · source as-of ${b.temporal.source_as_of || "unknown"} (${b.temporal.source_as_of_precision || "none"}) · ${b.temporal.freshness?.label_en || "Freshness unknown"}`,
-        ]
-      : []),
-    `- **mode:** ${rec.result.mode}`,
-    `- **gate:** ${rec.result.gate.passed ? "PASS" : "FAIL"}`,
-    `- **triage:** ${triage?.primary_kind || "?"} / ${triage?.importance?.grade || "?"}`,
-    ...(b.desk_section?.label_zh
-      ? [`- **desk:** ${b.desk_section.label_zh}${b.desk_section.primary ? ` (${b.desk_section.primary})` : ""}`]
-      : []),
-    ...(b.ontology_lite?.hits?.length
-      ? [
-          `- **ontology-lite:** ${b.ontology_lite.hits
-            .slice(0, 6)
-            .map((h) => h.id)
-            .join(", ")}`,
-        ]
-      : []),
-    ...(b.confidence_factors
-      ? [
-          `- **confidence:** ${b.confidence_factors.level} · ${corroborationLineEn({
-            score: b.corroboration?.score_0_to_3,
-            labelEn: b.corroboration?.label_en,
-            drivers: b.corroboration?.drivers,
-          })} · source_class=${b.source_class?.class || "?"}${
-            b.confidence_factors.source_tier?.tier
-              ? ` · ${sourceTierLineEn(b.confidence_factors.source_tier)}`
-              : ""
-          }`,
-          `- **basis:** ${HEURISTIC_BASIS_NOTE}`,
-        ]
-      : []),
-    ...(b.canada_policy_link && b.canada_policy_link.level !== "none"
-      ? [
-          `- **Canada policy link:** ${b.canada_policy_link.label_zh}`,
-          ...(b.canada_policy_link.hits || []).flatMap((h) =>
-            (h.public_refs || [])
-              .filter((r): r is { title?: string; url: string; publisher?: string } =>
-                Boolean(r && typeof r === "object" && typeof (r as { url?: string }).url === "string")
-              )
-              .map((r) => `  - [${r.title || r.url}](${r.url})`)
-          ),
-        ]
-      : []),
-    ...(nexusLine ? [nexusLine] : []),
-    "",
-    "## What",
-    en?.what || "",
-    "",
-    "## Context",
-    en?.context || "",
-    "",
-    "## So what",
-    en?.so_what || "",
-    "",
-    "## Confidence",
-    en?.confidence || "",
-    "",
-    ...(nexus && nexus.level !== "none"
-      ? [
-          "## Canada nexus (reader interest)",
-          nexus.rationale || "",
-          ...(nexus.hits || []).map((h) => `- **[${h.level}]** ${h.cue}: ${h.evidence}`),
-          "",
-        ]
-      : []),
-    ...(b.substance_cut
-      ? [
-          `## Substance cut (${b.substance_cut.band || "?"})`,
-          b.substance_cut.label_zh || "",
-          `Band basis: ${substanceBasisEn(b.substance_cut.nuggets, b.substance_cut.band)}.`,
-          b.substance_cut.analyst_prompt_zh || "",
-          "",
-          "**Nuggets**",
-          ...((b.substance_cut.nuggets || []).length
-            ? (b.substance_cut.nuggets || []).map((n) => `- **${n.label_zh}:** ${n.evidence}`)
-            : ["- (none)"]),
-          "",
-          "**Empty calories**",
-          ...((b.substance_cut.empty_calories || []).length
-            ? (b.substance_cut.empty_calories || []).map((e) => `- ${e}`)
-            : ["- (none)"]),
-          "",
-        ]
-      : []),
-    "## Open questions",
-    ...(b.open_questions || []).map((q) => `- ${q}`),
-    "",
-    "> Draft for human review · Public sources only · Not an intelligence product · Canada nexus ≠ personal targeting",
-    "",
-  ].join("\n");
+  return formatBriefResponseMarkdown(rec.result, {
+    title:
+      (rec.result.briefing.canada_nexus?.level === "direct"
+        ? "[CA] "
+        : rec.result.briefing.canada_nexus?.level === "possible"
+          ? "[CA?] "
+          : "") + rec.subscriptionTitle,
+    id: rec.id,
+    createdAt: rec.createdAt,
+    sourceLabel: rec.source.label,
+    sourceUrl: rec.source.url,
+  });
 }
 
 export function writeOutboxBrief(
@@ -168,6 +65,35 @@ export function writeOutboxBrief(
   fs.writeFileSync(jsonPath, JSON.stringify(record, null, 2), "utf8");
   fs.writeFileSync(markdownPath, toMarkdown(base), "utf8");
   return record;
+}
+
+/** Persist a paste-desk brief (Generate → Save) into outbox/briefs. */
+export function writePasteBrief(
+  result: BriefResponse,
+  source: { label: string; text: string; url?: string },
+  root = process.cwd()
+): OutboxRecord {
+  const pasteSub: Subscription = {
+    id: "paste-desk",
+    title:
+      result.briefing.desk_section?.label_en ||
+      result.briefing.content_analysis?.domain_label_en ||
+      "Paste briefing",
+    description: "Saved from the paste workbench",
+    keywords: [],
+    sourceIds: [],
+    delivery: ["outbox"],
+    forceOffline: result.mode === "offline",
+    active: true,
+  };
+  const item: CollectedItem = {
+    sourceId: slug(source.label || "paste"),
+    label: source.label || "paste",
+    sourceText: source.text,
+    collectedAt: new Date().toISOString(),
+    url: source.url,
+  };
+  return writeOutboxBrief(pasteSub, item, result, root);
 }
 
 export function listOutboxBriefs(subscriptionId?: string, root = process.cwd()): OutboxRecord[] {

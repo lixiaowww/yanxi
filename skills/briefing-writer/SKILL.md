@@ -25,6 +25,7 @@ turn **public Mandarin text** into a clear **English briefing note**.
    named sectors, priority-shift cues). If the cut is `thin`, lead `so_what` with that
    warning and do not treat slogans as operational facts.
 7. Write English `what` / `context` / `so_what` — **lead with nuggets**, not with ritual praise.
+   Reader spine (deliverable): Source digest → What → Context → Key facts → So what → Outlook → Watchpoints → Open questions.
 8. Add `policy_outlook` scenarios (`tag: "hypothesis"`) + `watchpoints` when policy-related.
 9. List `open_questions` for unclear scorecard rows and missing 细则/版面.
 

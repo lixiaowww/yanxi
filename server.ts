@@ -6,7 +6,8 @@ import { createServer as createViteServer } from "vite";
 import { runBriefingPipeline } from "./src/lib/pipeline.js";
 import { loadSubscriptions } from "./src/lib/subscriptions.js";
 import { runAllActiveSubscriptions } from "./src/lib/collector.js";
-import { listOutboxBriefs } from "./src/lib/outbox.js";
+import { listOutboxBriefs, writePasteBrief } from "./src/lib/outbox.js";
+import { formatBriefResponseMarkdown } from "./src/lib/brief-markdown.js";
 import { loadWhitelistPublic } from "./src/lib/public-fetch.js";
 import { listDomainFixtures } from "./src/lib/domains.js";
 import { DESK_CATALOG, HOT_THEME_CATALOG, assignDeskSection } from "./src/lib/briefing-desk.js";
@@ -226,6 +227,33 @@ async function main() {
         publicBaseUrl: PUBLIC_BASE_URL,
       });
       res.json({ ok: true, results });
+    } catch (e) {
+      sendApiError(res, e);
+    }
+  });
+
+  /** Persist the latest paste-desk brief into outbox/briefs as a final .md/.json. */
+  app.post("/api/brief/save", async (req, res) => {
+    try {
+      enforceRateLimit(req, briefLimiter, "briefing runs");
+      const result = req.body?.result as import("./src/lib/pipeline.js").BriefResponse | undefined;
+      const label = String(req.body?.sourceLabel || "paste");
+      const text = String(req.body?.sourceText || "");
+      if (!result?.briefing) throw httpError(400, "Missing briefing result to save.");
+      if (text.length < 20) throw httpError(400, "sourceText required to save a paste brief.");
+      const rec = writePasteBrief(result, { label, text });
+      res.json({
+        ok: true,
+        id: rec.id,
+        jsonUrl: `/outbox/briefs/${path.basename(rec.jsonPath)}`,
+        mdUrl: `/outbox/briefs/${path.basename(rec.markdownPath)}`,
+        markdown: formatBriefResponseMarkdown(result, {
+          title: rec.subscriptionTitle,
+          id: rec.id,
+          createdAt: rec.createdAt,
+          sourceLabel: label,
+        }),
+      });
     } catch (e) {
       sendApiError(res, e);
     }

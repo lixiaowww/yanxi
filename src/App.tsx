@@ -285,6 +285,8 @@ export function App() {
   const [domainId, setDomainId] = useState("");
   const [activeQuote, setActiveQuote] = useState<string | null>(null);
   const [showRaw, setShowRaw] = useState(false);
+  const [savingBrief, setSavingBrief] = useState(false);
+  const [savedBriefUrl, setSavedBriefUrl] = useState<string | null>(null);
 
   const parts = useMemo(
     () => highlightSource(sourceText, activeQuote),
@@ -369,8 +371,24 @@ export function App() {
       const data = await res.json().catch(() => ({}) as { error?: string });
       if (!res.ok) throw new Error(briefErrorMessage(res.status, data.error));
       setResult(data);
+      setSavedBriefUrl(null);
       const first = data.briefing?.source_digest_zh?.[0]?.quote;
       if (first && sourceText.includes(first)) setActiveQuote(first);
+      // Persist the deliverable brief so Generate always leaves a final .md in outbox.
+      try {
+        const saveRes = await fetch("/api/brief/save", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ result: data, sourceLabel: label, sourceText }),
+        });
+        const saved = await saveRes.json().catch(() => ({} as { mdUrl?: string }));
+        if (saveRes.ok && saved.mdUrl) {
+          setSavedBriefUrl(saved.mdUrl);
+          await refreshSubs();
+        }
+      } catch {
+        /* save is best-effort; the on-screen brief still stands */
+      }
     } catch (e) {
       setResult(null);
       setError(e instanceof Error ? e.message : String(e));
@@ -390,6 +408,56 @@ export function App() {
       setSource2Text(text);
       setSource2Label(lab);
       setError("");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e));
+    }
+  }
+
+  async function saveBrief() {
+    if (!result) return;
+    setSavingBrief(true);
+    setError("");
+    try {
+      const res = await fetch("/api/brief/save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          result,
+          sourceLabel: label,
+          sourceText,
+        }),
+      });
+      const data = await res.json().catch(() => ({}) as { error?: string; mdUrl?: string });
+      if (!res.ok) throw new Error(data.error || res.statusText);
+      setSavedBriefUrl(data.mdUrl || null);
+      await refreshSubs();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setSavingBrief(false);
+    }
+  }
+
+  async function copyBriefMarkdown() {
+    if (!result?.briefing) return;
+    try {
+      // Prefer server-saved markdown when available; else rebuild a minimal client spine.
+      if (savedBriefUrl) {
+        const res = await fetch(savedBriefUrl);
+        const md = await res.text();
+        await navigator.clipboard.writeText(md);
+        return;
+      }
+      const res = await fetch("/api/brief/save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ result, sourceLabel: label, sourceText }),
+      });
+      const data = await res.json().catch(() => ({}) as { error?: string; markdown?: string; mdUrl?: string });
+      if (!res.ok) throw new Error(data.error || res.statusText);
+      if (data.mdUrl) setSavedBriefUrl(data.mdUrl);
+      await navigator.clipboard.writeText(data.markdown || "");
+      await refreshSubs();
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
     }
@@ -648,7 +716,7 @@ export function App() {
                         : result.llmConfigured
                           ? ""
                           : " (no LLM configured)"}
-                    . Read What → So what → Scenarios → Watchpoints.
+                    . Full brief: Digest → What → Context → Key facts → So what → Outlook → Watchpoints.
                   </p>
                 ) : null}
                 {b.temporal ? (
@@ -689,21 +757,65 @@ export function App() {
                 </section>
               ) : (
                 <>
+              <div className="row" style={{ marginBottom: "0.75rem", gap: "0.5rem", flexWrap: "wrap" }}>
+                <button type="button" className="secondary" onClick={() => saveBrief()} disabled={savingBrief}>
+                  {savingBrief ? "Saving…" : savedBriefUrl ? "Saved — open again" : "Save final brief"}
+                </button>
+                <button type="button" className="secondary" onClick={() => copyBriefMarkdown()}>
+                  Copy brief markdown
+                </button>
+                {savedBriefUrl ? (
+                  <a href={savedBriefUrl} target="_blank" rel="noreferrer">
+                    Open saved .md
+                  </a>
+                ) : null}
+              </div>
+
+              {(b.source_digest_zh || []).length ? (
+                <section className="read-block">
+                  <h2>1. Source digest</h2>
+                  <ul className="digest-list">
+                    {(b.source_digest_zh || []).map((row, idx) => {
+                      const q = row.quote || "";
+                      const ok = Boolean(q && sourceText.includes(q));
+                      return (
+                        <li key={idx}>
+                          <button
+                            type="button"
+                            className={`digest-btn ${activeQuote === q ? "active" : ""} ${ok ? "" : "missing"}`}
+                            onClick={() => q && setActiveQuote(q)}
+                          >
+                            <span className="digest-point">{row.point}</span>
+                            {q ? <span className="digest-quote">「{q}」</span> : null}
+                            {row.source_label ? <span className="meta"> · {row.source_label}</span> : null}
+                          </button>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </section>
+              ) : null}
+
               <section className="read-block">
-                <h2>What</h2>
+                <h2>2. What</h2>
                 <p className="prose">{b.briefing_en?.what || "—"}</p>
               </section>
 
               <section className="read-block">
-                <h2>So what</h2>
-                <p className="prose">{b.briefing_en?.so_what || b.content_analysis?.so_what || "—"}</p>
+                <h2>3. Context</h2>
+                <p className="prose">
+                  {b.briefing_en?.context ||
+                    (b.content_analysis
+                      ? `${b.content_analysis.domain_label_en} — ${b.content_analysis.background}`
+                      : "—")}
+                </p>
               </section>
 
               {(b.substance_cut?.nuggets || []).length ? (
                 <section className="read-block substance-panel">
-                  <h2>Extracted facts</h2>
+                  <h2>4. Key facts</h2>
                   <ul className="nugget-list">
-                    {(b.substance_cut?.nuggets || []).slice(0, 8).map((n, i) => (
+                    {(b.substance_cut?.nuggets || []).slice(0, 10).map((n, i) => (
                       <li key={i}>
                         <span className="nugget-kind">{n.value_en || n.label_zh}</span>
                         <span className="nugget-ev">{n.evidence}</span>
@@ -713,9 +825,14 @@ export function App() {
                 </section>
               ) : null}
 
+              <section className="read-block">
+                <h2>5. So what</h2>
+                <p className="prose">{b.briefing_en?.so_what || b.content_analysis?.so_what || "—"}</p>
+              </section>
+
               {(b.policy_outlook?.scenarios || []).length ? (
                 <section className="read-block">
-                  <h2>Scenarios (hypothesis)</h2>
+                  <h2>6. Outlook (hypothesis)</h2>
                   <ol className="scenario-list">
                     {(b.policy_outlook?.scenarios || []).map((s, i) => (
                       <li key={i}>
@@ -740,7 +857,7 @@ export function App() {
 
               {(b.policy_outlook?.watchpoints || []).length ? (
                 <section className="read-block next-panel">
-                  <h2>Watchpoints</h2>
+                  <h2>7. Watchpoints</h2>
                   <ul className="action-list">
                     {(b.policy_outlook?.watchpoints || []).map((w, i) => (
                       <li key={i}>{w}</li>
@@ -751,7 +868,7 @@ export function App() {
 
               {(b.open_questions || []).length ? (
                 <section className="read-block">
-                  <h2>Open questions</h2>
+                  <h2>8. Open questions</h2>
                   <ul className="action-list">
                     {(b.open_questions || []).map((q, i) => (
                       <li key={i}>{q}</li>
@@ -762,7 +879,7 @@ export function App() {
 
               {b.corroboration ? (
                 <section className="read-block">
-                  <h2>Cross-source check</h2>
+                  <h2>9. Cross-source check</h2>
                   <p className="prose">
                     {corroborationLineEn({
                       score: b.corroboration.score_0_to_3,
@@ -839,29 +956,6 @@ export function App() {
                 </section>
               ) : null}
 
-              {(b.source_digest_zh || []).length ? (
-                <section className="read-block">
-                  <h2>Source excerpts (click to highlight left)</h2>
-                  <ul className="digest-list">
-                    {(b.source_digest_zh || []).map((row, idx) => {
-                      const q = row.quote || "";
-                      const ok = q && sourceText.includes(q);
-                      return (
-                        <li key={idx}>
-                          <button
-                            type="button"
-                            className={`digest-btn ${activeQuote === q ? "active" : ""} ${ok ? "" : "missing"}`}
-                            onClick={() => setActiveQuote(q || null)}
-                          >
-                            <span className="digest-point">{row.point}</span>
-                            {q ? <span className="digest-quote">「{q}」</span> : null}
-                          </button>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                </section>
-              ) : null}
                 </>
               )}
 
@@ -874,11 +968,7 @@ export function App() {
               ) : null}
 
               <details className="meta-fold">
-                <summary>Analyst detail (method, triage, scorecard — not content analysis)</summary>
-                <p className="meta">{b.briefing_en?.context}</p>
-                {b.content_analysis?.background ? (
-                  <p className="meta">Background frame: {b.content_analysis.background}</p>
-                ) : null}
+                <summary>Analyst detail (method, triage, scorecard — not the briefing body)</summary>
                 {b.info_triage ? (
                   <p className="meta">
                     Kind {b.info_triage.primary_kind} · research priority{" "}
