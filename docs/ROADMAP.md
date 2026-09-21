@@ -48,7 +48,7 @@
   - **不**写简报正文；**不**覆盖 ethics/quote gate；**不**把概率当事件置信度  
   - 输出标 `hypothesis` / intake triage  
   - 验收：批量 collect 样例上，规则误放行空壳 / 误杀有细节 的比例可测下降  
-  - **前置（进行中）**：人审样例包 `npm run test:review`；证据窗不中切；再攒灰区金标再接线  
+  - **前置**：`examples/intake-gold.json` + `npm run test:intake`（clear 13/13；灰区分歧为 Jev 目标；裸词误放行已压到 0）  
 
 ## Later
 

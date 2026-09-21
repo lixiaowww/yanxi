@@ -1,0 +1,167 @@
+{
+  "framing": "civilian-intake-gold",
+  "note": "Editorial gold for whether a public paste is worth admitting into LLM/outbox. First cut = whitelist + hard nuggets/adoption. Gold may disagree on gray cases — those are the Jev second-cut targets. Not an intelligence ranking.",
+  "labels": ["admit", "defer", "reject_thin", "social_downweight"],
+  "cases": [
+    {
+      "id": "fixture:boilerplate-heavy",
+      "fixtureId": "boilerplate-heavy",
+      "zone": "clear",
+      "gold": "admit",
+      "why_en": "Hard deadline + funded pilot + prohibition in the same excerpt."
+    },
+    {
+      "id": "fixture:hot-china-ai",
+      "fixtureId": "hot-china-ai",
+      "zone": "clear",
+      "gold": "admit",
+      "why_en": "Named supporting measures, deadline, funded pilot, data-export ban."
+    },
+    {
+      "id": "fixture:hot-electric-vehicles",
+      "fixtureId": "hot-electric-vehicles",
+      "zone": "clear",
+      "gold": "admit",
+      "why_en": "Deadline, funded EV battery/charger pilot, fraud prohibition."
+    },
+    {
+      "id": "fixture:hot-taiwan-strait",
+      "fixtureId": "hot-taiwan-strait",
+      "zone": "clear",
+      "gold": "admit",
+      "why_en": "Named measures, deadline, funded youth-exchange pilot."
+    },
+    {
+      "id": "fixture:macro-instrument",
+      "fixtureId": "macro-instrument",
+      "zone": "clear",
+      "gold": "admit",
+      "why_en": "State Council General Office notice with implementing language."
+    },
+    {
+      "id": "fixture:macro-cewc",
+      "fixtureId": "macro-cewc",
+      "zone": "clear",
+      "gold": "reject_thin",
+      "why_en": "Meeting formula only — no number, deadline, or named instrument."
+    },
+    {
+      "id": "fixture:ideology-party",
+      "fixtureId": "ideology-party",
+      "zone": "clear",
+      "gold": "reject_thin",
+      "why_en": "Theme-education boilerplate without implementable detail."
+    },
+    {
+      "id": "fixture:social-governance",
+      "fixtureId": "social-governance",
+      "zone": "clear",
+      "gold": "reject_thin",
+      "why_en": "Local governance posture without hard cues."
+    },
+    {
+      "id": "fixture:dual-circulation",
+      "fixtureId": "dual-circulation",
+      "zone": "clear",
+      "gold": "reject_thin",
+      "why_en": "Strategy formula; no funded instrument or date."
+    },
+    {
+      "id": "fixture:foreign-affairs",
+      "fixtureId": "foreign-affairs",
+      "zone": "clear",
+      "gold": "reject_thin",
+      "why_en": "Spokesperson posture without a case or instrument."
+    },
+    {
+      "id": "fixture:defense-public",
+      "fixtureId": "defense-public",
+      "zone": "clear",
+      "gold": "reject_thin",
+      "why_en": "Public defense discourse only; no implementable civilian detail."
+    },
+    {
+      "id": "fixture:rural-food",
+      "fixtureId": "rural-food",
+      "zone": "clear",
+      "gold": "reject_thin",
+      "why_en": "Ministry talking points; red-line lexicon without a new instrument."
+    },
+    {
+      "id": "fixture:social-commentary-paste",
+      "fixtureId": "social-commentary-paste",
+      "zone": "clear",
+      "gold": "social_downweight",
+      "sourceClass": "social_commentary",
+      "why_en": "Unverified social/relay paste — never a primary source admission."
+    },
+    {
+      "id": "fixture:canada-nexus",
+      "fixtureId": "canada-nexus",
+      "zone": "gray",
+      "gold": "defer",
+      "why_en": "Named bodies + products but no remedy instrument — watch queue, not a full brief source yet. First cut may soft-admit via body+sector pair."
+    },
+    {
+      "id": "fixture:industrial-tech",
+      "fixtureId": "industrial-tech",
+      "zone": "gray",
+      "gold": "defer",
+      "why_en": "Ministry + sector talk without deadline/funding/notice — defer pending an implementing file."
+    },
+    {
+      "id": "fixture:finance-risk",
+      "fixtureId": "finance-risk",
+      "zone": "gray",
+      "gold": "defer",
+      "why_en": "Risk lexicon worth monitoring; no quant, date, or named notice for a substantive brief."
+    },
+    {
+      "id": "fixture:canada-possible",
+      "fixtureId": "canada-possible",
+      "zone": "gray",
+      "gold": "defer",
+      "why_en": "Thematic possible Canada link (Arctic, minerals, CPTPP) without hard detail — queue, do not brief as adopted."
+    },
+    {
+      "id": "synth:bare-banfa",
+      "zone": "gray",
+      "gold": "reject_thin",
+      "sourceText": "有关方面表示要研究出台管理办法，推动相关工作落地见效。",
+      "sourceLabel": "synth-bare-banfa",
+      "why_en": "Bare 'management measures' token — first cut false-admits on named_instrument alone."
+    },
+    {
+      "id": "synth:bare-special-funds",
+      "zone": "gray",
+      "gold": "reject_thin",
+      "sourceText": "会议要求安排专项资金支持产业发展。",
+      "sourceLabel": "synth-bare-funds",
+      "why_en": "Bare 'special funds' without amount, body, or deadline — first cut false-admits."
+    },
+    {
+      "id": "synth:population-number",
+      "zone": "gray",
+      "gold": "reject_thin",
+      "sourceText": "据报道当地人口约50万人，面积1200平方公里。",
+      "sourceLabel": "synth-population-number",
+      "why_en": "Numeric cue that is demographic, not policy — first cut false-admits on numeric_target."
+    },
+    {
+      "id": "synth:deadline-only",
+      "zone": "gray",
+      "gold": "defer",
+      "sourceText": "有关部门将于2026年底前研究有关事项。",
+      "sourceLabel": "synth-deadline-only",
+      "why_en": "Deadline without an instrument or funded action — watch, do not treat as adopted substance."
+    },
+    {
+      "id": "synth:body-sector-talk",
+      "zone": "gray",
+      "gold": "defer",
+      "sourceText": "工业和信息化部有关负责人就芯片与半导体答记者问时表示，要坚持高质量发展，提升产业链韧性。",
+      "sourceLabel": "synth-body-sector-talk",
+      "why_en": "Named body + sector without hard implementable cues — gray watch item."
+    }
+  ]
+}
