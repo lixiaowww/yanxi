@@ -16,7 +16,6 @@ import {
   createFixedWindowLimiter,
   httpError,
   readFileInsideDir,
-  requireApiToken,
   trustProxyHops,
   type HttpErrorLike,
 } from "./src/lib/api-guard.js";
@@ -106,9 +105,9 @@ async function main() {
       framing: "civilian-open-source-research",
       llm: Boolean(process.env.LLM_API_KEY),
       cursorHarness: Boolean(process.env.CURSOR_API_KEY),
-      // Booleans only — never echo credential or token values.
-      llmRunsNeedToken: llmConfigured(),
-      briefTokenConfigured: Boolean(process.env.BRIEF_API_TOKEN || process.env.COLLECT_API_TOKEN),
+      // Booleans only — never echo credential values.
+      // /api/brief and /api/collect/run are open; abuse control is IP rate limiting.
+      llmOpen: llmConfigured(),
       collect: true,
       subscriptions: loadSubscriptions().subscriptions.filter((s) => s.active !== false).length,
     });
@@ -219,8 +218,8 @@ async function main() {
 
   app.post("/api/collect/run", async (req, res) => {
     try {
+      // Collect is open on the public demo; abuse control is IP rate limiting.
       enforceRateLimit(req, collectLimiter, "collect runs");
-      requireApiToken(req, { envVar: "COLLECT_API_TOKEN", action: "collect runs" });
       const onlyId = req.body?.subscriptionId ? String(req.body.subscriptionId) : undefined;
       const results = await runAllActiveSubscriptions({
         onlyId,
@@ -247,21 +246,8 @@ async function main() {
       }
 
       const forceOffline = Boolean(req.body?.forceOffline);
-      // Only the LLM-backed path spends the operator's quota; the template
-      // engine stays open so the public demo keeps working.
-      if (!forceOffline && llmConfigured()) {
-        try {
-          requireApiToken(req, {
-            envVar: "BRIEF_API_TOKEN",
-            fallbackEnvVar: "COLLECT_API_TOKEN",
-            action: "LLM-backed briefing runs",
-          });
-        } catch (e) {
-          const err = e as HttpErrorLike;
-          err.message = `${err.message} The offline template path stays open — resend with "forceOffline": true.`;
-          throw err;
-        }
-      }
+      // LLM path is open to anyone who hits the URL (rate-limited below).
+      // Force offline still skips the model for template-only runs.
 
       const result = await runBriefingPipeline({
         sourceText: String(req.body?.sourceText || ""),
@@ -280,6 +266,10 @@ async function main() {
               | "press_commentary"
               | "social_commentary"
               | "unknown_public")
+          : undefined,
+        collectedAt: req.body?.collectedAt ? String(req.body.collectedAt) : undefined,
+        sourcePublishedAt: req.body?.sourcePublishedAt
+          ? String(req.body.sourcePublishedAt)
           : undefined,
       });
       res.json(result);

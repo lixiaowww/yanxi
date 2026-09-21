@@ -38,11 +38,14 @@ export function trustProxyHops(): number {
 }
 
 /**
- * Token check shared by /api/collect/run and LLM-backed /api/brief runs.
- * Convention (unchanged): `x-yanxi-token` header, or `?token=` for convenience.
+ * Optional shared-secret check for privileged actions.
+ * Brief and collect HTTP triggers are intentionally open on the public demo;
+ * abuse control there is IP rate limiting. This helper remains for any future
+ * operator-only routes that need a token.
  *
- * Fail-safe: in production an unset token means the action is refused, never
- * left open. Outside production an unset token means frictionless local dev.
+ * Convention: `x-yanxi-token` header, or `?token=` for convenience.
+ * Fail-safe: in production an unset token means the action is refused.
+ * Outside production an unset token means frictionless local dev.
  */
 export function requireApiToken(
   req: Request,

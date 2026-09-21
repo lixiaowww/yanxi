@@ -1,6 +1,12 @@
 import fs from "fs";
 import path from "path";
 import type { BriefResponse } from "./pipeline.js";
+import {
+  HEURISTIC_BASIS_NOTE,
+  corroborationLineEn,
+  sourceTierLineEn,
+  substanceBasisEn,
+} from "./score-bands.js";
 import type { CollectedItem } from "./public-fetch.js";
 import type { Subscription } from "./subscriptions.js";
 
@@ -42,6 +48,11 @@ function toMarkdown(rec: Omit<OutboxRecord, "markdownPath" | "jsonPath">): strin
     `- **id:** ${rec.id}`,
     `- **created:** ${rec.createdAt}`,
     `- **source:** ${rec.source.label}${rec.source.url ? ` · ${rec.source.url}` : ""}`,
+    ...(b.temporal
+      ? [
+          `- **temporal:** briefed ${b.temporal.briefed_at?.slice(0, 19) || "?"} · source as-of ${b.temporal.source_as_of || "unknown"} (${b.temporal.source_as_of_precision || "none"}) · ${b.temporal.freshness?.label_en || "Freshness unknown"}`,
+        ]
+      : []),
     `- **mode:** ${rec.result.mode}`,
     `- **gate:** ${rec.result.gate.passed ? "PASS" : "FAIL"}`,
     `- **triage:** ${triage?.primary_kind || "?"} / ${triage?.importance?.grade || "?"}`,
@@ -58,11 +69,16 @@ function toMarkdown(rec: Omit<OutboxRecord, "markdownPath" | "jsonPath">): strin
       : []),
     ...(b.confidence_factors
       ? [
-          `- **confidence:** ${b.confidence_factors.level} · corroboration ${b.corroboration?.score_0_to_3 ?? "?"}/3 · source_class=${b.source_class?.class || "?"}${
+          `- **confidence:** ${b.confidence_factors.level} · ${corroborationLineEn({
+            score: b.corroboration?.score_0_to_3,
+            labelEn: b.corroboration?.label_en,
+            drivers: b.corroboration?.drivers,
+          })} · source_class=${b.source_class?.class || "?"}${
             b.confidence_factors.source_tier?.tier
-              ? ` · tier=${b.confidence_factors.source_tier.tier}(w=${b.confidence_factors.source_tier.weight_0_to_1})`
+              ? ` · ${sourceTierLineEn(b.confidence_factors.source_tier)}`
               : ""
           }`,
+          `- **basis:** ${HEURISTIC_BASIS_NOTE}`,
         ]
       : []),
     ...(b.canada_policy_link && b.canada_policy_link.level !== "none"
@@ -103,6 +119,7 @@ function toMarkdown(rec: Omit<OutboxRecord, "markdownPath" | "jsonPath">): strin
       ? [
           `## Substance cut (${b.substance_cut.band || "?"})`,
           b.substance_cut.label_zh || "",
+          `Band basis: ${substanceBasisEn(b.substance_cut.nuggets, b.substance_cut.band)}.`,
           b.substance_cut.analyst_prompt_zh || "",
           "",
           "**Nuggets**",

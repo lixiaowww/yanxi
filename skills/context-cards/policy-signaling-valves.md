@@ -44,6 +44,10 @@ sources: Observable public PRC media/reporting conventions (open press patterns)
 
 `hit=1.0` · `unclear=0.4` · `miss=0.0`；`weighted_total = Σ(weight × raw_score)`。
 
+**Calibration status: none.** 权重与档位阈值均为手工设定的编辑先验，无标注语料、无留出验证集。
+`weighted_total` 只作内部排序，**不得**写给读者；对读者只报 `band` 与「命中了哪些类别」。
+See `docs/RELIABILITY.md`.
+
 ## 三类调节阀（由上表归并）
 
 - **先后顺序** ← sequence  

@@ -1,7 +1,16 @@
 /**
- * Within-desk-section corroboration board — what we have vs what would raise corr.
+ * Within-desk-section corroboration board — what we have vs what would raise corroboration.
  * Civilian research aid; not an ops watch floor.
+ *
+ * Rendered output carries ordinal bands only. The 0–3 counters stay in `internal` because
+ * they order and threshold; they are hand-set heuristics, not measurements.
  */
+
+import {
+  HEURISTIC_BASIS_NOTE,
+  corroborationBand,
+  type CorroborationBand,
+} from "./score-bands.js";
 
 export type ItemRole =
   | "direction_meeting"
@@ -16,6 +25,7 @@ export type CorroborationItemSnap = {
   fixtureId: string;
   label: string;
   role: ItemRole;
+  /** Internal 0–3 counter — used for ordering/thresholding only, rendered as a band. */
   corr: number;
   conf: string;
   substance: string;
@@ -30,8 +40,10 @@ export type SectionCorroborationBoard = {
   sectionId: string;
   label_zh: string;
   itemCount: number;
-  maxCorr: number;
-  avgCorr: number;
+  /** Strongest corroboration in the column, as an ordinal band. This is what readers see. */
+  maxCorrBand: CorroborationBand;
+  /** Internal ordering counters — hand-set heuristics, never rendered to a human. */
+  internal: { maxCorrScore: number; avgCorrScore: number };
   rolesPresent: ItemRole[];
   items: CorroborationItemSnap[];
   /** Union of missing cues across items (deduped). */
@@ -117,7 +129,7 @@ export function buildSectionCorroborationBoard(opts: {
   } else {
     if (maxCorr < 2) {
       next_steps_zh.push(
-        "Max corroboration < 2: prioritize direction+instrument pairing or a second public source"
+        "Corroboration weak/minimal — pair direction+instrument, or add a second public source"
       );
     }
     if (hasDirection && !hasInstrument) {
@@ -161,8 +173,8 @@ export function buildSectionCorroborationBoard(opts: {
     sectionId: opts.sectionId,
     label_zh: opts.label_zh,
     itemCount: items.length,
-    maxCorr,
-    avgCorr,
+    maxCorrBand: corroborationBand(maxCorr),
+    internal: { maxCorrScore: maxCorr, avgCorrScore: avgCorr },
     rolesPresent,
     items,
     gaps,
@@ -176,16 +188,17 @@ export function renderBoardMarkdown(board: SectionCorroborationBoard): string[] 
   const lines = [
     `#### Corroboration board · ${board.label_zh}`,
     "",
-    `- Items **${board.itemCount}** · max corr **${board.maxCorr}/3** · avg **${board.avgCorr}** · pairable=${board.pairable ? "yes" : "no"}`,
+    `- Items **${board.itemCount}** · strongest corroboration **${board.maxCorrBand}** · pairable=${board.pairable ? "yes" : "no"}`,
     `- Roles: ${board.rolesPresent.map(roleLabelZh).join(", ") || "—"}`,
+    `- ${HEURISTIC_BASIS_NOTE}`,
     "",
   ];
   if (board.items.length) {
-    lines.push("| Fixture | Role | corr | conf | substance | Missing |");
-    lines.push("|------|------|------|------|-----------|--------|");
+    lines.push("| Fixture | Role | Corroboration | Confidence | Verifiable detail | Missing |");
+    lines.push("|------|------|---------------|------------|-------------------|--------|");
     for (const i of board.items) {
       lines.push(
-        `| \`${i.fixtureId}\` | ${roleLabelZh(i.role)} | ${i.corr} | ${i.conf} | ${i.substance} | ${(i.missing[0] || "—").slice(0, 28)} |`
+        `| \`${i.fixtureId}\` | ${roleLabelZh(i.role)} | ${corroborationBand(i.corr)} | ${i.conf} | ${i.substance} | ${(i.missing[0] || "—").slice(0, 28)} |`
       );
     }
     lines.push("");

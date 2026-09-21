@@ -252,6 +252,11 @@ function matchesFrom(text: string, terms: string[]): string[] {
   return hits.filter((t) => !hits.some((other) => other !== t && other.includes(t)));
 }
 
+/** Named subject anchors present in a passage (for soft related-brief discovery). */
+export function subjectHitsInText(text: string): string[] {
+  return matchesFrom(text || "", SUBJECT_TERMS);
+}
+
 function detailAnchors(text: string): string[] {
   const out = new Set<string>();
   for (const m of text.match(/\d+(\.\d+)?\s*(%|％|个百分点|亿元|万亿元|亿|万吨|万人)/g) || []) {

@@ -10,6 +10,10 @@ export type PolicyScenario = {
   label?: string;
   likelihood?: string;
   basis?: string;
+  /** Time horizon where inferable from the paste. */
+  horizon?: string;
+  /** Observable condition that would confirm this path. */
+  trigger?: string;
   tag?: string;
 };
 
@@ -79,7 +83,14 @@ export type BriefingJson = {
     substance_score_0_to_1?: number;
     band?: string;
     label_zh?: string;
-    nuggets?: { kind?: string; label_zh?: string; evidence?: string; tag?: string }[];
+    nuggets?: {
+      kind?: string;
+      label_zh?: string;
+      value_zh?: string;
+      value_en?: string;
+      evidence?: string;
+      tag?: string;
+    }[];
     boilerplate_hits?: { cue?: string; evidence?: string }[];
     empty_calories?: string[];
     analyst_prompt_zh?: string;
@@ -101,6 +112,21 @@ export type BriefingJson = {
     rationale?: string;
     tag?: string;
   };
+  /**
+   * Reader-facing domain content analysis: impact, trade-offs, forecasts.
+   * Background/hypothesis layer — not a proven claim about intent.
+   */
+  content_analysis?: {
+    framing?: string;
+    domain?: string;
+    domain_label_en?: string;
+    background?: string;
+    so_what?: string;
+    scenarios?: PolicyScenario[];
+    watchpoints?: string[];
+    open_questions?: string[];
+    tag?: string;
+  };
   /** Reject direction-only pastes lacking hard data/instruments. */
   adoption?: {
     framing?: string;
@@ -109,6 +135,40 @@ export type BriefingJson = {
     reason_zh?: string;
     hard_nuggets?: { kind?: string; label_zh?: string; evidence?: string }[];
     rejected_as?: string | null;
+    tag?: string;
+  };
+  /** Two-cut intake: first=hard nuggets; second=gray defer (local or Jev). */
+  intake?: {
+    framing?: string;
+    label?: string;
+    first_cut?: string;
+    second_cut?: string | null;
+    second_cut_engine?: string;
+    reason_en?: string;
+    jev?: {
+      model?: string;
+      choice?: string;
+      confidence?: number;
+      probabilities?: Record<string, number>;
+    };
+    tag?: string;
+  };
+  /** Source / brief clocks for freshness judgement. */
+  temporal?: {
+    framing?: string;
+    briefed_at?: string;
+    collected_at?: string;
+    source_as_of?: string;
+    source_as_of_precision?: string;
+    source_as_of_evidence?: string;
+    source_as_of_method?: string;
+    freshness?: {
+      band?: string;
+      label_en?: string;
+      age_days?: number;
+      basis_en?: string;
+    };
+    forward_deadlines_en?: string[];
     tag?: string;
   };
   source_class?: {
@@ -509,6 +569,34 @@ export function runClaimGate(
         severity: "soft",
         message: "desk_section.primary not in civilian desk taxonomy.",
         evidence: String(desk.primary),
+      });
+    }
+  }
+
+  const analysis = briefing.content_analysis;
+  if (analysis) {
+    if (analysis.framing && analysis.framing !== "civilian-content-analysis") {
+      findings.push({
+        id: "content-analysis-framing-invalid",
+        severity: "soft",
+        message: "content_analysis must use civilian-content-analysis framing.",
+        evidence: String(analysis.framing),
+      });
+    }
+    if (analysis.tag && analysis.tag.toLowerCase() !== "hypothesis") {
+      findings.push({
+        id: "content-analysis-tag-invalid",
+        severity: "soft",
+        message: "content_analysis.tag must be hypothesis (draft analysis, not proven fact).",
+        evidence: String(analysis.tag),
+      });
+    }
+    if (OVERCLAIM.test(analysis.so_what || "")) {
+      findings.push({
+        id: "content-analysis-overclaim",
+        severity: "soft",
+        message: "content_analysis.so_what uses overconfident language.",
+        evidence: (analysis.so_what || "").slice(0, 120),
       });
     }
   }

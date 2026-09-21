@@ -6,13 +6,18 @@ import { buildSignalingScorecard, valvesFromScorecard } from "./media-heuristics
 import { buildInfoTriage } from "./info-triage.js";
 import { buildCanadaNexus, canadaNexusImportanceBump } from "./canada-nexus.js";
 import { buildCanadaPolicyLink } from "./canada-policy-link.js";
-import { buildSubstanceCut } from "./substance.js";
+import { buildSubstanceCut, type SubstanceNugget } from "./substance.js";
 import { assignDeskSection } from "./briefing-desk.js";
 import { matchOntologyLite } from "./ontology-lite.js";
 import { detectSourceClass, type SourceClass } from "./source-class.js";
 import { buildConfidenceFactors, buildCorroboration } from "./confidence.js";
 import { evaluateAdoption, filterDigestByHardNuggets } from "./adoption.js";
 import { appendGateAudit } from "./audit-log.js";
+import { composeDigestRows, composeRejectionWhat, extractFacts, type FactSet } from "./facts.js";
+import { buildContentAnalysis } from "./analysis.js";
+import { resolveIntake, intakeAllowsBrief, type IntakeDecision } from "./intake.js";
+import { buildTemporalCut } from "./temporal.js";
+import { findRelatedBriefs, type RelatedBriefHit } from "./related-briefs.js";
 
 export type SourceInput = {
   label: string;
@@ -28,6 +33,10 @@ export type BriefRequest = {
   forceOffline?: boolean;
   /** Optional override — social_commentary hard-caps confidence. */
   sourceClass?: SourceClass;
+  /** When the paste/item was collected or received (ISO). */
+  collectedAt?: string;
+  /** Operator-supplied publication date (YYYY-MM-DD or ISO). */
+  sourcePublishedAt?: string;
 };
 
 export type BriefResponse = {
@@ -46,11 +55,34 @@ export type BriefResponse = {
   gate: { passed: boolean; findings: ReturnType<typeof runClaimGate> };
   systemPromptChars: number;
   sourceCount: number;
+  /**
+   * Soft links to other outbox briefs on overlapping subjects.
+   * Discovery only — not corroboration until merged and re-run.
+   */
+  relatedBriefs?: RelatedBriefHit[];
 };
 
 function buildInfoValue(
   briefing: BriefingJson
 ): BriefResponse["infoValue"] {
+  const intakeLabel = briefing.intake?.label;
+  if (intakeLabel === "defer") {
+    return {
+      level: "low",
+      label_zh: "Deferred — watch queue (no hard detail yet)",
+      next_zh: [
+        briefing.intake?.reason_en || "Keep on a watch queue for an implementing notice",
+        "Re-run when a public notice, amount, or deadline-tied instrument appears",
+      ],
+    };
+  }
+  if (intakeLabel === "social_downweight") {
+    return {
+      level: "low",
+      label_zh: "Social commentary — down-weighted",
+      next_zh: ["Paste an official or wire excerpt before treating as a primary source"],
+    };
+  }
   if (briefing.adoption && briefing.adoption.adopted === false) {
     return {
       level: "low",
@@ -122,7 +154,21 @@ export async function runBriefingPipeline(req: BriefRequest): Promise<BriefRespo
   const joined = sources.map((s) => s.text).join("\n");
   const { prompt, matchedCards } = composeBriefingSystemPrompt(joined);
   const configured = llmConfigured();
-  const useLlm = !req.forceOffline && configured;
+
+  // First cut + optional second cut before spending LLM quota.
+  const substanceEarly = buildSubstanceCut(joined);
+  const adoptionEarly = evaluateAdoption(substanceEarly);
+  const classEarly = detectSourceClass(joined, {
+    forced: req.sourceClass,
+    labels: sources.map((s) => s.label),
+  });
+  const intake = await resolveIntake({
+    adopted: adoptionEarly.adopted,
+    sourceClass: classEarly.class,
+    text: joined,
+    substance: substanceEarly,
+  });
+  const allowLlm = !req.forceOffline && configured && intakeAllowsBrief(intake.label);
 
   let briefing: BriefingJson;
   let mode: "llm" | "offline" = "offline";
@@ -135,7 +181,10 @@ export async function runBriefingPipeline(req: BriefRequest): Promise<BriefRespo
     briefing = offlineBriefing(joined, matchedCards, sources[0].label, sources);
     offlineReason =
       "llm_not_configured: set LLM_API_KEY + LLM_BASE_URL + LLM_MODEL (or keep offline)";
-  } else if (useLlm) {
+  } else if (!intakeAllowsBrief(intake.label)) {
+    briefing = offlineBriefing(joined, matchedCards, sources[0].label, sources);
+    offlineReason = `intake_${intake.label}: skipped LLM — ${intake.reason_en}`;
+  } else if (allowLlm) {
     try {
       briefing = await callLlmJson(prompt, userMessage(sources));
       mode = "llm";
@@ -151,10 +200,14 @@ export async function runBriefingPipeline(req: BriefRequest): Promise<BriefRespo
   }
 
   briefing = applyDeterministicLayers(briefing, joined, {
+    mode,
     sourceCount: sources.length,
     sourceLabels: sources.map((s) => s.label),
     sources,
     forcedSourceClass: req.sourceClass,
+    intake,
+    collectedAt: req.collectedAt,
+    sourcePublishedAt: req.sourcePublishedAt,
   });
   const finalCards =
     briefing.ontology_lite?.hits
@@ -166,6 +219,25 @@ export async function runBriefingPipeline(req: BriefRequest): Promise<BriefRespo
 
   const findings = runClaimGate(briefing, joined, sources);
   const infoValue = buildInfoValue(briefing);
+  let relatedBriefs: RelatedBriefHit[] = [];
+  try {
+    relatedBriefs = findRelatedBriefs({
+      briefing,
+      sourceText: joined,
+      limit: 6,
+    });
+  } catch {
+    relatedBriefs = [];
+  }
+
+  // Multi-source runs already have real corroboration; still hint if single-source.
+  if (sources.length < 2 && relatedBriefs.length && infoValue.level !== "high") {
+    infoValue.next_zh = [
+      `Add a related outbox excerpt as a second source (${relatedBriefs[0].label}) and re-run to test cross-check`,
+      ...infoValue.next_zh,
+    ].slice(0, 4);
+  }
+
   const result: BriefResponse = {
     mode,
     offlineReason,
@@ -176,6 +248,7 @@ export async function runBriefingPipeline(req: BriefRequest): Promise<BriefRespo
     gate: { passed: gatePassed(findings), findings },
     systemPromptChars: prompt.length,
     sourceCount: sources.length,
+    relatedBriefs,
   };
 
   try {
@@ -194,11 +267,16 @@ function applyDeterministicLayers(
   briefing: BriefingJson,
   sourceText: string,
   ctx: {
+    /** Offline digests are already fact-composed; LLM digests still get filtered. */
+    mode?: "llm" | "offline";
     sourceCount: number;
     sourceLabels: string[];
     /** Per-source texts — corroboration needs them to observe cross-source overlap. */
     sources?: SourceInput[];
     forcedSourceClass?: SourceClass;
+    intake?: IntakeDecision;
+    collectedAt?: string;
+    sourcePublishedAt?: string;
   }
 ): BriefingJson {
   const scorecard = buildSignalingScorecard(sourceText);
@@ -266,6 +344,27 @@ function applyDeterministicLayers(
 
   const adoption = evaluateAdoption(substance_cut);
   next.adoption = adoption;
+  next.intake = ctx.intake
+    ? {
+        framing: ctx.intake.framing,
+        label: ctx.intake.label,
+        first_cut: ctx.intake.first_cut,
+        second_cut: ctx.intake.second_cut,
+        second_cut_engine: ctx.intake.second_cut_engine,
+        reason_en: ctx.intake.reason_en,
+        jev: ctx.intake.jev,
+        tag: ctx.intake.tag,
+      }
+    : undefined;
+
+  const factsEarly = extractFacts(sourceText);
+  const temporal = buildTemporalCut({
+    text: sourceText,
+    collectedAt: ctx.collectedAt,
+    sourcePublishedAt: ctx.sourcePublishedAt,
+    forwardDeadlinesEn: factsEarly.deadline.map((d) => d.value_en).filter(Boolean),
+  });
+  next.temporal = temporal;
 
   next.context_notes = ontologyMatch.hits.length
     ? ontologyMatch.hits.map((h) => ({
@@ -281,66 +380,96 @@ function applyDeterministicLayers(
         },
       ];
 
+  const facts = factsEarly;
+  const analysis =
+    next.content_analysis ??
+    buildContentAnalysis(facts, {
+      text: sourceText,
+      hotThemes: (desk_section.hot_themes || []).map((h) => h.id),
+      deskPrimary: desk_section.primary,
+      primaryKind: info_triage.primary_kind,
+      cards: ontologyMatch.names,
+      sourceCount: ctx.sourceCount,
+    });
+
   if (!adoption.adopted) {
+    const deferred = ctx.intake?.label === "defer";
+    // No manufactured analysis or forecasts for a paste with no content facts.
+    next.content_analysis = undefined;
     next.source_digest_zh = [];
     next.briefing_en = {
-      what: "Not adopted: paste lacks verifiable detail (numbers, deadlines, named instruments, or funding lines).",
-      context: adoption.reason_zh,
-      so_what:
-        "Direction-only / formula language is filtered out. Paste an implementing notice or an excerpt with concrete data, then re-run.",
+      what: composeRejectionWhat(facts),
+      context: deferred
+        ? "Deferred to the watch queue: thematic or institutional cues without an actionable instrument yet."
+        : "No content analysis produced: the excerpt states no action, instrument, amount, deadline or scope to analyse.",
+      so_what: deferred
+        ? `Watch for a later public notice, funded line, or deadline-tied instrument. ${ctx.intake?.reason_en || ""} ${missingFactsSentence(facts)}`.trim()
+        : `Analysis needs at least one of: the document to be issued and by whom, the amount and funding channel, the deadline, the pilot or geographic scope, or a quantified target. ${missingFactsSentence(facts)}`,
       confidence: "low",
       sources_used: ctx.sourceLabels,
     };
     next.policy_outlook = {
       horizon: "near",
       scenarios: [],
-      watchpoints: [
-        "Add: public excerpt with numbers / deadlines",
-        "Add: named notice / measure / implementation plan",
-        "Add: funding line or responsible body + instrument in the same paste",
-      ],
+      watchpoints: deferred
+        ? [
+            "Whether an implementing notice or funded pilot is published on the same subject",
+            "Whether a named body takes ownership of the timeline or product list",
+          ]
+        : [],
     };
-    next.open_questions = [
-      "Is this meeting direction only, with no implementing instrument?",
-      "Can you find a same-topic public implementing text and paste both?",
-    ];
+    next.open_questions = [];
     next.substance_cut = {
       ...substance_cut,
-      nuggets: [],
+      nuggets: deferred ? substance_cut.nuggets : [],
       empty_calories: [
         ...(substance_cut.empty_calories || []),
-        "Adoption rule: no hard detail → whole brief rejected",
+        deferred
+          ? "Intake second cut: defer (watch queue) — no full brief"
+          : "Adoption rule: no hard detail → whole brief rejected",
       ].slice(0, 5),
-      analyst_prompt_zh: adoption.reason_zh,
+      analyst_prompt_zh: deferred ? ctx.intake?.reason_en || adoption.reason_zh : adoption.reason_zh,
     };
   } else {
-    next.source_digest_zh = filterDigestByHardNuggets(
-      next.source_digest_zh,
-      adoption.hard_nuggets
-    );
-    if (!next.source_digest_zh.length && adoption.hard_nuggets.length) {
-      next.source_digest_zh = adoption.hard_nuggets.slice(0, 4).map((n) => ({
-        point: n.label_zh,
-        quote: n.evidence.slice(0, 40),
-        source_label: ctx.sourceLabels[0],
-      }));
+    // The offline composer already builds fact-stated rows per source; only an
+    // LLM-authored digest needs filtering down to hard-detail quotes.
+    if (ctx.mode === "llm") {
+      next.source_digest_zh = filterDigestByHardNuggets(
+        next.source_digest_zh,
+        adoption.hard_nuggets
+      );
+    }
+    if (!next.source_digest_zh?.length) {
+      next.source_digest_zh = digestFallback(ctx, adoption.hard_nuggets);
     }
     next.substance_cut = {
       ...substance_cut,
       nuggets: adoption.hard_nuggets,
     };
+    next.content_analysis = analysis;
   }
 
   if (next.briefing_en && adoption.adopted) {
     const socialNote =
       source_class.class === "social_commentary"
-        ? "Treat as atmosphere/rumor memo only; do not raise confidence from this source alone. "
+        ? "This rests on social commentary rather than an official text, so the impact reading below is provisional. "
         : "";
     next.briefing_en = {
       ...next.briefing_en,
+      context: next.briefing_en.context || `${analysis.domain_label_en} — ${analysis.background}`,
       confidence: confidence_factors.level,
-      so_what: `${socialNote}${next.briefing_en.so_what || ""}`.trim(),
+      so_what: `${socialNote}${next.briefing_en.so_what || analysis.so_what}`.trim(),
     };
+    if (!next.policy_outlook?.scenarios?.length) {
+      next.policy_outlook = {
+        horizon: next.policy_outlook?.horizon || "near",
+        scenarios: analysis.scenarios,
+        watchpoints: analysis.watchpoints,
+      };
+    }
+    if (!next.open_questions?.length) {
+      next.open_questions = analysis.open_questions;
+    }
   }
 
   if (!adoption.adopted && next.confidence_factors) {
@@ -355,34 +484,73 @@ function applyDeterministicLayers(
     };
   }
 
-  const wpExtra: string[] = [];
-  if (adoption.adopted) {
-    if (substance_cut.empty_calories.length) wpExtra.push(...substance_cut.empty_calories.slice(0, 2));
-    if (corroboration.missing.length) {
-      wpExtra.push(`Missing corroboration: ${corroboration.missing[0]}`);
-    }
-    if (canada_policy_link.level !== "none" && canada_policy_link.hits[0]) {
-      wpExtra.push(
-        `Canada public-policy overlay: ${canada_policy_link.hits[0].theme_en || canada_policy_link.hits[0].theme_zh} (verify current public text)`
-      );
-    }
-    if (next.policy_outlook) {
-      const wp = next.policy_outlook.watchpoints || [];
-      next.policy_outlook = {
-        ...next.policy_outlook,
-        watchpoints: [...wpExtra, ...wp].slice(0, 7),
-      };
-    }
+  // Reader-facing watchpoints stay observable events/decisions/data. Method
+  // gaps (substance band, corroboration, source tier) live in their own fields
+  // and in the collapsed analyst-detail panel, not in the briefing narrative.
+  if (adoption.adopted && next.policy_outlook) {
+    const freshnessWatch =
+      temporal.freshness.band === "unknown"
+        ? ["Confirm publication or meeting date — paste has no dated dateline"]
+        : temporal.freshness.band === "stale" || temporal.freshness.band === "aging"
+          ? [
+              `Re-check for a newer public text (source as-of ${temporal.source_as_of || "?"} looks ${temporal.freshness.band})`,
+            ]
+          : [];
+    next.policy_outlook = {
+      ...next.policy_outlook,
+      watchpoints: [
+        ...new Set([
+          ...(next.policy_outlook.watchpoints?.length
+            ? next.policy_outlook.watchpoints
+            : analysis.watchpoints || []),
+          ...freshnessWatch,
+        ]),
+      ].slice(0, 8),
+    };
   }
 
   if (source_class.class === "social_commentary" && adoption.adopted) {
     next.open_questions = [
-      "What is the official/wire URL for the primary claim behind this social commentary?",
+      "Which official or wire text carries the primary claim behind this account?",
       ...(next.open_questions || []),
     ].slice(0, 6);
   }
 
   return next;
+}
+
+/** Name the content facts a rejected paste would need, in reader terms. */
+function missingFactsSentence(facts: FactSet): string {
+  const missing: string[] = [];
+  if (!facts.instrument.length) missing.push("no document or measure is named");
+  if (!facts.money.length) missing.push("no amount or funding channel appears");
+  if (!facts.deadline.length) missing.push("no date is given");
+  if (!facts.scope.length) missing.push("no pilot or geographic scope is set");
+  if (!facts.quantity.length) missing.push("no quantified target is stated");
+  return missing.length
+    ? `In this excerpt ${missing.slice(0, 4).join(", ")}.`
+    : "This excerpt states no actionable commitment.";
+}
+
+/**
+ * Rebuild digest rows from the paste when the incoming ones are unusable.
+ * Prefers fact-composed rows and falls back to hard-nugget quotes, which stay
+ * exact substrings so the claim gate keeps passing.
+ */
+function digestFallback(
+  ctx: { sources?: SourceInput[]; sourceLabels: string[] },
+  hard: SubstanceNugget[]
+): NonNullable<BriefingJson["source_digest_zh"]> {
+  const rows: NonNullable<BriefingJson["source_digest_zh"]> = [];
+  for (const src of ctx.sources || []) {
+    rows.push(...composeDigestRows(src.text, src.label, 3));
+  }
+  if (rows.length) return rows.slice(0, 6);
+  return hard.slice(0, 4).map((n) => ({
+    point: `Establishes ${n.label_zh.toLowerCase()}: ${n.value_en}.`,
+    quote: n.evidence,
+    source_label: ctx.sourceLabels[0],
+  }));
 }
 
 function userMessage(sources: SourceInput[]): string {

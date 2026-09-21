@@ -1,4 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
+import {
+  confidenceLineEn,
+  corroborationLineEn,
+  signalingBasisEn,
+  substanceBasisEn,
+} from "./lib/score-bands";
 
 const SAMPLE = `据新华社北京电，近日召开的中央经济工作会议强调，要坚持高质量发展。会议要求有关部门于2026年底前出台配套办法，安排专项资金不少于50亿元支持芯片与半导体中小企业试点。`;
 
@@ -11,6 +17,27 @@ type Briefing = {
     label_zh?: string;
     reason_zh?: string;
     hard_nuggets?: { kind?: string; label_zh?: string; evidence?: string }[];
+  };
+  intake?: {
+    label?: string;
+    first_cut?: string;
+    second_cut?: string | null;
+    second_cut_engine?: string;
+    reason_en?: string;
+  };
+  temporal?: {
+    briefed_at?: string;
+    collected_at?: string;
+    source_as_of?: string;
+    source_as_of_precision?: string;
+    source_as_of_evidence?: string;
+    freshness?: {
+      band?: string;
+      label_en?: string;
+      age_days?: number;
+      basis_en?: string;
+    };
+    forward_deadlines_en?: string[];
   };
   info_triage?: {
     primary_kind?: string;
@@ -34,7 +61,7 @@ type Briefing = {
     label_zh?: string;
     boilerplate_ratio_0_to_1?: number;
     substance_score_0_to_1?: number;
-    nuggets?: { kind?: string; label_zh?: string; evidence?: string }[];
+    nuggets?: { kind?: string; label_zh?: string; evidence?: string; value_en?: string }[];
     boilerplate_hits?: { cue?: string; evidence?: string }[];
     empty_calories?: string[];
     analyst_prompt_zh?: string;
@@ -76,6 +103,9 @@ type Briefing = {
     label_en?: string;
     missing?: string[];
     drivers?: string[];
+    shared_subjects?: string[];
+    cross_checked?: boolean;
+    distinct_source_count?: number;
   };
   confidence_factors?: {
     level?: string;
@@ -111,7 +141,11 @@ type Briefing = {
       level?: string;
     }[];
   };
-  signaling_scorecard?: { weighted_total?: number; band?: string; rules?: unknown[] };
+  signaling_scorecard?: {
+    weighted_total?: number;
+    band?: string;
+    rules?: { category?: string; status?: string }[];
+  };
   signaling_valves?: {
     sequence?: { status?: string; observation?: string };
     implementing_detail?: { status?: string; observation?: string };
@@ -127,10 +161,25 @@ type Briefing = {
   };
   policy_outlook?: {
     horizon?: string;
-    scenarios?: { label?: string; likelihood?: string; basis?: string }[];
+    scenarios?: { label?: string; likelihood?: string; basis?: string; trigger?: string; horizon?: string }[];
     watchpoints?: string[];
   };
   open_questions?: string[];
+  content_analysis?: {
+    domain?: string;
+    domain_label_en?: string;
+    background?: string;
+    so_what?: string;
+    scenarios?: {
+      label?: string;
+      likelihood?: string;
+      basis?: string;
+      horizon?: string;
+      trigger?: string;
+    }[];
+    watchpoints?: string[];
+    open_questions?: string[];
+  };
 };
 
 type ApiResult = {
@@ -146,6 +195,18 @@ type ApiResult = {
   briefing: Briefing;
   gate: { passed: boolean; findings: { severity: string; message: string; evidence: string }[] };
   systemPromptChars: number;
+  sourceCount?: number;
+  relatedBriefs?: {
+    id: string;
+    label: string;
+    createdAt: string;
+    jsonFile: string;
+    shared_keys: string[];
+    desk?: string;
+    what_preview?: string;
+    corroboration_band?: string;
+    note_en: string;
+  }[];
 };
 
 type SubRow = {
@@ -194,10 +255,10 @@ type ThemeRow = { id?: string; label_en?: string };
 function briefErrorMessage(status: number, serverError?: string): string {
   const detail = serverError || `Request failed (HTTP ${status}).`;
   if (status === 401 || status === 403) {
-    return `${detail} Tick "Force offline" to use the template engine — that path stays open without a token.`;
+    return detail;
   }
   if (status === 429) {
-    return `${detail} This shared demo caps briefing runs per visitor; the offline template path is still available once the window resets.`;
+    return `${detail} This shared demo caps briefing runs per visitor; try again after the window resets, or tick Force offline for the template path.`;
   }
   if (status === 413) {
     return `${detail} Paste a shorter public excerpt and re-run.`;
@@ -208,6 +269,9 @@ function briefErrorMessage(status: number, serverError?: string): string {
 export function App() {
   const [sourceText, setSourceText] = useState(SAMPLE);
   const [label, setLabel] = useState("sample-xinhua-style-excerpt");
+  const [source2Text, setSource2Text] = useState("");
+  const [source2Label, setSource2Label] = useState("second-public-source");
+  const [sourcePublishedAt, setSourcePublishedAt] = useState("");
   const [forceOffline, setForceOffline] = useState(false);
   const [markSocial, setMarkSocial] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -278,15 +342,29 @@ export function App() {
     setError("");
     setActiveQuote(null);
     try {
+      const second = source2Text.trim();
+      const payload =
+        second.length >= 20
+          ? {
+              sources: [
+                { label, text: sourceText },
+                { label: source2Label || "second-public-source", text: second },
+              ],
+              forceOffline,
+              sourceClass: markSocial ? "social_commentary" : undefined,
+              sourcePublishedAt: sourcePublishedAt.trim() || undefined,
+            }
+          : {
+              sourceText,
+              sourceLabel: label,
+              forceOffline,
+              sourceClass: markSocial ? "social_commentary" : undefined,
+              sourcePublishedAt: sourcePublishedAt.trim() || undefined,
+            };
       const res = await fetch("/api/brief", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          sourceText,
-          sourceLabel: label,
-          forceOffline,
-          sourceClass: markSocial ? "social_commentary" : undefined,
-        }),
+        body: JSON.stringify(payload),
       });
       const data = await res.json().catch(() => ({}) as { error?: string });
       if (!res.ok) throw new Error(briefErrorMessage(res.status, data.error));
@@ -298,6 +376,22 @@ export function App() {
       setError(e instanceof Error ? e.message : String(e));
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function useRelatedAsSecondSource(jsonFile: string) {
+    try {
+      const res = await fetch(`/outbox/briefs/${jsonFile}`);
+      if (!res.ok) throw new Error(`Could not load ${jsonFile}`);
+      const rec = await res.json();
+      const text = String(rec?.source?.sourceText || "");
+      const lab = String(rec?.source?.label || rec?.id || "related-source");
+      if (text.length < 20) throw new Error("Related brief has no usable source text");
+      setSource2Text(text);
+      setSource2Label(lab);
+      setError("");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e));
     }
   }
 
@@ -396,6 +490,29 @@ export function App() {
             Source label
           </label>
           <input id="label" value={label} onChange={(e) => setLabel(e.target.value)} />
+          <label htmlFor="src2" style={{ marginTop: "0.75rem" }}>
+            Second public source (optional) — same subject, different issuer → real corroboration
+          </label>
+          <textarea
+            id="src2"
+            value={source2Text}
+            placeholder="Paste a second public excerpt (implementing notice, local restatement, wire). Leave empty for single-source."
+            onChange={(e) => setSource2Text(e.target.value)}
+            rows={5}
+          />
+          <label htmlFor="label2" style={{ marginTop: "0.5rem" }}>
+            Second source label
+          </label>
+          <input id="label2" value={source2Label} onChange={(e) => setSource2Label(e.target.value)} />
+          <label htmlFor="pubdate" style={{ marginTop: "0.75rem" }}>
+            Source date (optional, YYYY-MM-DD) — used when the paste has no dateline
+          </label>
+          <input
+            id="pubdate"
+            type="date"
+            value={sourcePublishedAt}
+            onChange={(e) => setSourcePublishedAt(e.target.value)}
+          />
           <div className="row">
             <label style={{ display: "flex", gap: "0.4rem", alignItems: "center" }}>
               <input
@@ -443,14 +560,24 @@ export function App() {
                 <div className="status-chips">
                   <span
                     className={`chip ${
-                      b.adoption?.adopted === false ? "chip-bad" : b.adoption?.adopted ? "chip-ok" : "chip-warn"
+                      b.intake?.label === "defer"
+                        ? "chip-warn"
+                        : b.adoption?.adopted === false
+                          ? "chip-bad"
+                          : b.adoption?.adopted
+                            ? "chip-ok"
+                            : "chip-warn"
                     }`}
                   >
-                    {b.adoption?.adopted === false
-                      ? "Not adopted"
-                      : b.adoption?.adopted
-                        ? "Adopted"
-                        : "Pending"}
+                    {b.intake?.label === "defer"
+                      ? "Deferred (watch)"
+                      : b.intake?.label === "social_downweight"
+                        ? "Social down-weight"
+                        : b.adoption?.adopted === false
+                          ? "Not adopted"
+                          : b.adoption?.adopted
+                            ? "Adopted"
+                            : "Pending"}
                   </span>
                   <span className={`chip ${result.mode === "llm" ? "chip-ok" : "chip-warn"}`}>
                     {result.mode === "llm" ? "LLM brief" : "Template brief"}
@@ -461,6 +588,19 @@ export function App() {
                   {result.infoValue ? (
                     <span className={`chip value-${result.infoValue.level}`}>
                       Info value {result.infoValue.level}
+                    </span>
+                  ) : null}
+                  {b.temporal?.freshness?.label_en ? (
+                    <span
+                      className={`chip ${
+                        b.temporal.freshness.band === "fresh" || b.temporal.freshness.band === "recent"
+                          ? "chip-ok"
+                          : b.temporal.freshness.band === "unknown"
+                            ? "chip-warn"
+                            : "chip-bad"
+                      }`}
+                    >
+                      {b.temporal.freshness.label_en}
                     </span>
                   ) : null}
                   {b.confidence_factors?.level ? (
@@ -508,23 +648,44 @@ export function App() {
                         : result.llmConfigured
                           ? ""
                           : " (no LLM configured)"}
-                    . Start with What / So what / What&apos;s missing.
+                    . Read What → So what → Scenarios → Watchpoints.
                   </p>
                 ) : null}
-                {result.infoValue?.level === "low" && b.adoption?.adopted !== false ? (
-                  <p className="status-note warn">{result.infoValue.label_zh}</p>
+                {b.temporal ? (
+                  <p className="status-note">
+                    Time: briefed {b.temporal.briefed_at?.slice(0, 19) || "?"}
+                    {b.temporal.source_as_of
+                      ? ` · source as-of ${b.temporal.source_as_of} (${b.temporal.source_as_of_precision || "?"})`
+                      : " · source as-of unknown"}
+                    {b.temporal.source_as_of_evidence
+                      ? ` · cue “${b.temporal.source_as_of_evidence}”`
+                      : ""}
+                    {b.temporal.forward_deadlines_en?.length
+                      ? ` · forward: ${b.temporal.forward_deadlines_en.join("; ")}`
+                      : ""}
+                    {b.temporal.freshness?.basis_en ? ` — ${b.temporal.freshness.basis_en}` : ""}
+                  </p>
+                ) : null}
+                {b.content_analysis?.domain_label_en ? (
+                  <p className="status-note">
+                    Domain: {b.content_analysis.domain_label_en}
+                  </p>
                 ) : null}
               </header>
 
               {b.adoption?.adopted === false ? (
                 <section className="read-block reject-block">
-                  <h2>Not adopted</h2>
+                  <h2>{b.intake?.label === "defer" ? "Deferred — watch queue" : "Not adopted"}</h2>
+                  <p className="prose">{b.briefing_en?.what || b.adoption.label_zh}</p>
                   <p className="prose">{b.briefing_en?.so_what || b.adoption.reason_zh}</p>
-                  <ul className="action-list">
-                    {(b.policy_outlook?.watchpoints || result.infoValue?.next_zh || []).map((w, i) => (
-                      <li key={i}>{w}</li>
-                    ))}
-                  </ul>
+                  {b.intake?.reason_en ? <p className="meta">{b.intake.reason_en}</p> : null}
+                  {(b.policy_outlook?.watchpoints || []).length ? (
+                    <ul className="action-list">
+                      {(b.policy_outlook?.watchpoints || []).map((w, i) => (
+                        <li key={i}>{w}</li>
+                      ))}
+                    </ul>
+                  ) : null}
                 </section>
               ) : (
                 <>
@@ -535,71 +696,26 @@ export function App() {
 
               <section className="read-block">
                 <h2>So what</h2>
-                <p className="prose">{b.briefing_en?.so_what || "—"}</p>
+                <p className="prose">{b.briefing_en?.so_what || b.content_analysis?.so_what || "—"}</p>
               </section>
 
-              {b.substance_cut ? (
-                <section className={`read-block substance-panel substance-${b.substance_cut.band || "thin"}`}>
-                  <h2>
-                    Verifiable detail
-                    <span className={`substance-badge substance-${b.substance_cut.band || "thin"}`}>
-                      {b.substance_cut.band === "dense"
-                        ? "dense"
-                        : b.substance_cut.band === "mixed"
-                          ? "mixed"
-                          : "thin"}
-                    </span>
-                  </h2>
-                  <p className="meta">{b.substance_cut.label_zh}</p>
-                  {(b.substance_cut.nuggets || []).length ? (
-                    <ul className="nugget-list">
-                      {(b.substance_cut.nuggets || []).slice(0, 8).map((n, i) => (
-                        <li key={i}>
-                          <span className="nugget-kind">{n.label_zh}</span>
-                          <span className="nugget-ev">{n.evidence}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <p className="prose muted">
-                      No numbers, deadlines, named notices, or responsible bodies detected — mostly direction / formula language.
-                    </p>
-                  )}
-                  {(b.substance_cut.empty_calories || []).length ? (
-                    <p className="meta">
-                      Empty-calorie notes: {(b.substance_cut.empty_calories || []).slice(0, 2).join("; ")}
-                    </p>
-                  ) : null}
+              {(b.substance_cut?.nuggets || []).length ? (
+                <section className="read-block substance-panel">
+                  <h2>Extracted facts</h2>
+                  <ul className="nugget-list">
+                    {(b.substance_cut?.nuggets || []).slice(0, 8).map((n, i) => (
+                      <li key={i}>
+                        <span className="nugget-kind">{n.value_en || n.label_zh}</span>
+                        <span className="nugget-ev">{n.evidence}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </section>
               ) : null}
 
-              <section className="read-block next-panel">
-                <h2>What&apos;s missing · next</h2>
-                <ul className="action-list">
-                  {Array.from(
-                    new Set([
-                      ...(b.corroboration?.missing || []),
-                      ...(result.infoValue?.next_zh || []),
-                      ...(b.open_questions || []).slice(0, 3),
-                      ...(b.policy_outlook?.watchpoints || []).slice(0, 3),
-                    ])
-                  )
-                    .slice(0, 6)
-                    .map((item, i) => (
-                      <li key={i}>{item}</li>
-                    ))}
-                </ul>
-                {b.corroboration ? (
-                  <p className="meta">
-                    Corroboration {b.corroboration.score_0_to_3}/3 (
-                    {b.corroboration.label_en || b.corroboration.label_zh})
-                  </p>
-                ) : null}
-              </section>
-
               {(b.policy_outlook?.scenarios || []).length ? (
                 <section className="read-block">
-                  <h2>Scenarios (hypothesis — not forecasts)</h2>
+                  <h2>Scenarios (hypothesis)</h2>
                   <ol className="scenario-list">
                     {(b.policy_outlook?.scenarios || []).map((s, i) => (
                       <li key={i}>
@@ -610,10 +726,92 @@ export function App() {
                               ? "plausible"
                               : "less likely"}
                         </span>
-                        <span className="prose">{s.label}</span>
+                        <div>
+                          <p className="prose">{s.label}</p>
+                          {s.horizon ? <p className="meta">Horizon: {s.horizon}</p> : null}
+                          {s.basis ? <p className="meta">Basis: {s.basis}</p> : null}
+                          {s.trigger ? <p className="meta">Trigger: {s.trigger}</p> : null}
+                        </div>
                       </li>
                     ))}
                   </ol>
+                </section>
+              ) : null}
+
+              {(b.policy_outlook?.watchpoints || []).length ? (
+                <section className="read-block next-panel">
+                  <h2>Watchpoints</h2>
+                  <ul className="action-list">
+                    {(b.policy_outlook?.watchpoints || []).map((w, i) => (
+                      <li key={i}>{w}</li>
+                    ))}
+                  </ul>
+                </section>
+              ) : null}
+
+              {(b.open_questions || []).length ? (
+                <section className="read-block">
+                  <h2>Open questions</h2>
+                  <ul className="action-list">
+                    {(b.open_questions || []).map((q, i) => (
+                      <li key={i}>{q}</li>
+                    ))}
+                  </ul>
+                </section>
+              ) : null}
+
+              {b.corroboration ? (
+                <section className="read-block">
+                  <h2>Cross-source check</h2>
+                  <p className="prose">
+                    {corroborationLineEn({
+                      score: b.corroboration.score_0_to_3,
+                      labelEn: b.corroboration.label_en || b.corroboration.label_zh,
+                      drivers: b.corroboration.drivers,
+                    })}
+                  </p>
+                  {(b.corroboration.shared_subjects || []).length ? (
+                    <p className="meta">
+                      Shared subjects: {(b.corroboration.shared_subjects || []).join(", ")}
+                    </p>
+                  ) : null}
+                  {(b.corroboration.missing || []).length ? (
+                    <ul className="action-list">
+                      {(b.corroboration.missing || []).slice(0, 4).map((m, i) => (
+                        <li key={i}>{m}</li>
+                      ))}
+                    </ul>
+                  ) : null}
+                  {result.sourceCount != null ? (
+                    <p className="meta">Sources in this run: {result.sourceCount}</p>
+                  ) : null}
+                </section>
+              ) : null}
+
+              {(result.relatedBriefs || []).length ? (
+                <section className="read-block">
+                  <h2>Related briefs in outbox</h2>
+                  <p className="meta">
+                    Same-topic candidates only — not proof. Load one as the second source and re-run to test corroboration.
+                  </p>
+                  <ul className="action-list">
+                    {(result.relatedBriefs || []).map((r) => (
+                      <li key={r.id}>
+                        <strong>{r.label}</strong>
+                        {r.desk ? ` · ${r.desk}` : ""}
+                        {r.shared_keys?.length ? ` · ${r.shared_keys.slice(0, 3).join(", ")}` : ""}
+                        <div className="row" style={{ marginTop: "0.35rem", gap: "0.5rem" }}>
+                          <button type="button" className="secondary" onClick={() => useRelatedAsSecondSource(r.jsonFile)}>
+                            Use as second source
+                          </button>
+                          <a href={`/outbox/briefs/${r.jsonFile}`} target="_blank" rel="noreferrer">
+                            Open JSON
+                          </a>
+                        </div>
+                        {r.what_preview ? <p className="meta">{r.what_preview}</p> : null}
+                      </li>
+                    ))}
+                  </ul>
                 </section>
               ) : null}
 
@@ -676,16 +874,46 @@ export function App() {
               ) : null}
 
               <details className="meta-fold">
-                <summary>Analyst detail (context, triage, scorecard)</summary>
+                <summary>Analyst detail (method, triage, scorecard — not content analysis)</summary>
                 <p className="meta">{b.briefing_en?.context}</p>
+                {b.content_analysis?.background ? (
+                  <p className="meta">Background frame: {b.content_analysis.background}</p>
+                ) : null}
                 {b.info_triage ? (
                   <p className="meta">
                     Kind {b.info_triage.primary_kind} · research priority{" "}
-                    {b.info_triage.importance?.grade} · signaling {b.signaling_scorecard?.band}
+                    {b.info_triage.importance?.grade} · signaling {b.signaling_scorecard?.band} (
+                    {signalingBasisEn(b.signaling_scorecard?.rules)})
+                  </p>
+                ) : null}
+                {b.substance_cut ? (
+                  <p className="meta">
+                    Substance band {b.substance_cut.band}:{" "}
+                    {substanceBasisEn(b.substance_cut.nuggets, b.substance_cut.band)}
+                  </p>
+                ) : null}
+                {(b.substance_cut?.empty_calories || []).length ? (
+                  <p className="meta">
+                    Formula-language notes: {(b.substance_cut?.empty_calories || []).slice(0, 3).join("; ")}
+                  </p>
+                ) : null}
+                {b.corroboration ? (
+                  <p className="meta">
+                    {corroborationLineEn({
+                      score: b.corroboration.score_0_to_3,
+                      labelEn: b.corroboration.label_en || b.corroboration.label_zh,
+                      drivers: b.corroboration.drivers,
+                    })}
                   </p>
                 ) : null}
                 {b.confidence_factors ? (
+                  <p className="meta">{confidenceLineEn(b.confidence_factors)}</p>
+                ) : null}
+                {b.confidence_factors?.rationale ? (
                   <p className="meta">{b.confidence_factors.rationale}</p>
+                ) : null}
+                {(result.infoValue?.next_zh || []).length ? (
+                  <p className="meta">Method next: {(result.infoValue?.next_zh || []).join("; ")}</p>
                 ) : null}
                 {b.ontology_lite?.hits?.length ? (
                   <p className="meta">

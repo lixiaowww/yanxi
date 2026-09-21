@@ -202,8 +202,10 @@ const md = [
   "",
   "Civilian public-style chains: meeting→instrument, formula→nugget, social cap, desk routing.",
   "",
-  "| Case | Stage | OK | substance | corr | conf | desk | kind |",
-  "|------|-------|----|-----------|------|------|------|------|",
+  "Internal counters are shown on purpose: this report checks thresholds, it is not a reader-facing brief.",
+  "",
+  "| Case | Stage | OK | substance band | corr counter (internal) | conf | desk | kind |",
+  "|------|-------|----|----------------|-------------------------|------|------|------|",
   ...rows.map(
     (r) =>
       `| ${r.caseId} | ${r.stageId} | ${r.ok ? "PASS" : "FAIL"} | ${r.snap.substance} | ${r.snap.corr} | ${r.snap.conf} | ${r.snap.desk || "—"} | ${r.snap.kind || "—"} |`
