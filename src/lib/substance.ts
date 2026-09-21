@@ -1,7 +1,21 @@
 /**
  * Strip formulaic party-speak (党八股) and surface verifiable "substance" cues
  * in public Mandarin policy/media text. Civilian research aid — not mind-reading.
+ *
+ * Cue detection (which drives the substance band and the adoption gate) is
+ * deliberately unchanged; what each nugget *carries* now comes from
+ * `facts.ts`: the extracted value itself plus an English rendering and a
+ * clause-bounded quote, instead of an arbitrary ±18-character window.
  */
+
+import {
+  evidenceSpan,
+  extractFacts,
+  glossPhrase,
+  type ExtractedFact,
+  type FactKind,
+  type FactSet,
+} from "./facts.js";
 
 export type SubstanceKind =
   | "numeric_target"
@@ -17,7 +31,12 @@ export type SubstanceKind =
 export type SubstanceNugget = {
   kind: SubstanceKind;
   label_zh: string;
+  /** Clause-bounded exact substring of the paste (readable evidence). */
   evidence: string;
+  /** The extracted value verbatim, e.g. "2亿元" / "2026年底前". */
+  value_zh: string;
+  /** English rendering of the value, e.g. "no less than RMB 200 million". */
+  value_en: string;
   tag: "hypothesis";
 };
 
@@ -29,9 +48,15 @@ export type BoilerplateHit = {
 export type SubstanceCut = {
   framing: "civilian-boilerplate-vs-substance";
   method: "strip-formula-then-list-verifiables";
-  /** 0–1 share of chars covered by known formula phrases (rough). */
+  /**
+   * Internal only: rough share of chars covered by known formula phrases. The 3-decimal
+   * precision is an artifact of the division, not a measurement — never render it.
+   */
   boilerplate_ratio_0_to_1: number;
-  /** 0–1 based on nugget count / density. */
+  /**
+   * Internal ordering number from hand-set cue weights; the thresholds behind `band` were
+   * chosen by eye, never fitted to labelled data. Show `band` to a human, never this.
+   */
   substance_score_0_to_1: number;
   band: "thin" | "mixed" | "dense";
   label_zh: string;
@@ -118,10 +143,82 @@ const SUBSTANCE: Detector[] = [
   },
 ];
 
-function windowAround(text: string, index: number, len: number, pad = 18): string {
-  const start = Math.max(0, index - pad);
-  const end = Math.min(text.length, index + len + pad);
-  return text.slice(start, end).replace(/\s+/g, " ").trim();
+/** Last-resort English descriptions when a cue has no translatable value. */
+const CUE_FALLBACK_EN: Record<SubstanceKind, string> = {
+  numeric_target: "a numeric figure (see quoted excerpt)",
+  timeline: "a time marker (see quoted excerpt)",
+  named_instrument: "a policy instrument (see quoted excerpt)",
+  responsible_body: "an issuing body (see quoted excerpt)",
+  pilot_or_scope: "a pilot or scope boundary (see quoted excerpt)",
+  constraint_or_ban: "a constraint or red line (see quoted excerpt)",
+  resource_or_funding: "a funding or resource line (see quoted excerpt)",
+  named_sector_or_place: "a named sector or place (see quoted excerpt)",
+  delta_or_priority_shift: "a priority or wording-shift cue (see quoted excerpt)",
+};
+
+/** Which extracted fact kinds can supply the value for a given cue kind. */
+const FACT_KINDS_FOR_CUE: Record<SubstanceKind, FactKind[]> = {
+  numeric_target: ["quantity", "money"],
+  timeline: ["deadline"],
+  named_instrument: ["instrument"],
+  responsible_body: ["actor"],
+  pilot_or_scope: ["scope"],
+  constraint_or_ban: ["prohibition"],
+  resource_or_funding: ["money"],
+  named_sector_or_place: ["subject"],
+  delta_or_priority_shift: [],
+};
+
+/**
+ * Render the value a cue carries. Kept distinct per cue kind so a single
+ * funding clause no longer produces four nuggets that all repeat each other:
+ * the numeric cue shows the amount, the funding cue shows the vehicle.
+ */
+function cueValue(
+  kind: SubstanceKind,
+  raw: string,
+  fact: ExtractedFact | null
+): { value_zh: string; value_en: string } {
+  if (fact) {
+    if (kind === "numeric_target" && fact.kind === "money" && fact.amount_en) {
+      return { value_zh: fact.value_zh, value_en: fact.amount_en };
+    }
+    if (kind === "resource_or_funding" && fact.kind === "money" && fact.vehicle_en) {
+      return {
+        value_zh: raw,
+        value_en: fact.amount_en ? `${fact.vehicle_en} (${fact.amount_en})` : fact.vehicle_en,
+      };
+    }
+    return { value_zh: fact.value_zh, value_en: fact.value_en };
+  }
+  // Never leak Mandarin into an analyst-facing label: the Chinese stays in
+  // value_zh and the English falls back to a generic cue description.
+  const glossed = glossPhrase(raw);
+  return { value_zh: raw, value_en: glossed.en || CUE_FALLBACK_EN[kind] };
+}
+
+/**
+ * Pick the extracted fact that best explains this cue match: an overlapping
+ * span first, then the nearest fact of a compatible kind in the same clause.
+ */
+function factForMatch(
+  facts: FactSet,
+  kind: SubstanceKind,
+  index: number,
+  len: number,
+  clause: string
+): ExtractedFact | null {
+  const wanted = FACT_KINDS_FOR_CUE[kind];
+  if (!wanted.length) return null;
+  const candidates = facts.facts.filter((f) => wanted.includes(f.kind));
+  const overlapping = candidates.find(
+    (f) => index < f.index + f.value_zh.length && index + len > f.index
+  );
+  if (overlapping) return overlapping;
+  const sameClause = candidates
+    .filter((f) => clause.includes(f.value_zh))
+    .sort((a, b) => Math.abs(a.index - index) - Math.abs(b.index - index));
+  return sameClause[0] || null;
 }
 
 function collectBoilerplate(text: string): { hits: BoilerplateHit[]; covered: number } {
@@ -136,7 +233,7 @@ function collectBoilerplate(text: string): { hits: BoilerplateHit[]; covered: nu
   return { hits: hits.slice(0, 12), covered: Math.min(covered, text.length) };
 }
 
-function collectNuggets(text: string): SubstanceNugget[] {
+function collectNuggets(text: string, facts: FactSet): SubstanceNugget[] {
   const out: SubstanceNugget[] = [];
   const seen = new Set<string>();
   for (const det of SUBSTANCE) {
@@ -144,13 +241,17 @@ function collectNuggets(text: string): SubstanceNugget[] {
     let m: RegExpExecArray | null;
     let n = 0;
     while ((m = rx.exec(text)) !== null && n < 4) {
+      // Dedupe on the raw cue match so band + adoption scoring stay stable.
       const key = `${det.kind}:${m[0]}`;
       if (seen.has(key)) continue;
       seen.add(key);
+      const clause = evidenceSpan(text, m.index, m[0].length);
+      const fact = factForMatch(facts, det.kind, m.index, m[0].length, clause);
       out.push({
         kind: det.kind,
         label_zh: det.label_zh,
-        evidence: windowAround(text, m.index, m[0].length),
+        evidence: fact ? fact.quote : clause,
+        ...cueValue(det.kind, m[0], fact),
         tag: "hypothesis",
       });
       n += 1;
@@ -176,10 +277,10 @@ function emptyCalories(text: string, nuggets: SubstanceNugget[]): string[] {
   return notes.slice(0, 5);
 }
 
-export function buildSubstanceCut(sourceText: string): SubstanceCut {
+export function buildSubstanceCut(sourceText: string, facts?: FactSet): SubstanceCut {
   const text = sourceText || "";
   const { hits: boilerplate_hits, covered } = collectBoilerplate(text);
-  const nuggets = collectNuggets(text);
+  const nuggets = collectNuggets(text, facts ?? extractFacts(text));
   const boilerplate_ratio_0_to_1 =
     text.length > 0 ? Number(Math.min(1, covered / Math.max(text.length, 1)).toFixed(3)) : 0;
 

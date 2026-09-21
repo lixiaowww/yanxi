@@ -7,7 +7,7 @@
 ## Method pillars
 
 1. Unwritten rules = open-reporting heuristics: enumerate then weight (signaling scorecard)
-2. Multi-source corroboration = score 0–3; missing-source list; in-column pair merge tests
+2. Cross-source corroboration = ordinal band (minimal → strong) + missing-source list; in-column pair merge tests
 
 - Factorized confidence (substance × corroboration × provenance × source class); social commentary hard-capped at low
 - Strip formula language → keep numbers / deadlines / instruments / responsible bodies
@@ -16,48 +16,50 @@
 
 ## Desk columns
 
+_Bands come from hand-set rule cues, not a calibrated model — they order and flag, they do not measure._
+
 ### Hot topics
 
-Aggregated public hot themes: Taiwan Strait, EVs, China AI, semiconductors, critical minerals — still adoption-gated on hard detail · items 4 · max corr 2/3
+Aggregated public hot themes: Taiwan Strait, EVs, China AI, semiconductors, critical minerals — still adoption-gated on hard detail · items 4 · strongest corroboration minimal
 
-- `hot-china-ai` · implementing_instrument/P3 · corr=2 · conf=medium
-  - The Mandarin source discusses: 科技部有关负责人就人工智能发展答记者问…
-- `hot-electric-vehicles` · implementing_instrument/P3 · corr=2 · conf=medium
-  - The Mandarin source discusses: 工业和信息化部有关负责人称，要巩固新能源汽车产业优势…
+- `hot-china-ai` · implementing_instrument/P3 · corroboration minimal · confidence low · verifiable detail dense (numbers, deadlines, named instruments and funding lines detected)
+  - the Ministry of Science and Technology official statement; large models filing supporting measures to be issued by end-2…
+- `hot-electric-vehicles` · implementing_instrument/P3 · corroboration minimal · confidence low · verifiable detail dense (numbers, deadlines, named instruments and funding lines detected)
+  - the Ministry of Industry and Information Technology official statement; supporting measures to be issued by end-2026; no…
 
 ### Economy & investment
 
-Fiscal/monetary, industrial investment, special funds, local debt/property, meeting→instrument detail (excl. hot-theme AI/EV/chips which route to Hot topics) · items 4 · max corr 3/3
+Fiscal/monetary, industrial investment, special funds, local debt/property, meeting→instrument detail (excl. hot-theme AI/EV/chips which route to Hot topics) · items 4 · strongest corroboration weak
 
-- `dual-circulation` · dual_circulation/P3 · corr=0 · conf=low
-  - Not adopted: paste lacks verifiable detail (numbers, deadlines, named instruments, or funding lines).…
-- `finance-risk` · finance_risk/P3 · corr=0 · conf=low
-  - Not adopted: paste lacks verifiable detail (numbers, deadlines, named instruments, or funding lines).…
+- `dual-circulation` · dual_circulation/P3 · corroboration minimal · confidence low · verifiable detail thin (no numbers, deadlines, named notices or responsible bodies detected)
+  - Not adopted — this excerpt carries no verifiable detail. Named in the paste: subject (dual circulation and the unified n…
+- `finance-risk` · finance_risk/P3 · corroboration minimal · confidence low · verifiable detail mixed (cue words matched, but no hard detail survived the adoption filter)
+  - Not adopted — this excerpt carries no verifiable detail. Named in the paste: acting party (an unnamed meeting) and subje…
 
 ### Foreign affairs
 
-Diplomatic discourse, bilateral ties, Belt and Road, sanctions/cooperation in open text · items 2 · max corr 0/3
+Diplomatic discourse, bilateral ties, Belt and Road, sanctions/cooperation in open text · items 2 · strongest corroboration minimal
 
-- `canada-nexus` · foreign_affairs/P3 · corr=0 · conf=low
-  - The Mandarin source discusses: 商务部有关负责人就中加经贸关系答记者问时表示，中方一贯主张通过对话协商解决贸易分歧…
-- `foreign-affairs` · foreign_affairs/P3 · corr=0 · conf=low
-  - Not adopted: paste lacks verifiable detail (numbers, deadlines, named instruments, or funding lines).…
+- `canada-nexus` · foreign_affairs/P3 · corroboration minimal · confidence low · verifiable detail mixed (responsible bodies and named sectors detected)
+  - the Ministry of Commerce official and the Ministry of Foreign Affairs spokesperson statement; named subjects: China-Cana…
+- `foreign-affairs` · foreign_affairs/P3 · corroboration minimal · confidence low · verifiable detail thin (no numbers, deadlines, named notices or responsible bodies detected)
+  - Not adopted — this excerpt carries no verifiable detail. Named in the paste: acting party (the Ministry of Foreign Affai…
 
 ### Defense — public discourse only
 
-Open defense/military/industry reporting and white-paper style language; not operational intel or targeting · items 1 · max corr 0/3
+Open defense/military/industry reporting and white-paper style language; not operational intel or targeting · items 1 · strongest corroboration minimal
 
-- `defense-public` · defense_public/P3 · corr=0 · conf=low
-  - Not adopted: paste lacks verifiable detail (numbers, deadlines, named instruments, or funding lines).…
+- `defense-public` · defense_public/P3 · corroboration minimal · confidence low · verifiable detail thin (no numbers, deadlines, named notices or responsible bodies detected)
+  - Not adopted — this excerpt carries no verifiable detail. Named in the paste: acting party (the Ministry of National Defe…
 
 ### Social governance
 
-Livelihood, grassroots governance, public opinion, common prosperity, party education — open social-governance language · items 3 · max corr 0/3
+Livelihood, grassroots governance, public opinion, common prosperity, party education — open social-governance language · items 3 · strongest corroboration minimal
 
-- `ideology-party` · ideology_party/P3 · corr=0 · conf=low
-  - Not adopted: paste lacks verifiable detail (numbers, deadlines, named instruments, or funding lines).…
-- `rural-food` · rural_revitalization/P3 · corr=0 · conf=low
-  - Not adopted: paste lacks verifiable detail (numbers, deadlines, named instruments, or funding lines).…
+- `ideology-party` · ideology_party/P3 · corroboration minimal · confidence low · verifiable detail thin (no numbers, deadlines, named notices or responsible bodies detected)
+  - Not adopted — this excerpt carries no verifiable detail. Named in the paste: acting party (unnamed local authorities and…
+- `rural-food` · rural_revitalization/P3 · corroboration minimal · confidence low · verifiable detail mixed (cue words matched, but no hard detail survived the adoption filter)
+  - Not adopted — this excerpt carries no verifiable detail. Named in the paste: acting party (the Ministry of Agriculture a…
 
 ## Regression
 

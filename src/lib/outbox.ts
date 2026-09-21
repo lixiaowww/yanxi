@@ -1,6 +1,12 @@
 import fs from "fs";
 import path from "path";
 import type { BriefResponse } from "./pipeline.js";
+import {
+  HEURISTIC_BASIS_NOTE,
+  corroborationLineEn,
+  sourceTierLineEn,
+  substanceBasisEn,
+} from "./score-bands.js";
 import type { CollectedItem } from "./public-fetch.js";
 import type { Subscription } from "./subscriptions.js";
 
@@ -58,11 +64,16 @@ function toMarkdown(rec: Omit<OutboxRecord, "markdownPath" | "jsonPath">): strin
       : []),
     ...(b.confidence_factors
       ? [
-          `- **confidence:** ${b.confidence_factors.level} · corroboration ${b.corroboration?.score_0_to_3 ?? "?"}/3 · source_class=${b.source_class?.class || "?"}${
+          `- **confidence:** ${b.confidence_factors.level} · ${corroborationLineEn({
+            score: b.corroboration?.score_0_to_3,
+            labelEn: b.corroboration?.label_en,
+            drivers: b.corroboration?.drivers,
+          })} · source_class=${b.source_class?.class || "?"}${
             b.confidence_factors.source_tier?.tier
-              ? ` · tier=${b.confidence_factors.source_tier.tier}(w=${b.confidence_factors.source_tier.weight_0_to_1})`
+              ? ` · ${sourceTierLineEn(b.confidence_factors.source_tier)}`
               : ""
           }`,
+          `- **basis:** ${HEURISTIC_BASIS_NOTE}`,
         ]
       : []),
     ...(b.canada_policy_link && b.canada_policy_link.level !== "none"
@@ -103,6 +114,7 @@ function toMarkdown(rec: Omit<OutboxRecord, "markdownPath" | "jsonPath">): strin
       ? [
           `## Substance cut (${b.substance_cut.band || "?"})`,
           b.substance_cut.label_zh || "",
+          `Band basis: ${substanceBasisEn(b.substance_cut.nuggets, b.substance_cut.band)}.`,
           b.substance_cut.analyst_prompt_zh || "",
           "",
           "**Nuggets**",

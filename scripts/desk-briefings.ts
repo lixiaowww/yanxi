@@ -19,6 +19,12 @@ import {
   type CorroborationItemSnap,
   type SectionCorroborationBoard,
 } from "../src/lib/corroboration-report.js";
+import {
+  HEURISTIC_BASIS_NOTE,
+  corroborationBand,
+  corroborationBasisEn,
+  substanceBasisEn,
+} from "../src/lib/score-bands.js";
 
 type SectionBrief = {
   fixtureId: string;
@@ -30,7 +36,9 @@ type SectionBrief = {
   importance?: string;
   substance?: string;
   canada?: string;
+  /** Internal 0–3 counter; reports print the band, not this. */
   corr: number;
+  corrDrivers: string[];
   conf: string;
   missing: string[];
   sourceText: string;
@@ -38,7 +46,7 @@ type SectionBrief = {
   soWhat?: string;
   scenarios: { label?: string; likelihood?: string; basis?: string }[];
   watchpoints: string[];
-  nuggets: { label_zh?: string; evidence?: string }[];
+  nuggets: { kind?: string; label_zh?: string; evidence?: string }[];
 };
 
 const fixtures = listDomainFixtures();
@@ -73,6 +81,7 @@ for (const f of fixtures) {
     substance: result.briefing.substance_cut?.band,
     canada: result.briefing.canada_nexus?.level,
     corr: result.briefing.corroboration?.score_0_to_3 ?? 0,
+    corrDrivers: result.briefing.corroboration?.drivers || [],
     conf: result.briefing.confidence_factors?.level || result.briefing.briefing_en?.confidence || "?",
     missing: result.briefing.corroboration?.missing || [],
     sourceText: f.sourceText,
@@ -179,24 +188,28 @@ const md: string[] = [
   "",
   "## 全桌印证总览",
   "",
-  "| 栏目 | 条目 | 最高 corr | 平均 | 可配对 | 首要缺口 |",
-  "|------|------|-----------|------|--------|----------|",
+  "| Section | Items | Strongest corroboration | Pairable | Top gap |",
+  "|---------|-------|-------------------------|----------|---------|",
   ...boards.map((b) => {
     const gap = b.next_steps_zh[0] || "—";
-    return `| ${b.label_zh} | ${b.itemCount} | ${b.maxCorr}/3 | ${b.avgCorr} | ${b.pairable ? "是" : "否"} | ${gap.slice(0, 36)} |`;
+    return `| ${b.label_zh} | ${b.itemCount} | ${b.maxCorrBand} | ${b.pairable ? "yes" : "no"} | ${gap.slice(0, 36)} |`;
   }),
+  "",
+  `_${HEURISTIC_BASIS_NOTE}_`,
   "",
 ];
 
 if (pairDeltas.length) {
   md.push("### 栏内方向+细则合并实测");
   md.push("");
-  md.push("| 栏目 | 配对 | 弱腿→合并后 | 最高→合并后 | conf | 抬升弱腿? | 刷新最高? |");
-  md.push("|------|------|--------------|--------------|------|-----------|-----------|");
+  md.push(
+    "| Section | Pair | Weaker leg → merged | Strongest → merged | Confidence | Lifted weaker leg? | New strongest? |"
+  );
+  md.push("|---------|------|---------------------|--------------------|------------|--------------------|----------------|");
   for (const d of pairDeltas) {
     const label = DESK_CATALOG.find((s) => s.id === d.sectionId)?.label_zh || d.sectionId;
     md.push(
-      `| ${label} | \`${d.pair}\` | ${d.beforeMin}→**${d.afterCorr}** | ${d.beforeMax}→${d.afterCorr} | ${d.afterConf} | ${d.reinforced ? "是" : "否"} | ${d.rose ? "是" : "否"} |`
+      `| ${label} | \`${d.pair}\` | ${corroborationBand(d.beforeMin)}→**${corroborationBand(d.afterCorr)}** | ${corroborationBand(d.beforeMax)}→${corroborationBand(d.afterCorr)} | ${d.afterConf} | ${d.reinforced ? "yes" : "no"} | ${d.rose ? "yes" : "no"} |`
     );
   }
   md.push("");
@@ -221,7 +234,10 @@ for (const sec of DESK_CATALOG) {
     md.push(`### ${r.label_zh} · \`${r.fixtureId}\``);
     md.push("");
     md.push(
-      `- triage: **${r.kind}** / **${r.importance}** · substance=${r.substance} · corr=${r.corr}/3 · conf=${r.conf} · CA=${r.canada || "none"} · gate=${r.gate ? "PASS" : "FAIL"}`
+      `- triage: **${r.kind}** / **${r.importance}** · verifiable detail=${r.substance} · corroboration=${corroborationBand(r.corr)} · confidence=${r.conf} · CA=${r.canada || "none"} · gate=${r.gate ? "PASS" : "FAIL"}`
+    );
+    md.push(
+      `- band basis: ${substanceBasisEn(r.nuggets, r.substance)}; corroboration — ${corroborationBasisEn({ drivers: r.corrDrivers, sourceCount: 1, missing: r.missing })}`
     );
     md.push("");
     md.push("**What**");
@@ -282,22 +298,26 @@ const corrMd = [
   "",
   "## 全桌印证总览",
   "",
-  "| 栏目 | 条目 | 最高 corr | 平均 | 可配对 | 首要缺口 |",
-  "|------|------|-----------|------|--------|----------|",
+  "| Section | Items | Strongest corroboration | Pairable | Top gap |",
+  "|---------|-------|-------------------------|----------|---------|",
   ...boards.map((b) => {
     const gap = b.next_steps_zh[0] || "—";
-    return `| ${b.label_zh} | ${b.itemCount} | ${b.maxCorr}/3 | ${b.avgCorr} | ${b.pairable ? "是" : "否"} | ${gap.slice(0, 40)} |`;
+    return `| ${b.label_zh} | ${b.itemCount} | ${b.maxCorrBand} | ${b.pairable ? "yes" : "no"} | ${gap.slice(0, 40)} |`;
   }),
+  "",
+  `_${HEURISTIC_BASIS_NOTE}_`,
   "",
 ];
 if (pairDeltas.length) {
   corrMd.push("## 栏内配对合并实测", "");
-  corrMd.push("| 栏目 | 配对 | 弱腿→合并后 | 最高→合并后 | conf | 抬升弱腿? | 刷新最高? |");
-  corrMd.push("|------|------|--------------|--------------|------|-----------|-----------|");
+  corrMd.push(
+    "| Section | Pair | Weaker leg → merged | Strongest → merged | Confidence | Lifted weaker leg? | New strongest? |"
+  );
+  corrMd.push("|---------|------|---------------------|--------------------|------------|--------------------|----------------|");
   for (const d of pairDeltas) {
     const label = DESK_CATALOG.find((s) => s.id === d.sectionId)?.label_zh || d.sectionId;
     corrMd.push(
-      `| ${label} | \`${d.pair}\` | ${d.beforeMin}→**${d.afterCorr}** | ${d.beforeMax}→${d.afterCorr} | ${d.afterConf} | ${d.reinforced ? "是" : "否"} | ${d.rose ? "是" : "否"} |`
+      `| ${label} | \`${d.pair}\` | ${corroborationBand(d.beforeMin)}→**${corroborationBand(d.afterCorr)}** | ${corroborationBand(d.beforeMax)}→${corroborationBand(d.afterCorr)} | ${d.afterConf} | ${d.reinforced ? "yes" : "no"} | ${d.rose ? "yes" : "no"} |`
     );
   }
   corrMd.push("");

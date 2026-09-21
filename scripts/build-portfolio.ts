@@ -14,12 +14,21 @@ import {
   detectItemRole,
   type CorroborationItemSnap,
 } from "../src/lib/corroboration-report.js";
+import {
+  HEURISTIC_BASIS_NOTE,
+  corroborationBand,
+  substanceBasisEn,
+  type CorroborationBand,
+} from "../src/lib/score-bands.js";
 
 type DeskItem = {
   fixtureId: string;
   kind?: string;
   importance?: string;
   substance?: string;
+  substanceBasis: string;
+  corrBand: CorroborationBand;
+  /** Internal ordering counter — kept for debugging, never rendered. */
   corr: number;
   conf: string;
   what?: string;
@@ -56,6 +65,11 @@ for (const f of fixtures) {
     kind: result.briefing.info_triage?.primary_kind,
     importance: result.briefing.info_triage?.importance?.grade,
     substance: result.briefing.substance_cut?.band,
+    substanceBasis: substanceBasisEn(
+      result.briefing.substance_cut?.nuggets,
+      result.briefing.substance_cut?.band
+    ),
+    corrBand: corroborationBand(result.briefing.corroboration?.score_0_to_3),
     corr: result.briefing.corroboration?.score_0_to_3 ?? 0,
     conf: result.briefing.confidence_factors?.level || "?",
     what: result.briefing.briefing_en?.what,
@@ -98,7 +112,7 @@ const columns = DESK_CATALOG.map((sec) => {
     label_en: sec.label_en,
     blurb_zh: sec.blurb_zh,
     itemCount: items.length,
-    maxCorr: board.maxCorr,
+    maxCorrBand: board.maxCorrBand,
     items: items.slice(0, 4),
     next_steps_zh: board.next_steps_zh.slice(0, 3),
   };
@@ -150,8 +164,10 @@ const portfolio = {
   method: {
     pillar1_zh: "Unwritten rules = open-reporting heuristics: enumerate then weight (signaling scorecard)",
     pillar1_en: "Unwritten rules = open-reporting heuristics: enumerate then weight (signaling scorecard)",
-    pillar2_zh: "Multi-source corroboration = score 0–3; missing-source list; in-column pair merge tests",
-    pillar2_en: "Multi-source corroboration = score 0–3; missing-source list; in-column pair merge tests",
+    pillar2_zh:
+      "Cross-source corroboration = ordinal band (minimal → strong) + missing-source list; in-column pair merge tests",
+    pillar2_en:
+      "Cross-source corroboration = ordinal band (minimal → strong) + missing-source list; in-column pair merge tests",
     confidence_zh: "Factorized confidence (substance × corroboration × provenance × source class); social commentary hard-capped at low",
     confidence_en: "Factorized confidence (substance × corroboration × provenance × source class); social commentary hard-capped at low",
     substance_zh: "Strip formula language → keep numbers / deadlines / instruments / responsible bodies",
@@ -161,6 +177,7 @@ const portfolio = {
     ontology_zh: "Civic Ontology Lite: desk-first context cards ≤8; not OWL / intel ontology",
     ontology_en: "Civic Ontology Lite: desk-first context cards ≤8; not OWL / intel ontology",
   },
+  heuristic_basis_note: HEURISTIC_BASIS_NOTE,
   columns,
   hot_theme_catalog: HOT_THEME_CATALOG.map((t) => ({
     id: t.id,
@@ -182,6 +199,7 @@ const portfolio = {
     "Outlook = scenarios + watchpoints; never will-definitely",
     "Context cards = Civic Ontology Lite (background/hypothesis only)",
     "UI is English; Chinese appears only in source paste and quoted excerpts",
+    "Substance / corroboration / confidence / source tier are hand-set rule heuristics shown as bands — no labelled corpus, no validation set, so no scores are reported",
   ],
   generatedAt: new Date().toISOString(),
 };
@@ -212,13 +230,19 @@ const md = [
   "## Desk columns",
   "",
 ];
+md.push(`_${HEURISTIC_BASIS_NOTE}_`);
+md.push("");
 for (const col of columns) {
   md.push(`### ${col.label_en}`);
   md.push("");
-  md.push(`${col.blurb_zh} · items ${col.itemCount} · max corr ${col.maxCorr}/3`);
+  md.push(
+    `${col.blurb_zh} · items ${col.itemCount} · strongest corroboration ${col.maxCorrBand}`
+  );
   md.push("");
   for (const it of col.items.slice(0, 2)) {
-    md.push(`- \`${it.fixtureId}\` · ${it.kind}/${it.importance} · corr=${it.corr} · conf=${it.conf}`);
+    md.push(
+      `- \`${it.fixtureId}\` · ${it.kind}/${it.importance} · corroboration ${it.corrBand} · confidence ${it.conf} · verifiable detail ${it.substance} (${it.substanceBasis})`
+    );
     if (it.what) md.push(`  - ${it.what.slice(0, 120)}…`);
   }
   md.push("");

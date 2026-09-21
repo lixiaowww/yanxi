@@ -129,14 +129,22 @@ export function singleSourceCueBasisEn(cues?: { drivers?: string[] }): string {
   return `within-passage cues: ${joinClauses(phrases, 3)}`;
 }
 
-/** One clause naming the verifiable cue types detected in the paste. */
-export function substanceBasisEn(nuggets?: { kind?: string }[]): string {
+/**
+ * One clause naming the verifiable cue types detected in the paste.
+ *
+ * Pass `band` too: a rejected brief keeps the band it scored but has its nuggets stripped by the
+ * adoption gate, and claiming "nothing detected" there would be wrong.
+ */
+export function substanceBasisEn(nuggets?: { kind?: string }[], band?: string): string {
   const kinds = [...new Set((nuggets || []).map((n) => n.kind).filter(Boolean) as string[])];
-  if (!kinds.length) {
-    return "no numbers, deadlines, named notices or responsible bodies detected";
+  if (kinds.length) {
+    const named = kinds.map((k) => SUBSTANCE_KIND_EN[k] || humanize(k));
+    return `${joinClauses(named, 4)} detected`;
   }
-  const named = kinds.map((k) => SUBSTANCE_KIND_EN[k] || humanize(k));
-  return `${joinClauses(named, 4)} detected`;
+  if (band && band !== "thin") {
+    return "cue words matched, but no hard detail survived the adoption filter";
+  }
+  return "no numbers, deadlines, named notices or responsible bodies detected";
 }
 
 /** One clause naming which heuristic categories fired in the signaling scorecard. */

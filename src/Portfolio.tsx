@@ -6,7 +6,8 @@ type DeskItem = {
   kind?: string;
   importance?: string;
   substance?: string;
-  corr: number;
+  substanceBasis?: string;
+  corrBand?: string;
   conf: string;
   what?: string;
   soWhat?: string;
@@ -20,7 +21,7 @@ type Column = {
   blurb_zh: string;
   blurb_en?: string;
   itemCount: number;
-  maxCorr: number;
+  maxCorrBand?: string;
   items: DeskItem[];
   next_steps_zh: string[];
   next_steps_en?: string[];
@@ -32,6 +33,7 @@ type PortfolioData = {
   not_zh: string;
   not_en?: string;
   method: Record<string, string>;
+  heuristic_basis_note?: string;
   columns: Column[];
   hot_theme_catalog?: { id: string; label_en: string }[];
   regress: {
@@ -134,6 +136,7 @@ export function Portfolio() {
           Hot topics aggregates Taiwan Strait, EVs, China AI, semiconductors, and critical minerals
           when those cues appear in the paste.
         </p>
+        {data.heuristic_basis_note ? <p className="meta">{data.heuristic_basis_note}</p> : null}
         {(data.hot_theme_catalog || []).length ? (
           <p className="meta">
             Themes:{" "}
@@ -146,13 +149,20 @@ export function Portfolio() {
               <h3>{col.label_en || col.label_zh}</h3>
               <p className="meta">{col.blurb_en || col.blurb_zh}</p>
               <p className="meta">
-                Items {col.itemCount} · max corroboration <strong>{col.maxCorr}/3</strong>
+                Items {col.itemCount} · strongest corroboration{" "}
+                <strong>{col.maxCorrBand || "minimal"}</strong>
               </p>
               <ul className="plain-list">
                 {col.items.slice(0, 2).map((it) => (
                   <li key={it.fixtureId}>
-                    <code>{it.fixtureId}</code> · {it.kind}/{it.importance} · corr=
-                    {it.corr} · conf={it.conf}
+                    <code>{it.fixtureId}</code> · {it.kind}/{it.importance} · corroboration{" "}
+                    {it.corrBand || "minimal"} · confidence {it.conf}
+                    {it.substance ? (
+                      <div className="meta">
+                        Verifiable detail {it.substance}
+                        {it.substanceBasis ? ` — ${it.substanceBasis}` : ""}
+                      </div>
+                    ) : null}
                     {it.what ? <div className="meta">{it.what.slice(0, 140)}…</div> : null}
                   </li>
                 ))}

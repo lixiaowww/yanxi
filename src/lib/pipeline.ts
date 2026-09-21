@@ -6,13 +6,15 @@ import { buildSignalingScorecard, valvesFromScorecard } from "./media-heuristics
 import { buildInfoTriage } from "./info-triage.js";
 import { buildCanadaNexus, canadaNexusImportanceBump } from "./canada-nexus.js";
 import { buildCanadaPolicyLink } from "./canada-policy-link.js";
-import { buildSubstanceCut } from "./substance.js";
+import { buildSubstanceCut, type SubstanceNugget } from "./substance.js";
 import { assignDeskSection } from "./briefing-desk.js";
 import { matchOntologyLite } from "./ontology-lite.js";
 import { detectSourceClass, type SourceClass } from "./source-class.js";
 import { buildConfidenceFactors, buildCorroboration } from "./confidence.js";
 import { evaluateAdoption, filterDigestByHardNuggets } from "./adoption.js";
 import { appendGateAudit } from "./audit-log.js";
+import { composeDigestRows, composeRejectionWhat, extractFacts, type FactSet } from "./facts.js";
+import { buildContentAnalysis } from "./analysis.js";
 
 export type SourceInput = {
   label: string;
@@ -151,6 +153,7 @@ export async function runBriefingPipeline(req: BriefRequest): Promise<BriefRespo
   }
 
   briefing = applyDeterministicLayers(briefing, joined, {
+    mode,
     sourceCount: sources.length,
     sourceLabels: sources.map((s) => s.label),
     sources,
@@ -194,6 +197,8 @@ function applyDeterministicLayers(
   briefing: BriefingJson,
   sourceText: string,
   ctx: {
+    /** Offline digests are already fact-composed; LLM digests still get filtered. */
+    mode?: "llm" | "offline";
     sourceCount: number;
     sourceLabels: string[];
     /** Per-source texts — corroboration needs them to observe cross-source overlap. */
@@ -281,29 +286,36 @@ function applyDeterministicLayers(
         },
       ];
 
+  const facts = extractFacts(sourceText);
+  const analysis =
+    next.content_analysis ??
+    buildContentAnalysis(facts, {
+      text: sourceText,
+      hotThemes: (desk_section.hot_themes || []).map((h) => h.id),
+      deskPrimary: desk_section.primary,
+      primaryKind: info_triage.primary_kind,
+      cards: ontologyMatch.names,
+      sourceCount: ctx.sourceCount,
+    });
+
   if (!adoption.adopted) {
+    // No manufactured analysis or forecasts for a paste with no content facts.
+    next.content_analysis = undefined;
     next.source_digest_zh = [];
     next.briefing_en = {
-      what: "Not adopted: paste lacks verifiable detail (numbers, deadlines, named instruments, or funding lines).",
-      context: adoption.reason_zh,
-      so_what:
-        "Direction-only / formula language is filtered out. Paste an implementing notice or an excerpt with concrete data, then re-run.",
+      what: composeRejectionWhat(facts),
+      context:
+        "No content analysis produced: the excerpt states no action, instrument, amount, deadline or scope to analyse.",
+      so_what: `Analysis needs at least one of: the document to be issued and by whom, the amount and funding channel, the deadline, the pilot or geographic scope, or a quantified target. ${missingFactsSentence(facts)}`,
       confidence: "low",
       sources_used: ctx.sourceLabels,
     };
     next.policy_outlook = {
       horizon: "near",
       scenarios: [],
-      watchpoints: [
-        "Add: public excerpt with numbers / deadlines",
-        "Add: named notice / measure / implementation plan",
-        "Add: funding line or responsible body + instrument in the same paste",
-      ],
+      watchpoints: [],
     };
-    next.open_questions = [
-      "Is this meeting direction only, with no implementing instrument?",
-      "Can you find a same-topic public implementing text and paste both?",
-    ];
+    next.open_questions = [];
     next.substance_cut = {
       ...substance_cut,
       nuggets: [],
@@ -314,33 +326,45 @@ function applyDeterministicLayers(
       analyst_prompt_zh: adoption.reason_zh,
     };
   } else {
-    next.source_digest_zh = filterDigestByHardNuggets(
-      next.source_digest_zh,
-      adoption.hard_nuggets
-    );
-    if (!next.source_digest_zh.length && adoption.hard_nuggets.length) {
-      next.source_digest_zh = adoption.hard_nuggets.slice(0, 4).map((n) => ({
-        point: n.label_zh,
-        quote: n.evidence.slice(0, 40),
-        source_label: ctx.sourceLabels[0],
-      }));
+    // The offline composer already builds fact-stated rows per source; only an
+    // LLM-authored digest needs filtering down to hard-detail quotes.
+    if (ctx.mode === "llm") {
+      next.source_digest_zh = filterDigestByHardNuggets(
+        next.source_digest_zh,
+        adoption.hard_nuggets
+      );
+    }
+    if (!next.source_digest_zh?.length) {
+      next.source_digest_zh = digestFallback(ctx, adoption.hard_nuggets);
     }
     next.substance_cut = {
       ...substance_cut,
       nuggets: adoption.hard_nuggets,
     };
+    next.content_analysis = analysis;
   }
 
   if (next.briefing_en && adoption.adopted) {
     const socialNote =
       source_class.class === "social_commentary"
-        ? "Treat as atmosphere/rumor memo only; do not raise confidence from this source alone. "
+        ? "This rests on social commentary rather than an official text, so the impact reading below is provisional. "
         : "";
     next.briefing_en = {
       ...next.briefing_en,
+      context: next.briefing_en.context || `${analysis.domain_label_en} — ${analysis.background}`,
       confidence: confidence_factors.level,
-      so_what: `${socialNote}${next.briefing_en.so_what || ""}`.trim(),
+      so_what: `${socialNote}${next.briefing_en.so_what || analysis.so_what}`.trim(),
     };
+    if (!next.policy_outlook?.scenarios?.length) {
+      next.policy_outlook = {
+        horizon: next.policy_outlook?.horizon || "near",
+        scenarios: analysis.scenarios,
+        watchpoints: analysis.watchpoints,
+      };
+    }
+    if (!next.open_questions?.length) {
+      next.open_questions = analysis.open_questions;
+    }
   }
 
   if (!adoption.adopted && next.confidence_factors) {
@@ -355,34 +379,62 @@ function applyDeterministicLayers(
     };
   }
 
-  const wpExtra: string[] = [];
-  if (adoption.adopted) {
-    if (substance_cut.empty_calories.length) wpExtra.push(...substance_cut.empty_calories.slice(0, 2));
-    if (corroboration.missing.length) {
-      wpExtra.push(`Missing corroboration: ${corroboration.missing[0]}`);
-    }
-    if (canada_policy_link.level !== "none" && canada_policy_link.hits[0]) {
-      wpExtra.push(
-        `Canada public-policy overlay: ${canada_policy_link.hits[0].theme_en || canada_policy_link.hits[0].theme_zh} (verify current public text)`
-      );
-    }
-    if (next.policy_outlook) {
-      const wp = next.policy_outlook.watchpoints || [];
-      next.policy_outlook = {
-        ...next.policy_outlook,
-        watchpoints: [...wpExtra, ...wp].slice(0, 7),
-      };
-    }
+  // Reader-facing watchpoints stay observable events/decisions/data. Method
+  // gaps (substance band, corroboration, source tier) live in their own fields
+  // and in the collapsed analyst-detail panel, not in the briefing narrative.
+  if (adoption.adopted && next.policy_outlook) {
+    next.policy_outlook = {
+      ...next.policy_outlook,
+      watchpoints: [
+        ...new Set(next.policy_outlook.watchpoints?.length
+          ? next.policy_outlook.watchpoints
+          : analysis.watchpoints),
+      ].slice(0, 6),
+    };
   }
 
   if (source_class.class === "social_commentary" && adoption.adopted) {
     next.open_questions = [
-      "What is the official/wire URL for the primary claim behind this social commentary?",
+      "Which official or wire text carries the primary claim behind this account?",
       ...(next.open_questions || []),
     ].slice(0, 6);
   }
 
   return next;
+}
+
+/** Name the content facts a rejected paste would need, in reader terms. */
+function missingFactsSentence(facts: FactSet): string {
+  const missing: string[] = [];
+  if (!facts.instrument.length) missing.push("no document or measure is named");
+  if (!facts.money.length) missing.push("no amount or funding channel appears");
+  if (!facts.deadline.length) missing.push("no date is given");
+  if (!facts.scope.length) missing.push("no pilot or geographic scope is set");
+  if (!facts.quantity.length) missing.push("no quantified target is stated");
+  return missing.length
+    ? `In this excerpt ${missing.slice(0, 4).join(", ")}.`
+    : "This excerpt states no actionable commitment.";
+}
+
+/**
+ * Rebuild digest rows from the paste when the incoming ones are unusable.
+ * Prefers fact-composed rows and falls back to hard-nugget quotes, which stay
+ * exact substrings so the claim gate keeps passing.
+ */
+function digestFallback(
+  ctx: { sources?: SourceInput[]; sourceLabels: string[] },
+  hard: SubstanceNugget[]
+): NonNullable<BriefingJson["source_digest_zh"]> {
+  const rows: NonNullable<BriefingJson["source_digest_zh"]> = [];
+  for (const src of ctx.sources || []) {
+    rows.push(...composeDigestRows(src.text, src.label, 3));
+  }
+  if (rows.length) return rows.slice(0, 6);
+  return hard.slice(0, 4).map((n) => ({
+    point: `Establishes ${n.label_zh.toLowerCase()}: ${n.value_en}.`,
+    quote: n.evidence,
+    source_label: ctx.sourceLabels[0],
+  }));
 }
 
 function userMessage(sources: SourceInput[]): string {

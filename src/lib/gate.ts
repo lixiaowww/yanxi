@@ -10,6 +10,10 @@ export type PolicyScenario = {
   label?: string;
   likelihood?: string;
   basis?: string;
+  /** Time horizon where inferable from the paste. */
+  horizon?: string;
+  /** Observable condition that would confirm this path. */
+  trigger?: string;
   tag?: string;
 };
 
@@ -99,6 +103,21 @@ export type BriefingJson = {
     evidence?: string[];
     hot_themes?: { id?: string; label_en?: string; evidence?: string }[];
     rationale?: string;
+    tag?: string;
+  };
+  /**
+   * Reader-facing domain content analysis: impact, trade-offs, forecasts.
+   * Background/hypothesis layer — not a proven claim about intent.
+   */
+  content_analysis?: {
+    framing?: string;
+    domain?: string;
+    domain_label_en?: string;
+    background?: string;
+    so_what?: string;
+    scenarios?: PolicyScenario[];
+    watchpoints?: string[];
+    open_questions?: string[];
     tag?: string;
   };
   /** Reject direction-only pastes lacking hard data/instruments. */
@@ -509,6 +528,34 @@ export function runClaimGate(
         severity: "soft",
         message: "desk_section.primary not in civilian desk taxonomy.",
         evidence: String(desk.primary),
+      });
+    }
+  }
+
+  const analysis = briefing.content_analysis;
+  if (analysis) {
+    if (analysis.framing && analysis.framing !== "civilian-content-analysis") {
+      findings.push({
+        id: "content-analysis-framing-invalid",
+        severity: "soft",
+        message: "content_analysis must use civilian-content-analysis framing.",
+        evidence: String(analysis.framing),
+      });
+    }
+    if (analysis.tag && analysis.tag.toLowerCase() !== "hypothesis") {
+      findings.push({
+        id: "content-analysis-tag-invalid",
+        severity: "soft",
+        message: "content_analysis.tag must be hypothesis (draft analysis, not proven fact).",
+        evidence: String(analysis.tag),
+      });
+    }
+    if (OVERCLAIM.test(analysis.so_what || "")) {
+      findings.push({
+        id: "content-analysis-overclaim",
+        severity: "soft",
+        message: "content_analysis.so_what uses overconfident language.",
+        evidence: (analysis.so_what || "").slice(0, 120),
       });
     }
   }

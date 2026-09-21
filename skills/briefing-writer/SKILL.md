@@ -35,6 +35,7 @@ turn **public Mandarin text** into a clear **English briefing note**.
 - Prefer may/could/if-then; never will-definitely / guaranteed / secretly-plans.
 - Formulaic party-speak is **atmosphere / agenda cue**, not proof of secret plans or “brainwashing success”.
 - Factorize confidence (signaling × substance × corroboration × provenance × source_class). Social commentary cannot alone reach high confidence or corroborate official claims.
+- Scorecard weights and thresholds are **hand-set editorial priors** — no labelled corpus, no validation set. In prose written for a reader, report the **band** (`thin`/`mixed`/`dense`, `low`/`medium`/`high`, tier `A`–`U`, corroboration `minimal`→`strong`) plus one clause naming what produced it. Never quote `weighted_total`, a `0–1` score, or an `x/3` figure as if it were measured.
 - Draft for **human review** only.
 
 ## Output

@@ -41,6 +41,7 @@ export type SignalingScorecard = {
   method: "enumerate-then-weight";
   framing: "civilian-public-media-heuristics";
   rules: ScoredHeuristic[];
+  /** Internal ordering totals (hand-set weights, never calibrated). Do not render to a human — show `band`. */
   weighted_total: number;
   weight_sum: number;
   band: "low" | "medium" | "high";
@@ -272,7 +273,7 @@ export function buildSignalingScorecard(sourceText: string): SignalingScorecard 
     weighted_total,
     weight_sum,
     band,
-    calibration: `Enumerated ${rules.length} public-media heuristics; hit=${hits}, miss=${misses}, unclear=${unclear}; weighted_total=${weighted_total} / ${weight_sum} → band=${band}. Hypothesis only — not proof of intent.`,
+    calibration: `Enumerated ${rules.length} public-media heuristics; observed=${hits}, absent=${misses}, unclear=${unclear} → band=${band}. Weights are hand-set editorial priors with no labelled corpus and no held-out validation: the band orders and flags, it does not measure. Hypothesis only — not proof of intent.`,
     tag: "hypothesis",
   };
 }

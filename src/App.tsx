@@ -1,4 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
+import {
+  confidenceLineEn,
+  corroborationLineEn,
+  signalingBasisEn,
+  substanceBasisEn,
+} from "./lib/score-bands";
 
 const SAMPLE = `据新华社北京电，近日召开的中央经济工作会议强调，要坚持高质量发展。会议要求有关部门于2026年底前出台配套办法，安排专项资金不少于50亿元支持芯片与半导体中小企业试点。`;
 
@@ -34,7 +40,7 @@ type Briefing = {
     label_zh?: string;
     boilerplate_ratio_0_to_1?: number;
     substance_score_0_to_1?: number;
-    nuggets?: { kind?: string; label_zh?: string; evidence?: string }[];
+    nuggets?: { kind?: string; label_zh?: string; evidence?: string; value_en?: string }[];
     boilerplate_hits?: { cue?: string; evidence?: string }[];
     empty_calories?: string[];
     analyst_prompt_zh?: string;
@@ -111,7 +117,11 @@ type Briefing = {
       level?: string;
     }[];
   };
-  signaling_scorecard?: { weighted_total?: number; band?: string; rules?: unknown[] };
+  signaling_scorecard?: {
+    weighted_total?: number;
+    band?: string;
+    rules?: { category?: string; status?: string }[];
+  };
   signaling_valves?: {
     sequence?: { status?: string; observation?: string };
     implementing_detail?: { status?: string; observation?: string };
@@ -127,10 +137,25 @@ type Briefing = {
   };
   policy_outlook?: {
     horizon?: string;
-    scenarios?: { label?: string; likelihood?: string; basis?: string }[];
+    scenarios?: { label?: string; likelihood?: string; basis?: string; trigger?: string; horizon?: string }[];
     watchpoints?: string[];
   };
   open_questions?: string[];
+  content_analysis?: {
+    domain?: string;
+    domain_label_en?: string;
+    background?: string;
+    so_what?: string;
+    scenarios?: {
+      label?: string;
+      likelihood?: string;
+      basis?: string;
+      horizon?: string;
+      trigger?: string;
+    }[];
+    watchpoints?: string[];
+    open_questions?: string[];
+  };
 };
 
 type ApiResult = {
@@ -508,23 +533,21 @@ export function App() {
                         : result.llmConfigured
                           ? ""
                           : " (no LLM configured)"}
-                    . Start with What / So what / What&apos;s missing.
+                    . Read What → So what → Scenarios → Watchpoints.
                   </p>
                 ) : null}
-                {result.infoValue?.level === "low" && b.adoption?.adopted !== false ? (
-                  <p className="status-note warn">{result.infoValue.label_zh}</p>
+                {b.content_analysis?.domain_label_en ? (
+                  <p className="status-note">
+                    Domain: {b.content_analysis.domain_label_en}
+                  </p>
                 ) : null}
               </header>
 
               {b.adoption?.adopted === false ? (
                 <section className="read-block reject-block">
                   <h2>Not adopted</h2>
+                  <p className="prose">{b.briefing_en?.what || b.adoption.label_zh}</p>
                   <p className="prose">{b.briefing_en?.so_what || b.adoption.reason_zh}</p>
-                  <ul className="action-list">
-                    {(b.policy_outlook?.watchpoints || result.infoValue?.next_zh || []).map((w, i) => (
-                      <li key={i}>{w}</li>
-                    ))}
-                  </ul>
                 </section>
               ) : (
                 <>
@@ -535,71 +558,26 @@ export function App() {
 
               <section className="read-block">
                 <h2>So what</h2>
-                <p className="prose">{b.briefing_en?.so_what || "—"}</p>
+                <p className="prose">{b.briefing_en?.so_what || b.content_analysis?.so_what || "—"}</p>
               </section>
 
-              {b.substance_cut ? (
-                <section className={`read-block substance-panel substance-${b.substance_cut.band || "thin"}`}>
-                  <h2>
-                    Verifiable detail
-                    <span className={`substance-badge substance-${b.substance_cut.band || "thin"}`}>
-                      {b.substance_cut.band === "dense"
-                        ? "dense"
-                        : b.substance_cut.band === "mixed"
-                          ? "mixed"
-                          : "thin"}
-                    </span>
-                  </h2>
-                  <p className="meta">{b.substance_cut.label_zh}</p>
-                  {(b.substance_cut.nuggets || []).length ? (
-                    <ul className="nugget-list">
-                      {(b.substance_cut.nuggets || []).slice(0, 8).map((n, i) => (
-                        <li key={i}>
-                          <span className="nugget-kind">{n.label_zh}</span>
-                          <span className="nugget-ev">{n.evidence}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <p className="prose muted">
-                      No numbers, deadlines, named notices, or responsible bodies detected — mostly direction / formula language.
-                    </p>
-                  )}
-                  {(b.substance_cut.empty_calories || []).length ? (
-                    <p className="meta">
-                      Empty-calorie notes: {(b.substance_cut.empty_calories || []).slice(0, 2).join("; ")}
-                    </p>
-                  ) : null}
+              {(b.substance_cut?.nuggets || []).length ? (
+                <section className="read-block substance-panel">
+                  <h2>Extracted facts</h2>
+                  <ul className="nugget-list">
+                    {(b.substance_cut?.nuggets || []).slice(0, 8).map((n, i) => (
+                      <li key={i}>
+                        <span className="nugget-kind">{n.value_en || n.label_zh}</span>
+                        <span className="nugget-ev">{n.evidence}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </section>
               ) : null}
 
-              <section className="read-block next-panel">
-                <h2>What&apos;s missing · next</h2>
-                <ul className="action-list">
-                  {Array.from(
-                    new Set([
-                      ...(b.corroboration?.missing || []),
-                      ...(result.infoValue?.next_zh || []),
-                      ...(b.open_questions || []).slice(0, 3),
-                      ...(b.policy_outlook?.watchpoints || []).slice(0, 3),
-                    ])
-                  )
-                    .slice(0, 6)
-                    .map((item, i) => (
-                      <li key={i}>{item}</li>
-                    ))}
-                </ul>
-                {b.corroboration ? (
-                  <p className="meta">
-                    Corroboration {b.corroboration.score_0_to_3}/3 (
-                    {b.corroboration.label_en || b.corroboration.label_zh})
-                  </p>
-                ) : null}
-              </section>
-
               {(b.policy_outlook?.scenarios || []).length ? (
                 <section className="read-block">
-                  <h2>Scenarios (hypothesis — not forecasts)</h2>
+                  <h2>Scenarios (hypothesis)</h2>
                   <ol className="scenario-list">
                     {(b.policy_outlook?.scenarios || []).map((s, i) => (
                       <li key={i}>
@@ -610,10 +588,37 @@ export function App() {
                               ? "plausible"
                               : "less likely"}
                         </span>
-                        <span className="prose">{s.label}</span>
+                        <div>
+                          <p className="prose">{s.label}</p>
+                          {s.horizon ? <p className="meta">Horizon: {s.horizon}</p> : null}
+                          {s.basis ? <p className="meta">Basis: {s.basis}</p> : null}
+                          {s.trigger ? <p className="meta">Trigger: {s.trigger}</p> : null}
+                        </div>
                       </li>
                     ))}
                   </ol>
+                </section>
+              ) : null}
+
+              {(b.policy_outlook?.watchpoints || []).length ? (
+                <section className="read-block next-panel">
+                  <h2>Watchpoints</h2>
+                  <ul className="action-list">
+                    {(b.policy_outlook?.watchpoints || []).map((w, i) => (
+                      <li key={i}>{w}</li>
+                    ))}
+                  </ul>
+                </section>
+              ) : null}
+
+              {(b.open_questions || []).length ? (
+                <section className="read-block">
+                  <h2>Open questions</h2>
+                  <ul className="action-list">
+                    {(b.open_questions || []).map((q, i) => (
+                      <li key={i}>{q}</li>
+                    ))}
+                  </ul>
                 </section>
               ) : null}
 
@@ -676,16 +681,46 @@ export function App() {
               ) : null}
 
               <details className="meta-fold">
-                <summary>Analyst detail (context, triage, scorecard)</summary>
+                <summary>Analyst detail (method, triage, scorecard — not content analysis)</summary>
                 <p className="meta">{b.briefing_en?.context}</p>
+                {b.content_analysis?.background ? (
+                  <p className="meta">Background frame: {b.content_analysis.background}</p>
+                ) : null}
                 {b.info_triage ? (
                   <p className="meta">
                     Kind {b.info_triage.primary_kind} · research priority{" "}
-                    {b.info_triage.importance?.grade} · signaling {b.signaling_scorecard?.band}
+                    {b.info_triage.importance?.grade} · signaling {b.signaling_scorecard?.band} (
+                    {signalingBasisEn(b.signaling_scorecard?.rules)})
+                  </p>
+                ) : null}
+                {b.substance_cut ? (
+                  <p className="meta">
+                    Substance band {b.substance_cut.band}:{" "}
+                    {substanceBasisEn(b.substance_cut.nuggets, b.substance_cut.band)}
+                  </p>
+                ) : null}
+                {(b.substance_cut?.empty_calories || []).length ? (
+                  <p className="meta">
+                    Formula-language notes: {(b.substance_cut?.empty_calories || []).slice(0, 3).join("; ")}
+                  </p>
+                ) : null}
+                {b.corroboration ? (
+                  <p className="meta">
+                    {corroborationLineEn({
+                      score: b.corroboration.score_0_to_3,
+                      labelEn: b.corroboration.label_en || b.corroboration.label_zh,
+                      drivers: b.corroboration.drivers,
+                    })}
                   </p>
                 ) : null}
                 {b.confidence_factors ? (
+                  <p className="meta">{confidenceLineEn(b.confidence_factors)}</p>
+                ) : null}
+                {b.confidence_factors?.rationale ? (
                   <p className="meta">{b.confidence_factors.rationale}</p>
+                ) : null}
+                {(result.infoValue?.next_zh || []).length ? (
+                  <p className="meta">Method next: {(result.infoValue?.next_zh || []).join("; ")}</p>
                 ) : null}
                 {b.ontology_lite?.hits?.length ? (
                   <p className="meta">

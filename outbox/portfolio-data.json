@@ -9,8 +9,8 @@
   "method": {
     "pillar1_zh": "Unwritten rules = open-reporting heuristics: enumerate then weight (signaling scorecard)",
     "pillar1_en": "Unwritten rules = open-reporting heuristics: enumerate then weight (signaling scorecard)",
-    "pillar2_zh": "Multi-source corroboration = score 0–3; missing-source list; in-column pair merge tests",
-    "pillar2_en": "Multi-source corroboration = score 0–3; missing-source list; in-column pair merge tests",
+    "pillar2_zh": "Cross-source corroboration = ordinal band (minimal → strong) + missing-source list; in-column pair merge tests",
+    "pillar2_en": "Cross-source corroboration = ordinal band (minimal → strong) + missing-source list; in-column pair merge tests",
     "confidence_zh": "Factorized confidence (substance × corroboration × provenance × source class); social commentary hard-capped at low",
     "confidence_en": "Factorized confidence (substance × corroboration × provenance × source class); social commentary hard-capped at low",
     "substance_zh": "Strip formula language → keep numbers / deadlines / instruments / responsible bodies",
@@ -20,6 +20,7 @@
     "ontology_zh": "Civic Ontology Lite: desk-first context cards ≤8; not OWL / intel ontology",
     "ontology_en": "Civic Ontology Lite: desk-first context cards ≤8; not OWL / intel ontology"
   },
+  "heuristic_basis_note": "Bands come from hand-set rule cues, not a calibrated model — they order and flag, they do not measure.",
   "columns": [
     {
       "id": "hot_topics",
@@ -27,17 +28,19 @@
       "label_en": "Hot topics",
       "blurb_zh": "Aggregated public hot themes: Taiwan Strait, EVs, China AI, semiconductors, critical minerals — still adoption-gated on hard detail",
       "itemCount": 4,
-      "maxCorr": 2,
+      "maxCorrBand": "minimal",
       "items": [
         {
           "fixtureId": "hot-china-ai",
           "kind": "implementing_instrument",
           "importance": "P3",
           "substance": "dense",
-          "corr": 2,
-          "conf": "medium",
-          "what": "The Mandarin source discusses: 科技部有关负责人就人工智能发展答记者问",
-          "soWhat": "Instrument language raises implementation-track confidence vs meeting-only text, but still only within the public excerpt — check scope, timeline, and responsible bodies if named.",
+          "substanceBasis": "numbers, deadlines, named instruments and funding lines detected",
+          "corrBand": "minimal",
+          "corr": 0,
+          "conf": "low",
+          "what": "the Ministry of Science and Technology official statement; large models filing supporting measures to be issued by end-2026; no less than RMB 2 billion in special funds for a computing-power hubs pilot. The excerpt also expressly prohibits improper cross-border data transfers. Not stated in the excerpt: a quantified target.",
+          "soWhat": "A named instrument (large models filing supporting measures), a date (by end-2026) and an amount (no less than RMB 2 billion in special funds) sit in one excerpt, so this is checkable against the issuing body's own public text rather than read as meeting rhetoric. The amount is s",
           "canada": "none",
           "canadaPolicy": "none",
           "outlook": [
@@ -60,10 +63,12 @@
           "kind": "implementing_instrument",
           "importance": "P3",
           "substance": "dense",
-          "corr": 2,
-          "conf": "medium",
-          "what": "The Mandarin source discusses: 工业和信息化部有关负责人称，要巩固新能源汽车产业优势",
-          "soWhat": "Instrument language raises implementation-track confidence vs meeting-only text, but still only within the public excerpt — check scope, timeline, and responsible bodies if named.",
+          "substanceBasis": "numbers, deadlines, named instruments and funding lines detected",
+          "corrBand": "minimal",
+          "corr": 0,
+          "conf": "low",
+          "what": "the Ministry of Industry and Information Technology official statement; supporting measures to be issued by end-2026; no less than RMB 3 billion in special funds for a power batteries and charging piles pilot. The excerpt also expressly prohibits subsidy fraud. Not stated in the excerpt: a quantified target.",
+          "soWhat": "A named instrument (supporting measures), a date (by end-2026) and an amount (no less than RMB 3 billion in special funds) sit in one excerpt, so this is checkable against the issuing body's own public text rather than read as meeting rhetoric. The amount is stated as a floor rat",
           "canada": "none",
           "canadaPolicy": "none",
           "outlook": [
@@ -86,10 +91,12 @@
           "kind": "implementing_instrument",
           "importance": "P3",
           "substance": "dense",
-          "corr": 2,
-          "conf": "medium",
-          "what": "The Mandarin source discusses: 国台办发言人表示，两岸关系事关台海和平稳定",
-          "soWhat": "Public cues look relatively strong in this excerpt; still verify with a second open source before raising confidence.",
+          "substanceBasis": "numbers, deadlines, named instruments and funding lines detected",
+          "corrBand": "minimal",
+          "corr": 0,
+          "conf": "low",
+          "what": "the Taiwan Affairs Office spokesperson statement; supporting publicity and exchange management measures to be issued by end-2026; no less than RMB 200 million in special funds for a cross-Strait youth exchange pilot. Not stated in the excerpt: a quantified target.",
+          "soWhat": "A named instrument (supporting publicity and exchange management measures), a date (by end-2026) and an amount (no less than RMB 200 million in special funds) sit in one excerpt, so this is checkable against the issuing body's own public text rather than read as meeting rhetoric.",
           "canada": "none",
           "canadaPolicy": "none",
           "outlook": [
@@ -98,7 +105,7 @@
               "likelihood": "medium"
             },
             {
-              "label": "Implementation stays thin until a named 细则/办法 appears",
+              "label": "Implementation stays thin until a named measure or implementing rule appears",
               "likelihood": "low"
             },
             {
@@ -112,10 +119,12 @@
           "kind": "industrial_tech_policy",
           "importance": "P3",
           "substance": "mixed",
+          "substanceBasis": "responsible bodies and named sectors detected",
+          "corrBand": "minimal",
           "corr": 0,
           "conf": "low",
-          "what": "The Mandarin source discusses: 工业和信息化部有关负责人指出，要加快关键核心技术攻关，提升芯片与半导体产业链供应链韧性和安全可控水平，支持专精特新企业发展，推动人工智能赋能制造业转型升级，避免在关键领域出现卡脖子风险",
-          "soWhat": "Industrial/tech vocabulary signals priority domains for open-source tracking; avoid inferring capability leaps beyond what the text states.",
+          "what": "the Ministry of Industry and Information Technology official statement; named subjects: chips, semiconductors, specialised SMEs and artificial intelligence. Not stated in the excerpt: a named instrument, a funding line, a deadline or time marker, a quantified target and a pilot or scope boundary.",
+          "soWhat": "No instrument, amount, or date appears here, so the excerpt reads as direction language rather than delivery detail. Single excerpt only — corroborate against a second public source before raising confidence. Draft for human review. Industrial/tech vocabulary signals priority dom",
           "canada": "none",
           "canadaPolicy": "none",
           "outlook": [
@@ -135,6 +144,7 @@
         }
       ],
       "next_steps_zh": [
+        "Corroboration weak/minimal — pair direction+instrument, or add a second public source",
         "Has instrument language; add matching central/ministry meeting or wire direction for contrast"
       ]
     },
@@ -144,16 +154,18 @@
       "label_en": "Economy & investment",
       "blurb_zh": "Fiscal/monetary, industrial investment, special funds, local debt/property, meeting→instrument detail (excl. hot-theme AI/EV/chips which route to Hot topics)",
       "itemCount": 4,
-      "maxCorr": 3,
+      "maxCorrBand": "weak",
       "items": [
         {
           "fixtureId": "dual-circulation",
           "kind": "dual_circulation",
           "importance": "P3",
           "substance": "thin",
+          "substanceBasis": "no numbers, deadlines, named notices or responsible bodies detected",
+          "corrBand": "minimal",
           "corr": 0,
           "conf": "low",
-          "what": "Not adopted: paste lacks verifiable detail (numbers, deadlines, named instruments, or funding lines).",
+          "what": "Not adopted — this excerpt carries no verifiable detail. Named in the paste: subject (dual circulation and the unified national market). Missing: a named instrument, a funding line, a deadline or time marker, a quantified target and a pilot or scope boundary.",
           "soWhat": "Direction-only / formula language is filtered out. Paste an implementing notice or an excerpt with concrete data, then re-run.",
           "canada": "none",
           "canadaPolicy": "none",
@@ -164,9 +176,11 @@
           "kind": "finance_risk",
           "importance": "P3",
           "substance": "mixed",
+          "substanceBasis": "cue words matched, but no hard detail survived the adoption filter",
+          "corrBand": "minimal",
           "corr": 0,
           "conf": "low",
-          "what": "Not adopted: paste lacks verifiable detail (numbers, deadlines, named instruments, or funding lines).",
+          "what": "Not adopted — this excerpt carries no verifiable detail. Named in the paste: acting party (an unnamed meeting) and subject (local-government debt, hidden local debt and housing-delivery guarantees). Missing: a named instrument, a funding line, a deadline or time marker, a quantified target and a pilot or scope boundary.",
           "soWhat": "Direction-only / formula language is filtered out. Paste an implementing notice or an excerpt with concrete data, then re-run.",
           "canada": "none",
           "canadaPolicy": "none",
@@ -177,9 +191,11 @@
           "kind": "leadership_meeting",
           "importance": "P1",
           "substance": "thin",
-          "corr": 0,
+          "substanceBasis": "no numbers, deadlines, named notices or responsible bodies detected",
+          "corrBand": "weak",
+          "corr": 1,
           "conf": "low",
-          "what": "Not adopted: paste lacks verifiable detail (numbers, deadlines, named instruments, or funding lines).",
+          "what": "Not adopted — this excerpt carries no verifiable detail. Named in the paste: acting party (the Central Economic Work Conference). Missing: a named instrument, a funding line, a deadline or time marker, a quantified target and a pilot or scope boundary.",
           "soWhat": "Direction-only / formula language is filtered out. Paste an implementing notice or an excerpt with concrete data, then re-run.",
           "canada": "none",
           "canadaPolicy": "none",
@@ -190,10 +206,12 @@
           "kind": "implementing_instrument",
           "importance": "P1",
           "substance": "dense",
-          "corr": 3,
-          "conf": "medium",
-          "what": "The Mandarin source discusses: 国务院办公厅近日印发通知，要求有关部门制定实施方案，因地制宜推进新质生产力相关试点，并强调在发展中保障和改善民生",
-          "soWhat": "Instrument language raises implementation-track confidence vs meeting-only text, but still only within the public excerpt — check scope, timeline, and responsible bodies if named.",
+          "substanceBasis": "named instruments detected",
+          "corrBand": "minimal",
+          "corr": 0,
+          "conf": "low",
+          "what": "the Central Economic Work Conference readout and the State Council General Office; a notice issued; delivery bounded to a new quality productive forces related pilot. Not stated in the excerpt: a funding line, a deadline or time marker and a quantified target.",
+          "soWhat": "An instrument (notice) is named without a date, so timing is open-ended. Scope is bounded to a new quality productive forces related pilot, so read any amount against pilot size rather than national spend. Delivery is delegated to unnamed “relevant departments”, so the named spea",
           "canada": "none",
           "canadaPolicy": "none",
           "outlook": [
@@ -213,6 +231,7 @@
         }
       ],
       "next_steps_zh": [
+        "Corroboration weak/minimal — pair direction+instrument, or add a second public source",
         "Column already has direction + instrument: merge-run a brief to check if corroboration rises",
         "Has substance=thin items: prefer public excerpts with numbers/deadlines/responsible bodies"
       ]
@@ -223,17 +242,19 @@
       "label_en": "Foreign affairs",
       "blurb_zh": "Diplomatic discourse, bilateral ties, Belt and Road, sanctions/cooperation in open text",
       "itemCount": 2,
-      "maxCorr": 0,
+      "maxCorrBand": "minimal",
       "items": [
         {
           "fixtureId": "canada-nexus",
           "kind": "foreign_affairs",
           "importance": "P3",
           "substance": "mixed",
+          "substanceBasis": "responsible bodies and named sectors detected",
+          "corrBand": "minimal",
           "corr": 0,
           "conf": "low",
-          "what": "The Mandarin source discusses: 商务部有关负责人就中加经贸关系答记者问时表示，中方一贯主张通过对话协商解决贸易分歧",
-          "soWhat": "Map diplomatic framing terms carefully; distinguish ritual greetings from substantive commitments evidenced in the paste.",
+          "what": "the Ministry of Commerce official and the Ministry of Foreign Affairs spokesperson statement; named subjects: China-Canada, canola oil and softwood. Not stated in the excerpt: a named instrument, a funding line, a deadline or time marker, a quantified target and a pilot or scope boundary.",
+          "soWhat": "No instrument, amount, or date appears here, so the excerpt reads as direction language rather than delivery detail. Single excerpt only — corroborate against a second public source before raising confidence. Draft for human review. Map diplomatic framing terms carefully; disting",
           "canada": "direct",
           "canadaPolicy": "topical",
           "outlook": [
@@ -256,9 +277,11 @@
           "kind": "foreign_affairs",
           "importance": "P3",
           "substance": "thin",
+          "substanceBasis": "no numbers, deadlines, named notices or responsible bodies detected",
+          "corrBand": "minimal",
           "corr": 0,
           "conf": "low",
-          "what": "Not adopted: paste lacks verifiable detail (numbers, deadlines, named instruments, or funding lines).",
+          "what": "Not adopted — this excerpt carries no verifiable detail. Named in the paste: acting party (the Ministry of Foreign Affairs spokesperson) and subject (the Belt and Road Initiative). Missing: a named instrument, a funding line, a deadline or time marker, a quantified target and a pilot or scope boundary.",
           "soWhat": "Direction-only / formula language is filtered out. Paste an implementing notice or an excerpt with concrete data, then re-run.",
           "canada": "none",
           "canadaPolicy": "topical",
@@ -266,7 +289,7 @@
         }
       ],
       "next_steps_zh": [
-        "Max corroboration < 2: prioritize direction+instrument pairing or a second public source",
+        "Corroboration weak/minimal — pair direction+instrument, or add a second public source",
         "Has substance=thin items: prefer public excerpts with numbers/deadlines/responsible bodies"
       ]
     },
@@ -276,16 +299,18 @@
       "label_en": "Defense — public discourse only",
       "blurb_zh": "Open defense/military/industry reporting and white-paper style language; not operational intel or targeting",
       "itemCount": 1,
-      "maxCorr": 0,
+      "maxCorrBand": "minimal",
       "items": [
         {
           "fixtureId": "defense-public",
           "kind": "defense_public",
           "importance": "P3",
           "substance": "thin",
+          "substanceBasis": "no numbers, deadlines, named notices or responsible bodies detected",
+          "corrBand": "minimal",
           "corr": 0,
           "conf": "low",
-          "what": "Not adopted: paste lacks verifiable detail (numbers, deadlines, named instruments, or funding lines).",
+          "what": "Not adopted — this excerpt carries no verifiable detail. Named in the paste: acting party (the Ministry of National Defense regular press conference) and subject (national defence and the defence industry). Missing: a named instrument, a funding line, a deadline or time marker, a quantified target and a pilot or scope boundary.",
           "soWhat": "Direction-only / formula language is filtered out. Paste an implementing notice or an excerpt with concrete data, then re-run.",
           "canada": "none",
           "canadaPolicy": "none",
@@ -293,7 +318,7 @@
         }
       ],
       "next_steps_zh": [
-        "Max corroboration < 2: prioritize direction+instrument pairing or a second public source",
+        "Corroboration weak/minimal — pair direction+instrument, or add a second public source",
         "Has substance=thin items: prefer public excerpts with numbers/deadlines/responsible bodies"
       ]
     },
@@ -303,16 +328,18 @@
       "label_en": "Social governance",
       "blurb_zh": "Livelihood, grassroots governance, public opinion, common prosperity, party education — open social-governance language",
       "itemCount": 3,
-      "maxCorr": 0,
+      "maxCorrBand": "minimal",
       "items": [
         {
           "fixtureId": "ideology-party",
           "kind": "ideology_party",
           "importance": "P3",
           "substance": "thin",
+          "substanceBasis": "no numbers, deadlines, named notices or responsible bodies detected",
+          "corrBand": "minimal",
           "corr": 0,
           "conf": "low",
-          "what": "Not adopted: paste lacks verifiable detail (numbers, deadlines, named instruments, or funding lines).",
+          "what": "Not adopted — this excerpt carries no verifiable detail. Named in the paste: acting party (unnamed local authorities and departments). Missing: a named instrument, a funding line, a deadline or time marker, a quantified target and a pilot or scope boundary.",
           "soWhat": "Direction-only / formula language is filtered out. Paste an implementing notice or an excerpt with concrete data, then re-run.",
           "canada": "none",
           "canadaPolicy": "none",
@@ -323,9 +350,11 @@
           "kind": "rural_revitalization",
           "importance": "P3",
           "substance": "mixed",
+          "substanceBasis": "cue words matched, but no hard detail survived the adoption filter",
+          "corrBand": "minimal",
           "corr": 0,
           "conf": "low",
-          "what": "Not adopted: paste lacks verifiable detail (numbers, deadlines, named instruments, or funding lines).",
+          "what": "Not adopted — this excerpt carries no verifiable detail. Named in the paste: acting party (the Ministry of Agriculture and Rural Affairs) and subject (rural revitalisation, arable land and food security). Missing: a named instrument, a funding line, a deadline or time marker, a quantified target and a pilot or scope boundary.",
           "soWhat": "Direction-only / formula language is filtered out. Paste an implementing notice or an excerpt with concrete data, then re-run.",
           "canada": "none",
           "canadaPolicy": "none",
@@ -336,9 +365,11 @@
           "kind": "social_governance",
           "importance": "P3",
           "substance": "thin",
+          "substanceBasis": "no numbers, deadlines, named notices or responsible bodies detected",
+          "corrBand": "minimal",
           "corr": 0,
           "conf": "low",
-          "what": "Not adopted: paste lacks verifiable detail (numbers, deadlines, named instruments, or funding lines).",
+          "what": "Not adopted — this excerpt carries no verifiable detail. Named in the paste: acting party (an unnamed local meeting) and subject (social governance, public-opinion management and common prosperity). Missing: a named instrument, a funding line, a deadline or time marker, a quantified target and a pilot or scope boundary.",
           "soWhat": "Direction-only / formula language is filtered out. Paste an implementing notice or an excerpt with concrete data, then re-run.",
           "canada": "none",
           "canadaPolicy": "none",
@@ -346,7 +377,7 @@
         }
       ],
       "next_steps_zh": [
-        "Max corroboration < 2: prioritize direction+instrument pairing or a second public source",
+        "Corroboration weak/minimal — pair direction+instrument, or add a second public source",
         "Has meeting/direction language; missing named notice/measure/detail",
         "Has substance=thin items: prefer public excerpts with numbers/deadlines/responsible bodies"
       ]
@@ -379,7 +410,7 @@
     "cases": 8,
     "stages": 11,
     "failed": 0,
-    "stamp": "2026-09-21-14-38-48",
+    "stamp": "2026-09-21-14-58-25",
     "highlights": [
       "会议单独 → 弱印证；会议+细则 → 印证上升",
       "八股+干货 → substance 升档",
@@ -717,7 +748,8 @@
     "Quotes must be substrings of the paste (claim gate)",
     "Outlook = scenarios + watchpoints; never will-definitely",
     "Context cards = Civic Ontology Lite (background/hypothesis only)",
-    "UI is English; Chinese appears only in source paste and quoted excerpts"
+    "UI is English; Chinese appears only in source paste and quoted excerpts",
+    "Substance / corroboration / confidence / source tier are hand-set rule heuristics shown as bands — no labelled corpus, no validation set, so no scores are reported"
   ],
-  "generatedAt": "2026-09-21T14:39:07.753Z"
+  "generatedAt": "2026-09-21T14:58:26.285Z"
 }
