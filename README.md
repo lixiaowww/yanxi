@@ -24,10 +24,9 @@ npm install && npm run demo && npm run portfolio && npm run dev
 
 公开演示站（Render）花的是运营者自己的 LLM 额度：
 
-- **LLM 路径开放**：配了 `LLM_API_KEY` 后，谁打开网址都能直接 Generate（不需要 brief token）。
+- **LLM 与采集均开放**：配了 `LLM_API_KEY` 后可直接 Generate；`POST /api/collect/run` 也不再要求 token。
 - **offline / 模板**：勾选 “Force offline”（或未配 `LLM_API_KEY`）走模板引擎，不消耗模型额度。
-- **限流与体积上限**：所有 `/api/brief` 按客户端 IP 限流（默认 10 分钟 20 次，超限 `429` + `Retry-After`）；请求体默认上限 `128kb`，`sourceText` 合计超过 24000 字符返回 `413`。
-- **采集仍要 token**：`POST /api/collect/run` 继续用 `COLLECT_API_TOKEN`（`x-yanxi-token`）。
+- **限流与体积上限**：`/api/brief` 按 IP 限流（默认 10 分钟 20 次）；`/api/collect/run` 默认每窗口 6 次；请求体默认上限 `128kb`，`sourceText` 合计超过 24000 字符返回 `413`。
 
 变量说明见 [`.env.example`](.env.example)，部署配置见 [docs/DEPLOY.md](docs/DEPLOY.md)。
 

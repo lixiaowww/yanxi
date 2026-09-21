@@ -48,7 +48,7 @@ COLLECT_INTERVAL_MINUTES=60 npm run collect:daemon
 While `npm run dev` is up:
 
 - `GET /api/subscriptions` — list + feed URLs  
-- `POST /api/collect/run` — trigger (optional `COLLECT_API_TOKEN` via header `x-yanxi-token`)  
+- `POST /api/collect/run` — trigger (open on public demo; IP rate-limited)  
 - `GET /feeds/macro-public-digest.xml` — RSS for readers  
 - UI “Subscriptions” panel — Run collect / open RSS  
 
@@ -57,6 +57,5 @@ While `npm run dev` is up:
 ```bash
 # PUBLIC_BASE_URL=http://localhost:5179
 # COLLECT_INTERVAL_MINUTES=60
-# COLLECT_API_TOKEN=  # optional lock for POST /api/collect/run
 # SUBSCRIBE_WEBHOOK_URL=  # optional JSON webhook
 ```

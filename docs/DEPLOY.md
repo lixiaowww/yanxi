@@ -6,23 +6,22 @@
 
 - 约 15 分钟无流量后休眠；唤醒约 1 分钟  
 - 磁盘**不持久**：`outbox/briefs` 重启会丢（演示以粘贴简报 + 预生成 portfolio 为主）  
-- 生产环境未设 `COLLECT_API_TOKEN` 时，`POST /api/collect/run` **关闭**
-- `POST /api/brief` 的 LLM 路径在配了 `LLM_API_KEY` 后**对所有人开放**（仅靠 IP 限流）
+- `POST /api/brief` 与 `POST /api/collect/run` 在公开演示上**开放**（靠 IP 限流，不要求 access token）
 
 ## 公开演示的访问模型
 
-公开站点花的是**运营者自己的 LLM 额度**。产品选择：谁打开网址都能打 LLM。
+公开站点花的是**运营者自己的 LLM 额度**。产品选择：谁打开网址都能打 LLM / 触发白名单 collect。
 
 | 路径 | 请求 | 是否需要 token |
 |------|------|----------------|
 | LLM 路径 | `POST /api/brief` 未勾选 force offline，且已配置 `LLM_API_KEY` | 否 — 公开开放 |
 | offline / 模板 | `POST /api/brief` 带 `"forceOffline": true`，或未配置 `LLM_API_KEY` | 否 |
-| 采集触发 | `POST /api/collect/run` | 是 — `COLLECT_API_TOKEN` via `x-yanxi-token` |
+| 采集触发 | `POST /api/collect/run` | 否 — 公开开放（仍限流） |
 
-- **速率限制**：所有 `/api/brief` 调用（含 offline）按客户端 IP 限流，默认每 10 分钟 20 次；超限返回 `429` + `Retry-After`。进程内固定窗口计数，映射有上限，无新增运行时依赖。`/api/collect/run` 默认每窗口 6 次，用于防止 token 猜测。
+- **速率限制**：所有 `/api/brief` 调用（含 offline）按客户端 IP 限流，默认每 10 分钟 20 次；超限返回 `429` + `Retry-After`。进程内固定窗口计数，映射有上限，无新增运行时依赖。`/api/collect/run` 默认每窗口 6 次。
 - **请求体上限**：`express.json` 限 `BRIEF_BODY_LIMIT`（默认 `128kb`），超出返回 `413`；`sourceText` + `sources[]` 合计超过 `BRIEF_MAX_SOURCE_CHARS`（默认 24000 字符）也返回 `413`，不会送进 LLM。
 - **代理与真实 IP**：Render 前面只有一跳代理，故 `TRUST_PROXY_HOPS=1`，Express 取 `X-Forwarded-For` 的**最后一跳**，客户端自行伪造的前缀无法绕过限流。
-- token / 密钥只比对 env 值，**不回显**；`/api/health` 仅暴露布尔位（是否配置），不含任何密钥值。
+- `/api/health` 仅暴露布尔位（是否配置 LLM），不含任何密钥值。
 
 ## 一键步骤
 
@@ -35,8 +34,7 @@
 3. 环境变量：  
    - `NODE_ENV=production`（一般自动）  
    - `PUBLIC_BASE_URL=https://<你的服务名>.onrender.com`（部署后填）  
-   - `COLLECT_API_TOKEN`：随机长串（Blueprint 可自动生成）——仅保护 `/api/collect/run`  
-   - 可选：`BRIEF_RATE_MAX` / `BRIEF_RATE_WINDOW_MS` / `TRUST_PROXY_HOPS`（`render.yaml` 已给默认值 20 / 600000 / 1）  
+   - 可选：`BRIEF_RATE_MAX` / `BRIEF_RATE_WINDOW_MS` / `COLLECT_RATE_MAX` / `TRUST_PROXY_HOPS`  
    - 可选 LLM（不填则全程 offline；填了则**任何人**可走 LLM，靠限流挡滥用）：  
      - `LLM_API_KEY`  
      - `LLM_BASE_URL=https://api.groq.com/openai/v1`  
@@ -60,7 +58,6 @@ npm start
 ## 安全提醒
 
 - 仓库内**不得**出现真实 token / 密钥值：`render.yaml` 只声明 `generateValue` / `sync: false`，实际值在 Render 面板。  
-- 采集触发仍用 `x-yanxi-token`；`?token=` 仅为本机便利（会进访问日志）。  
 - 公开站点不要放真实 `CURSOR_API_KEY`。  
 - 白名单 URL 采集默认关闭；公开演示以 fixtures + 粘贴为主。  
 - 文案保持民用：非情报产品。

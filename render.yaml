@@ -21,14 +21,13 @@ services:
         value: "22"
       - key: PUBLIC_BASE_URL
         sync: false
-      - key: COLLECT_API_TOKEN
-        generateValue: true
-      # /api/brief is open when LLM_API_KEY is set; per-IP rate limit only.
-
+      # /api/brief and /api/collect/run are open; per-IP rate limits only.
       - key: BRIEF_RATE_MAX
         value: "20"
       - key: BRIEF_RATE_WINDOW_MS
         value: "600000"
+      - key: COLLECT_RATE_MAX
+        value: "6"
       # Render puts exactly one proxy hop in front of the app.
       - key: TRUST_PROXY_HOPS
         value: "1"

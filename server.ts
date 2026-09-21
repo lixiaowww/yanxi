@@ -16,7 +16,6 @@ import {
   createFixedWindowLimiter,
   httpError,
   readFileInsideDir,
-  requireApiToken,
   trustProxyHops,
   type HttpErrorLike,
 } from "./src/lib/api-guard.js";
@@ -107,9 +106,8 @@ async function main() {
       llm: Boolean(process.env.LLM_API_KEY),
       cursorHarness: Boolean(process.env.CURSOR_API_KEY),
       // Booleans only — never echo credential values.
-      // /api/brief LLM path is open when LLM_API_KEY is set; only collect stays token-gated.
+      // /api/brief and /api/collect/run are open; abuse control is IP rate limiting.
       llmOpen: llmConfigured(),
-      collectTokenConfigured: Boolean(process.env.COLLECT_API_TOKEN),
       collect: true,
       subscriptions: loadSubscriptions().subscriptions.filter((s) => s.active !== false).length,
     });
@@ -220,8 +218,8 @@ async function main() {
 
   app.post("/api/collect/run", async (req, res) => {
     try {
+      // Collect is open on the public demo; abuse control is IP rate limiting.
       enforceRateLimit(req, collectLimiter, "collect runs");
-      requireApiToken(req, { envVar: "COLLECT_API_TOKEN", action: "collect runs" });
       const onlyId = req.body?.subscriptionId ? String(req.body.subscriptionId) : undefined;
       const results = await runAllActiveSubscriptions({
         onlyId,
