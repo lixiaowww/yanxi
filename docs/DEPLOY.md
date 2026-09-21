@@ -20,7 +20,11 @@
    - `NODE_ENV=production`（一般自动）  
    - `PUBLIC_BASE_URL=https://<你的服务名>.onrender.com`（部署后填）  
    - `COLLECT_API_TOKEN`：随机长串（Blueprint 可自动生成）  
-   - `LLM_API_KEY`：可选；不填则全程 offline  
+   - 可选 LLM（不填则全程 offline）：  
+     - `LLM_API_KEY`  
+     - `LLM_BASE_URL=https://api.groq.com/openai/v1`  
+     - `LLM_MODEL=openai/gpt-oss-20b`  
+       （Groq：勿用已下线的 `llama-3.3-70b-versatile`；也可用 `openai/gpt-oss-120b`）  
 4. 部署完成后打开：  
    - `https://<name>.onrender.com/` — 简报工作台  
    - `https://<name>.onrender.com/portfolio` — Portfolio  
