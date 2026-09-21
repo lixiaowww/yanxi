@@ -103,6 +103,9 @@ type Briefing = {
     label_en?: string;
     missing?: string[];
     drivers?: string[];
+    shared_subjects?: string[];
+    cross_checked?: boolean;
+    distinct_source_count?: number;
   };
   confidence_factors?: {
     level?: string;
@@ -192,6 +195,18 @@ type ApiResult = {
   briefing: Briefing;
   gate: { passed: boolean; findings: { severity: string; message: string; evidence: string }[] };
   systemPromptChars: number;
+  sourceCount?: number;
+  relatedBriefs?: {
+    id: string;
+    label: string;
+    createdAt: string;
+    jsonFile: string;
+    shared_keys: string[];
+    desk?: string;
+    what_preview?: string;
+    corroboration_band?: string;
+    note_en: string;
+  }[];
 };
 
 type SubRow = {
@@ -254,6 +269,8 @@ function briefErrorMessage(status: number, serverError?: string): string {
 export function App() {
   const [sourceText, setSourceText] = useState(SAMPLE);
   const [label, setLabel] = useState("sample-xinhua-style-excerpt");
+  const [source2Text, setSource2Text] = useState("");
+  const [source2Label, setSource2Label] = useState("second-public-source");
   const [sourcePublishedAt, setSourcePublishedAt] = useState("");
   const [forceOffline, setForceOffline] = useState(false);
   const [markSocial, setMarkSocial] = useState(false);
@@ -325,16 +342,29 @@ export function App() {
     setError("");
     setActiveQuote(null);
     try {
+      const second = source2Text.trim();
+      const payload =
+        second.length >= 20
+          ? {
+              sources: [
+                { label, text: sourceText },
+                { label: source2Label || "second-public-source", text: second },
+              ],
+              forceOffline,
+              sourceClass: markSocial ? "social_commentary" : undefined,
+              sourcePublishedAt: sourcePublishedAt.trim() || undefined,
+            }
+          : {
+              sourceText,
+              sourceLabel: label,
+              forceOffline,
+              sourceClass: markSocial ? "social_commentary" : undefined,
+              sourcePublishedAt: sourcePublishedAt.trim() || undefined,
+            };
       const res = await fetch("/api/brief", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          sourceText,
-          sourceLabel: label,
-          forceOffline,
-          sourceClass: markSocial ? "social_commentary" : undefined,
-          sourcePublishedAt: sourcePublishedAt.trim() || undefined,
-        }),
+        body: JSON.stringify(payload),
       });
       const data = await res.json().catch(() => ({}) as { error?: string });
       if (!res.ok) throw new Error(briefErrorMessage(res.status, data.error));
@@ -346,6 +376,22 @@ export function App() {
       setError(e instanceof Error ? e.message : String(e));
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function useRelatedAsSecondSource(jsonFile: string) {
+    try {
+      const res = await fetch(`/outbox/briefs/${jsonFile}`);
+      if (!res.ok) throw new Error(`Could not load ${jsonFile}`);
+      const rec = await res.json();
+      const text = String(rec?.source?.sourceText || "");
+      const lab = String(rec?.source?.label || rec?.id || "related-source");
+      if (text.length < 20) throw new Error("Related brief has no usable source text");
+      setSource2Text(text);
+      setSource2Label(lab);
+      setError("");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e));
     }
   }
 
@@ -444,6 +490,20 @@ export function App() {
             Source label
           </label>
           <input id="label" value={label} onChange={(e) => setLabel(e.target.value)} />
+          <label htmlFor="src2" style={{ marginTop: "0.75rem" }}>
+            Second public source (optional) — same subject, different issuer → real corroboration
+          </label>
+          <textarea
+            id="src2"
+            value={source2Text}
+            placeholder="Paste a second public excerpt (implementing notice, local restatement, wire). Leave empty for single-source."
+            onChange={(e) => setSource2Text(e.target.value)}
+            rows={5}
+          />
+          <label htmlFor="label2" style={{ marginTop: "0.5rem" }}>
+            Second source label
+          </label>
+          <input id="label2" value={source2Label} onChange={(e) => setSource2Label(e.target.value)} />
           <label htmlFor="pubdate" style={{ marginTop: "0.75rem" }}>
             Source date (optional, YYYY-MM-DD) — used when the paste has no dateline
           </label>
@@ -695,6 +755,61 @@ export function App() {
                   <ul className="action-list">
                     {(b.open_questions || []).map((q, i) => (
                       <li key={i}>{q}</li>
+                    ))}
+                  </ul>
+                </section>
+              ) : null}
+
+              {b.corroboration ? (
+                <section className="read-block">
+                  <h2>Cross-source check</h2>
+                  <p className="prose">
+                    {corroborationLineEn({
+                      score: b.corroboration.score_0_to_3,
+                      labelEn: b.corroboration.label_en || b.corroboration.label_zh,
+                      drivers: b.corroboration.drivers,
+                    })}
+                  </p>
+                  {(b.corroboration.shared_subjects || []).length ? (
+                    <p className="meta">
+                      Shared subjects: {(b.corroboration.shared_subjects || []).join(", ")}
+                    </p>
+                  ) : null}
+                  {(b.corroboration.missing || []).length ? (
+                    <ul className="action-list">
+                      {(b.corroboration.missing || []).slice(0, 4).map((m, i) => (
+                        <li key={i}>{m}</li>
+                      ))}
+                    </ul>
+                  ) : null}
+                  {result.sourceCount != null ? (
+                    <p className="meta">Sources in this run: {result.sourceCount}</p>
+                  ) : null}
+                </section>
+              ) : null}
+
+              {(result.relatedBriefs || []).length ? (
+                <section className="read-block">
+                  <h2>Related briefs in outbox</h2>
+                  <p className="meta">
+                    Same-topic candidates only — not proof. Load one as the second source and re-run to test corroboration.
+                  </p>
+                  <ul className="action-list">
+                    {(result.relatedBriefs || []).map((r) => (
+                      <li key={r.id}>
+                        <strong>{r.label}</strong>
+                        {r.desk ? ` · ${r.desk}` : ""}
+                        {r.shared_keys?.length ? ` · ${r.shared_keys.slice(0, 3).join(", ")}` : ""}
+                        <div className="row" style={{ marginTop: "0.35rem", gap: "0.5rem" }}>
+                          <button type="button" className="secondary" onClick={() => useRelatedAsSecondSource(r.jsonFile)}>
+                            Use as second source
+                          </button>
+                          <a href={`/outbox/briefs/${r.jsonFile}`} target="_blank" rel="noreferrer">
+                            Open JSON
+                          </a>
+                        </div>
+                        {r.what_preview ? <p className="meta">{r.what_preview}</p> : null}
+                      </li>
                     ))}
                   </ul>
                 </section>

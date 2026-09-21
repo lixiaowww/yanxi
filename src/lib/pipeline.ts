@@ -17,6 +17,7 @@ import { composeDigestRows, composeRejectionWhat, extractFacts, type FactSet } f
 import { buildContentAnalysis } from "./analysis.js";
 import { resolveIntake, intakeAllowsBrief, type IntakeDecision } from "./intake.js";
 import { buildTemporalCut } from "./temporal.js";
+import { findRelatedBriefs, type RelatedBriefHit } from "./related-briefs.js";
 
 export type SourceInput = {
   label: string;
@@ -54,6 +55,11 @@ export type BriefResponse = {
   gate: { passed: boolean; findings: ReturnType<typeof runClaimGate> };
   systemPromptChars: number;
   sourceCount: number;
+  /**
+   * Soft links to other outbox briefs on overlapping subjects.
+   * Discovery only — not corroboration until merged and re-run.
+   */
+  relatedBriefs?: RelatedBriefHit[];
 };
 
 function buildInfoValue(
@@ -213,6 +219,25 @@ export async function runBriefingPipeline(req: BriefRequest): Promise<BriefRespo
 
   const findings = runClaimGate(briefing, joined, sources);
   const infoValue = buildInfoValue(briefing);
+  let relatedBriefs: RelatedBriefHit[] = [];
+  try {
+    relatedBriefs = findRelatedBriefs({
+      briefing,
+      sourceText: joined,
+      limit: 6,
+    });
+  } catch {
+    relatedBriefs = [];
+  }
+
+  // Multi-source runs already have real corroboration; still hint if single-source.
+  if (sources.length < 2 && relatedBriefs.length && infoValue.level !== "high") {
+    infoValue.next_zh = [
+      `Add a related outbox excerpt as a second source (${relatedBriefs[0].label}) and re-run to test cross-check`,
+      ...infoValue.next_zh,
+    ].slice(0, 4);
+  }
+
   const result: BriefResponse = {
     mode,
     offlineReason,
@@ -223,6 +248,7 @@ export async function runBriefingPipeline(req: BriefRequest): Promise<BriefRespo
     gate: { passed: gatePassed(findings), findings },
     systemPromptChars: prompt.length,
     sourceCount: sources.length,
+    relatedBriefs,
   };
 
   try {

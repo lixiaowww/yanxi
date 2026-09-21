@@ -40,6 +40,7 @@
 - [x] 公开站 LLM 路径开放（无 brief token；靠 IP 限流）  
 - [x] Intake 两刀（hard nuggets + local_gray / 可选 Jev）  
 - [x] **时效时钟**：`temporal`（source_as_of / briefed_at / collected_at + freshness band）  
+- [x] **信息量 / 互证**：UI 双源粘贴；outbox 同主题 `relatedBriefs` 软链接；同主题成对订阅（非无关大合并）  
 
 ## Next — P0（最高优先级）
 

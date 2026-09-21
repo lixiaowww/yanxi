@@ -29,7 +29,7 @@
       "forceOffline": true,
       "maxItemsPerRun": 14,
       "mergeMode": "combined",
-      "active": true
+      "active": false
     },
     {
       "id": "desk-by-section",
@@ -68,6 +68,39 @@
       "delivery": ["outbox", "rss"],
       "forceOffline": true,
       "maxItemsPerRun": 5,
+      "mergeMode": "combined",
+      "active": true
+    },
+    {
+      "id": "same-topic-pairs",
+      "title": "Same-topic pairs (meeting + instrument)",
+      "description": "Merge direction language with implementing-notice language on the same macro subject so corroboration can rise. Prefer this over unrelated multi-domain dumps.",
+      "keywords": ["中央经济工作会议", "高质量发展", "新质生产力", "通知", "实施方案"],
+      "sourceIds": ["domain-macro-cewc", "domain-macro-instrument"],
+      "scheduleCron": "0 8 * * 1-5",
+      "scheduleHuman": "Weekdays 08:00 local",
+      "delivery": ["outbox", "rss"],
+      "forceOffline": true,
+      "maxItemsPerRun": 2,
+      "mergeMode": "combined",
+      "active": true
+    },
+    {
+      "id": "hot-topic-depth-packs",
+      "title": "Hot topics — depth packs (EV / AI / Taiwan fixtures)",
+      "description": "Combined hot-topic fixtures for denser subject coverage in one run (still public fixtures only).",
+      "keywords": [],
+      "sourceIds": [
+        "domain-hot-electric-vehicles",
+        "domain-hot-china-ai",
+        "domain-hot-taiwan-strait",
+        "domain-industrial-tech"
+      ],
+      "scheduleCron": "0 8 * * 2,4",
+      "scheduleHuman": "Tue/Thu 08:00 local",
+      "delivery": ["outbox", "rss"],
+      "forceOffline": true,
+      "maxItemsPerRun": 4,
       "mergeMode": "combined",
       "active": true
     }
