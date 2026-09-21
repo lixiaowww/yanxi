@@ -408,17 +408,30 @@ export function runClaimGate(
     const q = (row.quote || "").trim();
     if (!q) continue;
     const labeled = (row.source_label || "").trim();
-    const pool = labeled
-      ? corpus.filter((s) => s.label === labeled)
-      : corpus;
+    const labeledPool = labeled ? corpus.filter((s) => s.label === labeled) : [];
+    // LLMs (small open models especially) sometimes invent their own
+    // source_label instead of echoing the one given in the prompt. That's
+    // a labeling slip, not a fabricated quote — falling back to the full
+    // corpus keeps the check honest (still hard-fails a quote that isn't
+    // in ANY given source) without punishing a real quote over a label
+    // mismatch. Flag the mismatch as soft so it stays visible in the audit.
+    const usedFallback = Boolean(labeled) && labeledPool.length === 0 && corpus.length > 0;
+    const pool = labeledPool.length ? labeledPool : corpus;
     const hit = pool.some((s) => s.text.includes(q));
     if (!hit) {
       findings.push({
         id: "quote-not-in-source",
         severity: "hard",
         message: labeled
-          ? `Chinese quote is not a substring of source_label=${labeled}.`
+          ? `Chinese quote is not a substring of source_label=${labeled}, or of any provided source text.`
           : "Chinese quote is not a substring of any provided source text.",
+        evidence: q.slice(0, 80),
+      });
+    } else if (usedFallback) {
+      findings.push({
+        id: "quote-source-label-mismatch",
+        severity: "soft",
+        message: `source_label="${labeled}" does not match any provided source; quote verified against the full corpus instead.`,
         evidence: q.slice(0, 80),
       });
     }

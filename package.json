@@ -23,8 +23,10 @@
     "test:brief-quality": "tsx scripts/test-brief-quality.ts",
     "test:scenario-enrich": "tsx scripts/test-scenario-enrich.ts",
     "test:human-review": "tsx scripts/test-human-review.ts",
+    "test:llm-fallback": "tsx scripts/test-llm-fallback.ts",
+    "test:canada-priority": "tsx scripts/test-canada-priority.ts",
     "portfolio": "tsx scripts/build-portfolio.ts",
-    "test": "npm run lint && npm run demo && npm run test:domains && npm run test:desk && npm run test:regress && npm run test:intake && npm run test:temporal && npm run test:multi && npm run test:brief-quality && npm run test:scenario-enrich && npm run test:human-review",
+    "test": "npm run lint && npm run demo && npm run test:domains && npm run test:desk && npm run test:regress && npm run test:intake && npm run test:temporal && npm run test:multi && npm run test:brief-quality && npm run test:scenario-enrich && npm run test:human-review && npm run test:llm-fallback && npm run test:canada-priority",
     "collect": "tsx scripts/collect-and-brief.ts",
     "collect:daemon": "tsx scripts/collect-daemon.ts",
     "harness:brief": "tsx scripts/cursor-harness-brief.ts"

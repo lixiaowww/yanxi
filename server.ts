@@ -211,6 +211,9 @@ async function main() {
       gatePassed: r.result.gate.passed,
       triage: r.result.briefing.info_triage,
       what: r.result.briefing.briefing_en?.what,
+      // Core ranking parameter — listOutboxBriefs() already sorts direct >
+      // possible > none first; surface the level so the UI shows *why*.
+      canadaNexus: r.result.briefing.canada_nexus?.level,
       jsonUrl: `/outbox/briefs/${path.basename(r.jsonPath)}`,
       mdUrl: `/outbox/briefs/${path.basename(r.markdownPath)}`,
     }));

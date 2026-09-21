@@ -18,6 +18,7 @@ export type RelatedBriefHit = {
   desk?: string;
   what_preview?: string;
   corroboration_band?: string;
+  canada_nexus?: string;
   note_en: string;
   tag: "hypothesis";
 };
@@ -84,7 +85,14 @@ export function findRelatedBriefs(opts: {
     if (!concrete.length && !soft) continue;
 
     const keys = (concrete.length ? concrete : [deskMine!, kindMine!]).filter(Boolean).slice(0, 6);
-    const score = concrete.length * 2 + (soft ? 1 : 0);
+    // Canada relevance is a core ranking parameter here, not a tie-breaker:
+    // a same-topic candidate that also names/plausibly implicates Canada is
+    // worth surfacing over an equally-matched one that doesn't, since it's
+    // the more likely "load as second source" pick for a Canada-focused
+    // reader. Sized to actually move the ranking (concrete match = 2).
+    const nexusLevel = rec.result?.briefing?.canada_nexus?.level;
+    const nexusBonus = nexusLevel === "direct" ? 3 : nexusLevel === "possible" ? 1 : 0;
+    const score = concrete.length * 2 + (soft ? 1 : 0) + nexusBonus;
     scored.push({
       score,
       hit: {
@@ -97,6 +105,7 @@ export function findRelatedBriefs(opts: {
         desk: rec.result?.briefing?.desk_section?.label_en || rec.result?.briefing?.desk_section?.label_zh,
         what_preview: (rec.result?.briefing?.briefing_en?.what || "").slice(0, 160),
         corroboration_band: corroborationBand(rec.result?.briefing?.corroboration?.score_0_to_3 ?? 0),
+        canada_nexus: nexusLevel,
         note_en:
           "Same-topic candidate in the outbox — not independent corroboration until you merge the excerpts and re-run.",
         tag: "hypothesis",

@@ -25,7 +25,7 @@ npm install && npm run demo && npm run portfolio && npm run dev
 公开演示站（Render）花的是运营者自己的 LLM 额度：
 
 - **LLM 与采集均开放**：配了 `LLM_API_KEY` 后可直接 Generate；`POST /api/collect/run` 也不再要求 token。
-- **offline / 模板**：勾选 “Force offline”（或未配 `LLM_API_KEY`）走模板引擎，不消耗模型额度。
+- **offline / 模板**：未配 `LLM_API_KEY`、或 LLM 调用失败/被限流时自动走模板引擎，不消耗模型额度。UI 不再暴露手动 Force offline 开关（无实际使用价值）；API/采集脚本仍支持 `forceOffline: true` 供测试与确定性场景使用。
 - **限流与体积上限**：`/api/brief` 按 IP 限流（默认 10 分钟 20 次）；`/api/collect/run` 默认每窗口 6 次；请求体默认上限 `128kb`，`sourceText` 合计超过 24000 字符返回 `413`。
 
 变量说明见 [`.env.example`](.env.example)，部署配置见 [docs/DEPLOY.md](docs/DEPLOY.md)。

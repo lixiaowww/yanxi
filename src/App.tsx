@@ -229,6 +229,7 @@ type ApiResult = {
     desk?: string;
     what_preview?: string;
     corroboration_band?: string;
+    canada_nexus?: string;
     note_en: string;
   }[];
 };
@@ -248,6 +249,7 @@ type OutboxRow = {
   sourceLabel: string;
   gatePassed: boolean;
   what?: string;
+  canadaNexus?: string;
   jsonUrl: string;
   mdUrl: string;
 };
@@ -282,7 +284,7 @@ function briefErrorMessage(status: number, serverError?: string): string {
     return detail;
   }
   if (status === 429) {
-    return `${detail} This shared demo caps briefing runs per visitor; try again after the window resets, or tick Force offline for the template path.`;
+    return `${detail} This shared demo caps briefing runs per visitor; try again after the rate-limit window resets.`;
   }
   if (status === 413) {
     return `${detail} Paste a shorter public excerpt and re-run.`;
@@ -296,7 +298,6 @@ export function App() {
   const [source2Text, setSource2Text] = useState("");
   const [source2Label, setSource2Label] = useState("second-public-source");
   const [sourcePublishedAt, setSourcePublishedAt] = useState("");
-  const [forceOffline, setForceOffline] = useState(false);
   const [markSocial, setMarkSocial] = useState(false);
   const [loading, setLoading] = useState(false);
   const [collecting, setCollecting] = useState(false);
@@ -388,14 +389,12 @@ export function App() {
                 { label, text: sourceText },
                 { label: source2Label || "second-public-source", text: second },
               ],
-              forceOffline,
               sourcePublishedAt: sourcePublishedAt.trim() || undefined,
               ...overrides,
             }
           : {
               sourceText,
               sourceLabel: label,
-              forceOffline,
               sourcePublishedAt: sourcePublishedAt.trim() || undefined,
               ...overrides,
             };
@@ -619,14 +618,6 @@ export function App() {
             onChange={(e) => setSourcePublishedAt(e.target.value)}
           />
           <div className="row">
-            <label style={{ display: "flex", gap: "0.4rem", alignItems: "center" }}>
-              <input
-                type="checkbox"
-                checked={forceOffline}
-                onChange={(e) => setForceOffline(e.target.checked)}
-              />
-              Force offline (skip LLM, template only)
-            </label>
             <label style={{ display: "flex", gap: "0.4rem", alignItems: "center" }}>
               <input
                 type="checkbox"
@@ -1030,11 +1021,17 @@ export function App() {
                 <section className="read-block">
                   <h2>Related briefs in outbox</h2>
                   <p className="meta">
-                    Same-topic candidates only — not proof. Load one as the second source and re-run to test corroboration.
+                    Same-topic candidates only — not proof. Canada-relevant matches are ranked
+                    first. Load one as the second source and re-run to test corroboration.
                   </p>
                   <ul className="action-list">
                     {(result.relatedBriefs || []).map((r) => (
                       <li key={r.id}>
+                        {r.canada_nexus === "direct" ? (
+                          <span className="nexus-badge nexus-direct">CA</span>
+                        ) : r.canada_nexus === "possible" ? (
+                          <span className="nexus-badge nexus-possible">CA?</span>
+                        ) : null}{" "}
                         <strong>{r.label}</strong>
                         {r.desk ? ` · ${r.desk}` : ""}
                         {r.shared_keys?.length ? ` · ${r.shared_keys.slice(0, 3).join(", ")}` : ""}
@@ -1174,10 +1171,19 @@ export function App() {
         {outbox.length > 0 ? (
           <>
             <h3>Recent outbox</h3>
+            <p className="meta">
+              Sorted Canada-relevant first (named or plausibly implicated), then newest — Canada
+              nexus is a core ranking parameter here, not a tie-breaker.
+            </p>
             <ul className="sublist">
               {outbox.slice(0, 6).map((row) => (
                 <li key={row.id}>
                   <span className={row.gatePassed ? "ok" : "bad"}>{row.gatePassed ? "PASS" : "FAIL"}</span>{" "}
+                  {row.canadaNexus === "direct" ? (
+                    <span className="nexus-badge nexus-direct">CA</span>
+                  ) : row.canadaNexus === "possible" ? (
+                    <span className="nexus-badge nexus-possible">CA?</span>
+                  ) : null}{" "}
                   <strong>{row.sourceLabel}</strong>
                   <span className="meta"> · {row.createdAt}</span>
                   <div className="row">

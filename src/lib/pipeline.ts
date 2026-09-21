@@ -13,7 +13,13 @@ import { detectSourceClass, SOURCE_CLASSES, type SourceClass } from "./source-cl
 import { buildConfidenceFactors, buildCorroboration } from "./confidence.js";
 import { evaluateAdoption, filterDigestByHardNuggets } from "./adoption.js";
 import { appendGateAudit } from "./audit-log.js";
-import { composeDigestRows, composeRejectionWhat, extractFacts, type FactSet } from "./facts.js";
+import {
+  composeDigestRows,
+  composeRejectionWhat,
+  composeWhatEn,
+  extractFacts,
+  type FactSet,
+} from "./facts.js";
 import { buildContentAnalysis, listProfileOptions, pickProfile } from "./analysis.js";
 import { resolveIntake, intakeAllowsBrief, type IntakeDecision, type IntakeLabel } from "./intake.js";
 import { buildTemporalCut } from "./temporal.js";
@@ -545,20 +551,32 @@ function applyDeterministicLayers(
     next.content_analysis = analysis;
   }
 
-  if (next.briefing_en && adoption.adopted) {
+  if (adoption.adopted) {
+    // The LLM path can return a partial JSON that omits briefing_en
+    // entirely (seen in production with smaller open models — they drop
+    // the field rather than leaving it empty). This block used to run only
+    // when briefing_en already existed, so that failure mode shipped a
+    // brief with content_analysis fully computed but nothing in the
+    // reader-facing What/Context/So-what/Outlook sections at all. Guard on
+    // adoption instead and synthesize `what` from facts when missing, same
+    // as the offline path does.
+    const base = next.briefing_en;
     const socialNote =
       source_class.class === "social_commentary"
         ? "This rests on social commentary rather than an official text, so the impact reading below is provisional. "
         : "";
     const domainForced = Boolean(ctx.forcedDomainProfile);
     next.briefing_en = {
-      ...next.briefing_en,
+      ...base,
+      what:
+        base?.what ||
+        composeWhatEn(facts, { sourceCount: ctx.sourceCount, sourceLabels: ctx.sourceLabels }),
       context:
-        !domainForced && next.briefing_en.context
-          ? next.briefing_en.context
+        !domainForced && base?.context
+          ? base.context
           : `${analysis.domain_label_en} — ${analysis.background}`,
       confidence: confidence_factors.level,
-      so_what: `${socialNote}${domainForced ? analysis.so_what : next.briefing_en.so_what || analysis.so_what}`.trim(),
+      so_what: `${socialNote}${domainForced ? analysis.so_what : base?.so_what || analysis.so_what}`.trim(),
     };
     // Same reasoning as content_analysis above: a forced domain must
     // replace whatever scenarios an earlier pass already set.

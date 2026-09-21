@@ -179,6 +179,22 @@ ForecastScenario {
 
 **验证：** `npm run test:human-review`（开→resolved 全链路；灰区外的 intake 覆盖必须被忽略）。
 
+### 4.6 加拿大关联度：核心参数，不是装饰徽章（2026-09-21）
+
+**问题**：`canada_nexus` 一直存在，但只是一个 +0.03~+0.1 的次要加分项，UI 上只在单份简报详情里显示徽章；列表类视图（outbox / related briefs）虽然后端已按 canada_nexus 排序，但读者在 UI 上完全看不出"为什么这条排在前面"。同时 "Force offline" 开关上线以来实际从未被使用（用户确认），占着主表单的位置却没有产品价值。
+
+**方案**：
+- `canadaNexusImportanceBump()` 从 0.03/0.1 提到 **0.12/0.25**——P 档宽度 0.20，direct 现在能可靠地把中间档的稿子拉高一整档，而不是只在边界上微调。
+- `findRelatedBriefs()` 排序新增同等量级的 canada_nexus 加分（direct +3 / possible +1，对比一个具体主题匹配是 +2），让"同主题 + 加拿大相关"的候选明确排到"同主题但不涉加"的前面，而不是只在打分持平时顺带靠前。
+- Outbox 面板、Related briefs 面板都加上 [CA]/[CA?] 徽章 + 一句"按加拿大相关度优先排序"的说明，把已经存在的后端排序做成读者看得见的产品行为。
+- 从 UI 主表单删除 "Force offline" 复选框；`BriefRequest.forceOffline` 字段在 API/`npm test`/采集脚本里原样保留（确定性场景仍需要它），只是不再作为面向操作者的手动开关。
+
+**不做**：不新增"加拿大相关度"作为粘贴请求的手动输入项（那是排序问题，不是待人工判断的模糊点，跟 §4.5 的 human review 覆盖是两回事）；不把 `canada_nexus` 变成过滤器（仍然全量生成，只是排序优先）。
+
+**代码：** `src/lib/canada-nexus.ts`（bump 数值）；`src/lib/related-briefs.ts`（排序加分 + `canada_nexus` 字段透出）；`server.ts` / `src/App.tsx`（outbox 徽章 + 说明文案；移除 Force offline 控件）。
+
+**验证：** `npm run test:canada-priority`（bump 数值 + 同主题候选按 canada_nexus 重排）。
+
 ---
 
 ## 5. 风险与伦理

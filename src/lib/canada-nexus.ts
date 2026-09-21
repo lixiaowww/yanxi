@@ -110,9 +110,15 @@ export function buildCanadaNexus(sourceText: string): CanadaNexus {
   };
 }
 
-/** Small research-priority bump when Canada is explicitly named (civilian reader interest). */
+/**
+ * Research-priority bump when Canada is named or plausibly implicated
+ * (civilian reader interest — this product's core differentiator, not a
+ * minor tie-breaker). Importance bands are 0.20 wide (P4<0.35≤P3<0.55≤P2<
+ * 0.75≤P1), so `direct` reliably moves a mid-band item up a full grade and
+ * `possible` moves it roughly half a grade.
+ */
 export function canadaNexusImportanceBump(nexus: CanadaNexus): number {
-  if (nexus.level === "direct") return 0.1;
-  if (nexus.level === "possible") return 0.03;
+  if (nexus.level === "direct") return 0.25;
+  if (nexus.level === "possible") return 0.12;
   return 0;
 }

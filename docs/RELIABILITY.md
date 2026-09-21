@@ -110,6 +110,21 @@ Still **not legal advice** — human verifies current consolidated text.
 
 Catalog helper: `listCanadaPolicyCatalog()` (also on Portfolio page).
 
+## Canada nexus as a ranking parameter
+
+`canada_nexus` (none / possible / direct) is a core ranking input, not a cosmetic badge:
+
+- `canadaNexusImportanceBump()` (`src/lib/canada-nexus.ts`) adds up to **+0.25** (direct) or
+  **+0.12** (possible) to the P1–P4 importance score — bands are 0.20 wide, so `direct` reliably
+  moves a mid-band item a full grade.
+- `listOutboxBriefs()` sorts direct > possible > none before recency; the Outbox panel and RSS
+  feeds inherit this order.
+- `findRelatedBriefs()` adds a same-sized bonus (+3 direct / +1 possible, against a concrete
+  topical match worth +2) so a same-topic Canada-relevant candidate ranks ahead of an equally
+  matched one that isn't, when suggesting a second source.
+
+Still **not targeting** — see `docs/ETHICS.md` 2a. Verified by `npm run test:canada-priority`.
+
 ## Social commentary
 
 Detected cues: 李老师、twitter/x、微博、网传、自媒体…

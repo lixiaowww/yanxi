@@ -101,7 +101,7 @@
 | F3 | 按关键词匹配 context cards（Ontology Lite） | P0 | 已交付 |
 | F4 | 产出 JSON 简报结构 + 读者脊柱 | P0 | 已交付 |
 | F5 | Claim gate 并返回 findings | P0 | 已交付 |
-| F6 | Force offline 开关 | P0 | 已交付 |
+| F6 | Force offline 开关（API/采集脚本用于确定性；2026-09-21 起从 UI 移除，无实际使用价值） | P0 | 已交付 |
 | F7 | 样例文本一键填充 | P1 | 已交付 |
 | F8 | 多源 URL 白名单抓取 + 订阅 RSS | P1 | 已交付 |
 | F9 | 作者自定义 context card 向导 | P2 | 未做 |
@@ -110,6 +110,7 @@
 | F12 | 时效降权：无 `source_as_of` 不可 complete；Outlook likelihood 按 freshness 封顶 | P0 | 已交付 |
 | F13 | 预测四件套：label / basis / trigger / alternative / falsifier（缺字段 soft） | P0 | 已交付 |
 | F14 | Human-in-the-loop 明确 intake：`human_review[]` 列出 source_class / intake 灰区 / 领域画像三处仍是猜测的点，非阻塞，操作者选完覆盖字段重跑即解决 | P1 | 已交付 |
+| F15 | 加拿大关联度作为核心排序参数：importance 加权、outbox/related-briefs 排序均以 canada_nexus 为一等信号（非装饰徽章） | P1 | 已交付 |
 
 详细设计见 [DP-brief-quality.md](./DP-brief-quality.md)。读者交付物字段与流水线见 [DP.md](./DP.md)、[ARCHITECTURE.md](./ARCHITECTURE.md)。
 
