@@ -39,6 +39,11 @@ type Briefing = {
     };
     forward_deadlines_en?: string[];
   };
+  brief_quality?: {
+    level?: string;
+    label_en?: string;
+    missing?: string[];
+  };
   info_triage?: {
     primary_kind?: string;
     kinds?: { kind?: string; label_zh?: string; score?: number; evidence?: string }[];
@@ -161,7 +166,15 @@ type Briefing = {
   };
   policy_outlook?: {
     horizon?: string;
-    scenarios?: { label?: string; likelihood?: string; basis?: string; trigger?: string; horizon?: string }[];
+    scenarios?: {
+      label?: string;
+      likelihood?: string;
+      basis?: string;
+      trigger?: string;
+      horizon?: string;
+      alternative?: string;
+      falsifier?: string;
+    }[];
     watchpoints?: string[];
   };
   open_questions?: string[];
@@ -176,6 +189,8 @@ type Briefing = {
       basis?: string;
       horizon?: string;
       trigger?: string;
+      alternative?: string;
+      falsifier?: string;
     }[];
     watchpoints?: string[];
     open_questions?: string[];
@@ -647,6 +662,24 @@ export function App() {
                             ? "Adopted"
                             : "Pending"}
                   </span>
+                  {b.brief_quality?.level ? (
+                    <span
+                      className={`chip ${
+                        b.brief_quality.level === "complete"
+                          ? "chip-ok"
+                          : b.brief_quality.level === "partial"
+                            ? "chip-warn"
+                            : "chip-bad"
+                      }`}
+                      title={(b.brief_quality.missing || []).join(", ") || b.brief_quality.label_en}
+                    >
+                      {b.brief_quality.level === "complete"
+                        ? "Complete brief"
+                        : b.brief_quality.level === "partial"
+                          ? "Partial brief"
+                          : "Rejected brief"}
+                    </span>
+                  ) : null}
                   <span className={`chip ${result.mode === "llm" ? "chip-ok" : "chip-warn"}`}>
                     {result.mode === "llm" ? "LLM brief" : "Template brief"}
                   </span>
@@ -832,7 +865,20 @@ export function App() {
 
               {(b.policy_outlook?.scenarios || []).length ? (
                 <section className="read-block">
-                  <h2>6. Outlook (hypothesis)</h2>
+                  <h2>
+                    6. Outlook (hypothesis)
+                    {b.brief_quality?.level === "partial"
+                      ? " — provisional (single source / undated)"
+                      : b.temporal?.freshness?.band === "aging" ||
+                          b.temporal?.freshness?.band === "stale"
+                        ? " — freshness risk"
+                        : ""}
+                  </h2>
+                  {b.brief_quality?.level === "partial" && (b.brief_quality.missing || []).length ? (
+                    <p className="meta">
+                      Missing for a complete brief: {(b.brief_quality.missing || []).join(", ")}
+                    </p>
+                  ) : null}
                   <ol className="scenario-list">
                     {(b.policy_outlook?.scenarios || []).map((s, i) => (
                       <li key={i}>
@@ -848,6 +894,10 @@ export function App() {
                           {s.horizon ? <p className="meta">Horizon: {s.horizon}</p> : null}
                           {s.basis ? <p className="meta">Basis: {s.basis}</p> : null}
                           {s.trigger ? <p className="meta">Trigger: {s.trigger}</p> : null}
+                          {s.alternative ? (
+                            <p className="meta">Alternative: {s.alternative}</p>
+                          ) : null}
+                          {s.falsifier ? <p className="meta">Falsifier: {s.falsifier}</p> : null}
                         </div>
                       </li>
                     ))}

@@ -14,6 +14,10 @@ export type PolicyScenario = {
   horizon?: string;
   /** Observable condition that would confirm this path. */
   trigger?: string;
+  /** Competing reading of the same excerpt (hypothesis). */
+  alternative?: string;
+  /** Public observation that would invalidate this path (hypothesis). */
+  falsifier?: string;
   tag?: string;
 };
 
@@ -284,6 +288,17 @@ export type BriefingJson = {
     horizon?: string;
     scenarios?: PolicyScenario[];
     watchpoints?: string[];
+  };
+  /**
+   * Brief quality gate (DP-brief-quality): complete | partial | rejected.
+   * complete needs ≥2 distinct sources + dated as-of; not event probability.
+   */
+  brief_quality?: {
+    framing?: string;
+    level?: string;
+    label_en?: string;
+    missing?: string[];
+    tag?: string;
   };
   open_questions?: string[];
 };
@@ -920,6 +935,33 @@ export function runClaimGate(
         evidence: (sc.label || basis).slice(0, 120),
       });
     }
+    // DP F13 — soft only so older LLM JSON without four-piece still passes.
+    if (sc.label && !sc.alternative) {
+      findings.push({
+        id: "outlook-missing-alternative",
+        severity: "soft",
+        message: "scenario should include alternative (competing reading).",
+        evidence: (sc.label || "").slice(0, 80),
+      });
+    }
+    if (sc.label && !sc.falsifier) {
+      findings.push({
+        id: "outlook-missing-falsifier",
+        severity: "soft",
+        message: "scenario should include falsifier (public observation that kills the path).",
+        evidence: (sc.label || "").slice(0, 80),
+      });
+    }
+  }
+
+  const bq = briefing.brief_quality?.level;
+  if (bq && !["complete", "partial", "rejected"].includes(bq)) {
+    findings.push({
+      id: "brief-quality-invalid",
+      severity: "soft",
+      message: "brief_quality.level must be complete|partial|rejected.",
+      evidence: bq,
+    });
   }
 
   return findings;

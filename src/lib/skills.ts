@@ -92,7 +92,15 @@ Return ONLY valid JSON with this shape:
   "policy_outlook": {
     "horizon": "near|medium",
     "scenarios": [
-      {"label": "...", "likelihood": "low|medium|high", "basis": "...", "tag": "hypothesis"}
+      {
+        "label": "...",
+        "likelihood": "low|medium|high",
+        "basis": "...",
+        "trigger": "observable confirmation...",
+        "alternative": "competing reading...",
+        "falsifier": "public observation that kills this path...",
+        "tag": "hypothesis"
+      }
     ],
     "watchpoints": ["observable public signal..."]
   },
@@ -110,6 +118,7 @@ Rules:
 - signaling_valves are category roll-ups of sequence / implementing_detail / press_placement.
 - The runtime may replace signaling_scorecard, info_triage, and ontology_lite with deterministic scorers — still fill them honestly.
 - policy_outlook preferred for policy sources; every scenario tag MUST be "hypothesis".
+- Each scenario should include alternative + falsifier (competing reading + public kill-condition).
 - Use may/could/if-then — never will-definitely / guaranteed / secretly-plans.
 - If unsure, lower confidence and add open_questions.`;
 

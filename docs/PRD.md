@@ -91,6 +91,9 @@
 | F8 | 多源 URL 白名单抓取 | P2 |
 | F9 | 作者自定义 context card 向导 | P2 |
 | F10 | Intake 两刀：第一刀白名单+hard nuggets；第二刀 local_gray / 可选 Jev（仅 defer↔reject_thin；不写正文、不覆盖 gate） | P0 |
+| F11 | 双源完整简报门禁：`brief_quality` complete 需 ≥2 独立公开摘录；单源强制 partial（见 [DP-brief-quality.md](./DP-brief-quality.md)） | P0 |
+| F12 | 时效降权：无 `source_as_of` 不可 complete；Outlook likelihood 按 freshness 封顶 | P0 |
+| F13 | 预测四件套：每个情景含 label / basis / trigger / alternative / falsifier（缺字段 soft） | P0 |
 
 ## 7. 非功能需求
 

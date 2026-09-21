@@ -26,6 +26,10 @@ export type ForecastScenario = {
   basis: string;
   /** Observable condition that would confirm this path. */
   trigger?: string;
+  /** Competing reading of the same excerpt (hypothesis). */
+  alternative?: string;
+  /** Public observation that would invalidate this path (hypothesis). */
+  falsifier?: string;
   tag: "hypothesis";
 };
 
@@ -173,6 +177,11 @@ function publicationScenario(v: View, detail: string): ForecastScenario {
     trigger: v.instrEn
       ? "A named issuing body, a draft circulated for public comment, or a document number appearing in an official gazette."
       : "A named issuing body or a draft circulated for public comment.",
+    alternative:
+      "Competing reading: the commitment stays rhetorical and no administrative text is issued in the stated window (hypothesis).",
+    falsifier: v.deadlineEn
+      ? `No draft, document number, or named issuer appears before ${v.deadlineEn.replace(/^by /, "")}, or a published text omits the funded/pilot element named here.`
+      : "No draft, document number, or named issuer appears, or a published text omits the funded/pilot element named here.",
     tag: "hypothesis",
   };
 }
@@ -189,7 +198,27 @@ function slippageScenario(v: View, narrowing: string): ForecastScenario {
     trigger: v.deadlineEn
       ? `No named implementing body or published draft before ${v.deadlineEn.replace(/^by /, "")}, or a published text that omits the funded element.`
       : "No named implementing body or published draft, or a text that omits the funded element.",
+    alternative:
+      "Competing reading: a named body takes ownership and the document lands on time with the funded element intact (hypothesis).",
+    falsifier: v.deadlineEn
+      ? `A dated implementing document naming the body and retaining the funded element appears before ${v.deadlineEn.replace(/^by /, "")}.`
+      : "A dated implementing document naming the body and retaining the funded element is published.",
     tag: "hypothesis",
+  };
+}
+
+/** Fill alternative/falsifier when a domain profile omitted them (DP F13). */
+function ensureFourPiece(s: ForecastScenario): ForecastScenario {
+  return {
+    ...s,
+    alternative:
+      s.alternative ||
+      "Competing reading: the excerpt is signalling without near-term delivery, and priorities shift elsewhere (hypothesis).",
+    falsifier:
+      s.falsifier ||
+      (s.trigger
+        ? `Public observation opposite to the trigger: ${s.trigger}`
+        : "A clear public text on the same subject that contradicts this outcome."),
   };
 }
 
@@ -844,7 +873,10 @@ export function buildContentAnalysis(
   const profile = pickProfile(ctx);
 
   const so_what = profile.soWhat(v).trim();
-  const scenarios = profile.scenarios(v).filter((s) => s.label && s.basis);
+  const scenarios = profile
+    .scenarios(v)
+    .filter((s) => s.label && s.basis)
+    .map(ensureFourPiece);
   const watchpoints = [...new Set(profile.watchpoints(v).filter(Boolean))].slice(0, 6);
   const open_questions = [...new Set(profile.questions(v).filter(Boolean))].slice(0, 5);
 

@@ -41,6 +41,7 @@
 - [x] Intake 两刀（hard nuggets + local_gray / 可选 Jev）  
 - [x] **时效时钟**：`temporal`（source_as_of / briefed_at / collected_at + freshness band）  
 - [x] **信息量 / 互证**：UI 双源粘贴；outbox 同主题 `relatedBriefs` 软链接；同主题成对订阅（非无关大合并）  
+- [x] **简报质量门禁（DP-brief-quality F11–F13）**：`brief_quality` complete|partial|rejected；无 as-of 则 Outlook likelihood 降权；情景四件套 alternative/falsifier  
 
 ## Next — P0（最高优先级）
 

@@ -51,6 +51,15 @@ export function formatBriefMarkdown(
     out.push(`- **confidence:** ${briefing.confidence_factors?.level || en?.confidence}`);
   }
   if (briefing.intake?.label) out.push(`- **intake:** ${briefing.intake.label}`);
+  if (briefing.brief_quality?.level) {
+    out.push(
+      `- **brief quality:** ${briefing.brief_quality.level}${
+        briefing.brief_quality.missing?.length
+          ? ` (missing: ${briefing.brief_quality.missing.join(", ")})`
+          : ""
+      }`
+    );
+  }
   if (briefing.temporal) {
     const t = briefing.temporal;
     out.push(
@@ -108,12 +117,18 @@ export function formatBriefMarkdown(
 
     const scenarios = outlook?.scenarios || [];
     if (scenarios.length) {
-      out.push("## Outlook (hypothesis)", "");
+      const provisional =
+        briefing.brief_quality?.level === "partial"
+          ? " (provisional — single source / undated)"
+          : "";
+      out.push(`## Outlook (hypothesis)${provisional}`, "");
       for (const s of scenarios) {
         out.push(`- **[${s.likelihood || "?"}]** ${s.label || ""}`);
         if (s.horizon) out.push(`  - Horizon: ${s.horizon}`);
         if (s.basis) out.push(`  - Basis: ${s.basis}`);
         if (s.trigger) out.push(`  - Trigger: ${s.trigger}`);
+        if (s.alternative) out.push(`  - Alternative: ${s.alternative}`);
+        if (s.falsifier) out.push(`  - Falsifier: ${s.falsifier}`);
       }
       out.push("");
     }

@@ -18,6 +18,11 @@ import { buildContentAnalysis } from "./analysis.js";
 import { resolveIntake, intakeAllowsBrief, type IntakeDecision } from "./intake.js";
 import { buildTemporalCut } from "./temporal.js";
 import { findRelatedBriefs, type RelatedBriefHit } from "./related-briefs.js";
+import {
+  clampLikelihood,
+  evaluateBriefQuality,
+  outlookLikelihoodCap,
+} from "./brief-quality.js";
 
 export type SourceInput = {
   label: string;
@@ -97,7 +102,14 @@ function buildInfoValue(
   const band = briefing.substance_cut?.band || "thin";
   const corr = briefing.corroboration?.score_0_to_3 ?? 0;
   const missing = briefing.corroboration?.missing || [];
+  const qualityMissing = briefing.brief_quality?.missing || [];
   const next: string[] = [];
+  if (qualityMissing.includes("second_public_source")) {
+    next.push("Add a second public excerpt on the same subject (or Use related as second source)");
+  }
+  if (qualityMissing.includes("source_as_of")) {
+    next.push("Add a dated dateline or set source published date before treating Outlook as current");
+  }
   if (band === "thin" || corr < 2) {
     next.push("Add a same-topic public implementing notice and re-run with the meeting text");
   }
@@ -507,6 +519,51 @@ function applyDeterministicLayers(
         ]),
       ].slice(0, 8),
     };
+  }
+
+  // DP F11–F12: brief quality gate + freshness likelihood caps.
+  const brief_quality = evaluateBriefQuality({
+    adopted: adoption.adopted,
+    distinctSourceCount: corroboration.distinct_source_count ?? ctx.sourceCount,
+    temporal,
+    operatorDated: Boolean(ctx.sourcePublishedAt),
+  });
+  next.brief_quality = brief_quality;
+
+  if (adoption.adopted && next.policy_outlook?.scenarios?.length) {
+    const cap = outlookLikelihoodCap(temporal);
+    const clampScenarios = <
+      T extends { likelihood?: string; alternative?: string; falsifier?: string; trigger?: string },
+    >(
+      scenarios: T[]
+    ): T[] =>
+      scenarios.map((s) => {
+        const lik = (s.likelihood || "low").toLowerCase();
+        const base =
+          lik === "high" || lik === "medium" || lik === "low" ? lik : ("low" as const);
+        return {
+          ...s,
+          likelihood: clampLikelihood(base, cap),
+          alternative:
+            s.alternative ||
+            "Competing reading: the excerpt is signalling without near-term delivery (hypothesis).",
+          falsifier:
+            s.falsifier ||
+            (s.trigger
+              ? `Public observation opposite to the trigger: ${s.trigger}`
+              : "A clear public text on the same subject that contradicts this outcome."),
+        };
+      });
+    next.policy_outlook = {
+      ...next.policy_outlook,
+      scenarios: clampScenarios(next.policy_outlook.scenarios),
+    };
+    if (next.content_analysis?.scenarios?.length) {
+      next.content_analysis = {
+        ...next.content_analysis,
+        scenarios: clampScenarios(next.content_analysis.scenarios),
+      };
+    }
   }
 
   if (source_class.class === "social_commentary" && adoption.adopted) {

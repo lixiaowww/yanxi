@@ -27,7 +27,11 @@ turn **public Mandarin text** into a clear **English briefing note**.
 7. Write English `what` / `context` / `so_what` — **lead with nuggets**, not with ritual praise.
    Reader spine (deliverable): Source digest → What → Context → Key facts → So what → Outlook → Watchpoints → Open questions.
 8. Add `policy_outlook` scenarios (`tag: "hypothesis"`) + `watchpoints` when policy-related.
+   Each scenario should carry the **four-piece pack**: `label`, `basis`, `trigger`,
+   `alternative` (competing reading), `falsifier` (public observation that kills the path).
 9. List `open_questions` for unclear scorecard rows and missing 细则/版面.
+10. Prefer **≥2 distinct public excerpts** on the same subject before treating the draft
+    as a complete brief; a single undated paste is a **partial** research note.
 
 ## Honesty rules (non-negotiable)
 - Never fabricate quotes, page placement, instruments, or outcomes.
@@ -37,6 +41,7 @@ turn **public Mandarin text** into a clear **English briefing note**.
 - Formulaic party-speak is **atmosphere / agenda cue**, not proof of secret plans or “brainwashing success”.
 - Factorize confidence (signaling × substance × corroboration × provenance × source_class). Social commentary cannot alone reach high confidence or corroborate official claims.
 - Scorecard weights and thresholds are **hand-set editorial priors** — no labelled corpus, no validation set. In prose written for a reader, report the **band** (`thin`/`mixed`/`dense`, `low`/`medium`/`high`, tier `A`–`U`, corroboration `minimal`→`strong`) plus one clause naming what produced it. Never quote `weighted_total`, a `0–1` score, or an `x/3` figure as if it were measured.
+- When the paste has **no dated dateline**, keep Outlook provisional and prefer lower likelihoods.
 - Draft for **human review** only.
 
 ## Output
