@@ -12,7 +12,10 @@ Yanxi uses Cursor’s agent harness in two layers: **in-repo** constraints and a
 | `.cursor/hooks.json` | Hook stub for future hard denies (permissions/hooks) |
 | `skills/` | **Runtime** product skills composed into the briefing prompt (not Cursor-only) |
 
-Hard guarantees still live in code: `src/lib/gate.ts` (quote substring, forbidden framing).
+Hard guarantees still live in code: `src/lib/gate.ts` (quote substring, forbidden framing),
+plus product gates in `src/lib/brief-quality.ts` / `adoption` / `intake` (see `docs/DP-brief-quality.md`).
+
+Design docs agents must keep in sync when scope changes: `docs/PRD.md`, `docs/ROADMAP.md`, and a DP under `docs/DP*.md`.
 
 ## Layer 2 — Programmatic harness (`@cursor/sdk`)
 
@@ -37,6 +40,13 @@ Script: `scripts/cursor-harness-brief.ts`
 | _(none)_ | Offline briefing demo |
 | `LLM_API_KEY` | Optional OpenAI-compatible chat for `/api/brief` |
 | `CURSOR_API_KEY` | Optional Cursor SDK harness script |
+| `TYPESAFE_API_KEY` | Optional Jev Choice for intake second cut only |
+
+## Verify
+
+```bash
+npm test
+```
 
 ## Ethics
 

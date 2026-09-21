@@ -25,4 +25,11 @@
 
 ## 门禁落地
 
-代码中 `ethics-sandbox` skill + `gate.ts` 禁用框架词与密级标记检查，与本文档一致。采集见 `docs/COLLECT.md`。新增功能须先更新本文件。  
+代码中 `ethics-sandbox` skill + `gate.ts` 禁用框架词与密级标记检查，与本文档一致。采集见 `docs/COLLECT.md`。新增功能须先更新本文件。
+
+## 简报诚实厚度
+
+- `brief_quality=complete` **不是**「情报定案」；仅表示同题 ≥2 独立公开摘录且有日期锚。  
+- `partial` 仍可展示 Outlook，但须标 provisional，且无日期时降低情景 likelihood。  
+- 禁止为凑 complete **臆造第二源**或合并无关主题冒充互证。  
+- 置信度 / 印证 / 质量等级均描述**草稿证据结构**，不是事件发生概率。  

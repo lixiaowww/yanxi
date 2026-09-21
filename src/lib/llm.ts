@@ -16,7 +16,11 @@ function extractJsonObject(raw: string): string {
   return text;
 }
 
-export async function callLlmJson(system: string, user: string): Promise<BriefingJson> {
+export async function callLlmJson<T = BriefingJson>(
+  system: string,
+  user: string,
+  opts?: { timeoutMs?: number }
+): Promise<T> {
   const base = process.env.LLM_BASE_URL!.replace(/\/$/, "");
   const model = process.env.LLM_MODEL!;
   const key = process.env.LLM_API_KEY!;
@@ -38,15 +42,24 @@ export async function callLlmJson(system: string, user: string): Promise<Briefin
     if (withJsonFormat) {
       payload.response_format = { type: "json_object" };
     }
-    const res = await fetch(`${base}/chat/completions`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${key}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    });
-    const t = await res.text();
+    const ctrl = new AbortController();
+    const timer = opts?.timeoutMs ? setTimeout(() => ctrl.abort(), opts.timeoutMs) : undefined;
+    let res: Response;
+    let t: string;
+    try {
+      res = await fetch(`${base}/chat/completions`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${key}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+        signal: ctrl.signal,
+      });
+      t = await res.text();
+    } finally {
+      if (timer) clearTimeout(timer);
+    }
     if (!res.ok) {
       throw new Error(`LLM HTTP ${res.status}: ${t.slice(0, 280)}`);
     }
@@ -70,9 +83,9 @@ export async function callLlmJson(system: string, user: string): Promise<Briefin
   }
 
   try {
-    return JSON.parse(extractJsonObject(content)) as BriefingJson;
+    return JSON.parse(extractJsonObject(content)) as T;
   } catch {
     content = await once(false);
-    return JSON.parse(extractJsonObject(content)) as BriefingJson;
+    return JSON.parse(extractJsonObject(content)) as T;
   }
 }

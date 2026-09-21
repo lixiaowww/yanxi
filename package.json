@@ -1,7 +1,7 @@
 {
   "name": "yanxi",
   "private": true,
-  "version": "0.2.0",
+  "version": "0.3.0",
   "type": "module",
   "description": "Yanxi — civilian open-source Mandarin→English contextual briefing with China context cards, claim gates, and whitelist collect/subscribe.",
   "scripts": {
@@ -21,8 +21,9 @@
     "test:temporal": "tsx scripts/test-temporal.ts",
     "test:multi": "tsx scripts/test-multi-source.ts",
     "test:brief-quality": "tsx scripts/test-brief-quality.ts",
+    "test:scenario-enrich": "tsx scripts/test-scenario-enrich.ts",
     "portfolio": "tsx scripts/build-portfolio.ts",
-    "test": "npm run lint && npm run demo && npm run test:domains && npm run test:desk && npm run test:regress && npm run test:intake && npm run test:temporal && npm run test:multi && npm run test:brief-quality",
+    "test": "npm run lint && npm run demo && npm run test:domains && npm run test:desk && npm run test:regress && npm run test:intake && npm run test:temporal && npm run test:multi && npm run test:brief-quality && npm run test:scenario-enrich",
     "collect": "tsx scripts/collect-and-brief.ts",
     "collect:daemon": "tsx scripts/collect-daemon.ts",
     "harness:brief": "tsx scripts/cursor-harness-brief.ts"

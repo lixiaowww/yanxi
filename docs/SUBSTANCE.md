@@ -24,6 +24,17 @@
 
 UI 面板标题：**Verifiable detail**（八股 vs 可核验）。`so_what` 会前置 nugget 或 thin 警告。
 
+## 与 adoption / intake / brief_quality
+
+| 层 | 作用 |
+|----|------|
+| `substance_cut` | 检出硬线索（数字、时限、文件名…） |
+| `adoption` | 无线索 → 整篇不采纳（rejected） |
+| `intake` | 灰区第二刀：defer 进观察队列，仍不写完整简报正文 |
+| `brief_quality` | 已采纳稿再分 complete / partial（双源+日期） |
+
+详见 `docs/DP-brief-quality.md` · `docs/RELIABILITY.md`。
+
 ## Calibration status: none
 
 The band is a **rule-based count of detected cue types**, with thresholds set by eye. It has never

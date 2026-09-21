@@ -18,6 +18,7 @@ import { buildContentAnalysis } from "./analysis.js";
 import { resolveIntake, intakeAllowsBrief, type IntakeDecision } from "./intake.js";
 import { buildTemporalCut } from "./temporal.js";
 import { findRelatedBriefs, type RelatedBriefHit } from "./related-briefs.js";
+import { enrichScenarioAlternatives } from "./scenario-enrich.js";
 import {
   clampLikelihood,
   evaluateBriefQuality,
@@ -227,6 +228,27 @@ export async function runBriefingPipeline(req: BriefRequest): Promise<BriefRespo
       .filter((id): id is string => Boolean(id)) ?? matchedCards;
   if (briefing.briefing_en) {
     briefing.briefing_en.sources_used = sources.map((s) => s.label);
+  }
+
+  // Optional — F13 alternative/falsifier enrichment (ACH-style: every
+  // scenario reviewed together in one call so they read as distinct rather
+  // than the rule engine's shared fallback sentence). Never runs offline;
+  // any failure keeps the rule-based fields untouched. Gated on mode==="llm"
+  // (not just allowLlm) so a request whose main call already failed/rate-
+  // limited doesn't immediately fire a second doomed call at the same
+  // provider — see scenario-enrich.ts for the short cooldown after a 429.
+  if (mode === "llm" && briefing.adoption?.adopted !== false && briefing.policy_outlook?.scenarios?.length) {
+    try {
+      const enriched = await enrichScenarioAlternatives(joined, briefing.policy_outlook.scenarios);
+      if (enriched) {
+        briefing.policy_outlook = { ...briefing.policy_outlook, scenarios: enriched };
+        if (briefing.content_analysis?.scenarios?.length === enriched.length) {
+          briefing.content_analysis = { ...briefing.content_analysis, scenarios: enriched };
+        }
+      }
+    } catch {
+      /* enrichment is optional; keep rule-based alternative/falsifier */
+    }
   }
 
   const findings = runClaimGate(briefing, joined, sources);

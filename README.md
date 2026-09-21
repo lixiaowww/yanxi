@@ -6,7 +6,7 @@
 |--|--|
 | **产品名** | 研析（Yanxi） |
 | **英文全称** | Yanxi — Open Mandarin Contextual Briefing |
-| **一句话** | 公开中文材料 → 政史文语境卡 → 英文 Briefing Note（含审慎政策展望）+ claim 门禁 |
+| **一句话** | 公开中文材料 → 政史文语境卡 → 英文 Briefing Note（含审慎政策展望与质量门禁）+ claim 门禁 |
 | **仓** | [github.com/lixiaowww/yanxi](https://github.com/lixiaowww/yanxi) |
 | **架构血缘** | GrantWright runtime skills 组合；Nexus_Crime 仅借鉴溯源/置信纪律（非主底座） |
 
@@ -45,8 +45,9 @@ npm run collect:daemon       # 定期运行（COLLECT_INTERVAL_MINUTES）
 
 | 文档 | 说明 |
 |------|------|
-| [docs/PRD.md](docs/PRD.md) | 产品需求文档 |
-| [docs/DP.md](docs/DP.md) | 设计方案 |
+| [docs/PRD.md](docs/PRD.md) | 产品需求文档（v0.3） |
+| [docs/DP.md](docs/DP.md) | 设计方案（总） |
+| [docs/DP-brief-quality.md](docs/DP-brief-quality.md) | 简报质量门禁 DP（F11–F13） |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | 技术架构 |
 | [docs/ETHICS.md](docs/ETHICS.md) | 伦理与红线 |
 | [docs/JOB-FIT.md](docs/JOB-FIT.md) | 岗位对齐范围（内部） |
@@ -55,7 +56,8 @@ npm run collect:daemon       # 定期运行（COLLECT_INTERVAL_MINUTES）
 | [docs/ROADMAP.md](docs/ROADMAP.md) | 路线图 |
 | [docs/PORTFOLIO.md](docs/PORTFOLIO.md) | Portfolio 一页（面试/自用叙事） |
 | [docs/ONTOLOGY-LITE.md](docs/ONTOLOGY-LITE.md) | Civic Ontology Lite（民用背景层 · 非 OWL） |
-| [docs/RELIABILITY.md](docs/RELIABILITY.md) | 置信度 / 印证 / 加国对照 / 社交降权 |
+| [docs/RELIABILITY.md](docs/RELIABILITY.md) | 置信度 / 印证 / 简报质量 / 加国对照 / 社交降权 |
+| [docs/SUBSTANCE.md](docs/SUBSTANCE.md) | 干货剥离（substance cut） |
 | [docs/DEPLOY.md](docs/DEPLOY.md) | **免费部署**（Render Free） |
 | [AGENTS.md](AGENTS.md) | Agent 入口约定 |
 

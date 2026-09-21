@@ -84,6 +84,24 @@ Within-passage wording cues (instrument vocabulary, meeting+instrument sequence,
 substance density, reported separately under `single_source_cues` — a rich single passage is still
 not corroborated.
 
+## Brief quality (complete / partial / rejected)
+
+Field: `brief_quality` · code `src/lib/brief-quality.ts` · design [DP-brief-quality.md](./DP-brief-quality.md).
+
+This gate answers a different question from corroboration: **is this draft thick enough to call a
+complete research brief?** It is still not P(event).
+
+| Level | Rule (summary) |
+|-------|----------------|
+| complete | adopted ∧ ≥2 distinct sources ∧ dated `source_as_of` (or operator-provided date) |
+| partial | adopted but missing second source and/or as-of |
+| rejected | not adopted (no hard detail) / intake defer path |
+
+Freshness also **caps Outlook likelihoods** (`unknown` → low；`aging`/`stale` → medium). Scenarios
+should carry `alternative` and `falsifier` (offline fills them；gate warns soft if LLM omits).
+
+UI chip: Complete brief / Partial brief. Markdown header mirrors `brief_quality.level` + `missing[]`.
+
 ## Clickable public refs
 
 `canada_policy_link.hits[].public_refs` are `{ title, url, publisher }` objects

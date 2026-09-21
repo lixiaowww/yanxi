@@ -9,6 +9,7 @@
 | 对应 PRD | [PRD.md](./PRD.md) F1–F10；本 DP 增补 F11–F13 |
 | 伦理 | [ETHICS.md](./ETHICS.md) — 民用公开源；禁止情报机关/SIGINT 叙事 |
 | Harness | [HARNESS.md](./HARNESS.md) · `AGENTS.md` · `.cursor/rules/*` |
+| 状态 | **已执行**（2026-09-21；`npm run test:brief-quality` 绿） |
 
 ---
 
@@ -120,6 +121,20 @@ ForecastScenario {
 | `aging` / `stale` | 保持 complete 资格，但 Outlook 标题标注时效风险；likelihood 上限 `medium` |
 
 **代码：** `temporal.ts` 导出 `outlookLikelihoodCap`；`analysis.ts` 或 pipeline 后处理情景；UI 芯片已有，加强文案。
+
+### 4.3a F13 补丁 — alternative/falsifier 去模板化（2026-09-21，成品审阅后追加）
+
+**问题**：`ensureFourPiece()`（`analysis.ts`）与 `pipeline.ts` 里各自硬编码了一句兜底 alternative/一句兜底 falsifier；11 个领域画像里只有 `publicationScenario` / `slippageScenario` 两个共用工厂手写了专属文案，其余画像的 scenario 对象根本不填这两个字段 → 同一份简报内多个情景、乃至不同领域的简报之间，alternative/falsifier 经常逐字相同；falsifier 还只是把 trigger 取反复述，没有新信息。读者一眼能认出模板，直接损害"像真简报"的观感。
+
+**方案**：`src/lib/scenario-enrich.ts` 新增 `enrichScenarioAlternatives()`——仅当 `LLM_API_KEY` 已配置且未 `forceOffline` 时，把该简报**全部情景一次性**丢给 LLM（ACH：同批对比，逼模型互相区分而非逐条孤立生成），要求：
+- 每条 alternative 必须与本批其余 alternative 不同；
+- falsifier 必须是独立于 trigger 的可观察反证条件，不得只是 trigger 取反。
+
+**软失败契约**（不可 hard-fail，绝不能让简报生成因为这一步而挂掉或变得不确定）：LLM 未配置 / 超时(12s) / HTTP 错误 / JSON 解析失败 / 情景数量不匹配 / 任一字段缺失 / **出现重复 alternative（说明 LLM 没能区分情景，判定整批失败）**——以上任一情况整批放弃，保留规则引擎原有文案。`npm test` 环境不设 `LLM_API_KEY`，此路径完全不触发，不影响既有回归的确定性。
+
+**开关**：`YANXI_SCENARIO_ENRICH=0` 可关闭（省 LLM 额度/延迟，公开演示站按需使用）。
+
+**验证**：`npm run test:scenario-enrich`（mock fetch，覆盖happy path / 重复 alternative / 数量不符 / 字段缺失 / JSON 损坏 / HTTP 错误 / 开关关闭 共 7 个断言）。
 
 ### 4.3 F13 — 预测四件套
 

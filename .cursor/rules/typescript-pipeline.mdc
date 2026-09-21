@@ -10,5 +10,8 @@ alwaysApply: false
 - Product id in health/API: `yanxi`.
 - Default: offline when no `LLM_API_KEY` or `forceOffline`.
 - On LLM failure: degrade to offline; never leave the demo broken.
-- Gate: hard findings block PASS; soft findings warn only.
-- Do not persist user pastes (MVP has no DB).
+- Order of product gates: substance → adoption → intake → temporal → analysis → corroboration → **brief_quality** → outlook likelihood clamp.
+- Gate: hard findings block PASS; soft findings warn only (including missing alternative/falsifier).
+- `brief_quality` complete needs ≥2 distinct sources + dated as-of; never invent a second source.
+- Quotes in digests must be substrings of the paste.
+- Optional save: reader markdown to outbox via `/api/brief/save` — still a human-review draft.

@@ -19,7 +19,9 @@ npm run dev            # 打开 http://localhost:5179/portfolio
 5. Civic Ontology Lite 背景卡目录（栏目优先 · 非 OWL）— 见 `docs/ONTOLOGY-LITE.md`  
 6. 加国公开政策对照 **可点击 URL**（Justice Laws / GAC / CBSA…）· 非法律意见  
 7. **采纳门槛**：无数字/时限/细则/资金（或主体+具名产品）→ 不生成实质简报  
+8. **简报质量**：complete 需双源+日期；单源/无日期为 partial；Outlook 为情景四件套（hypothesis）  
 
+设计见 `docs/PRD.md` v0.3 · `docs/DP-brief-quality.md`。
 ## 文件
 
 | 路径 | 用途 |
