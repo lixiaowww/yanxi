@@ -22,12 +22,12 @@ npm install && npm run demo && npm run portfolio && npm run dev
 
 ### 公开部署的访问模型
 
-公开演示站（Render）花的是运营者自己的 LLM 额度，因此：
+公开演示站（Render）花的是运营者自己的 LLM 额度：
 
-- **offline / 模板路径开放**：勾选 “Force offline”（或运营者未配 `LLM_API_KEY`）时任何人都能跑，演示照常可用。
-- **LLM 路径需要 token**：`POST /api/brief` 走 LLM 时需 `x-yanxi-token`（即 `BRIEF_API_TOKEN`），与 `POST /api/collect/run` 的 `COLLECT_API_TOKEN` 同一套约定。生产环境未设该变量 = LLM 运行**拒绝**（fail-safe，不是放开）。
-- **限流与体积上限**：所有 `/api/brief` 调用按客户端 IP 限流（默认 10 分钟 20 次，超限 `429` + `Retry-After`）；请求体默认上限 `128kb`，`sourceText` 合计超过 24000 字符返回 `413`。
-- 被拒时 UI 会给出英文提示，并说明 offline 模板路径仍可用。
+- **LLM 路径开放**：配了 `LLM_API_KEY` 后，谁打开网址都能直接 Generate（不需要 brief token）。
+- **offline / 模板**：勾选 “Force offline”（或未配 `LLM_API_KEY`）走模板引擎，不消耗模型额度。
+- **限流与体积上限**：所有 `/api/brief` 按客户端 IP 限流（默认 10 分钟 20 次，超限 `429` + `Retry-After`）；请求体默认上限 `128kb`，`sourceText` 合计超过 24000 字符返回 `413`。
+- **采集仍要 token**：`POST /api/collect/run` 继续用 `COLLECT_API_TOKEN`（`x-yanxi-token`）。
 
 变量说明见 [`.env.example`](.env.example)，部署配置见 [docs/DEPLOY.md](docs/DEPLOY.md)。
 

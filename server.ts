@@ -106,9 +106,10 @@ async function main() {
       framing: "civilian-open-source-research",
       llm: Boolean(process.env.LLM_API_KEY),
       cursorHarness: Boolean(process.env.CURSOR_API_KEY),
-      // Booleans only — never echo credential or token values.
-      llmRunsNeedToken: llmConfigured(),
-      briefTokenConfigured: Boolean(process.env.BRIEF_API_TOKEN || process.env.COLLECT_API_TOKEN),
+      // Booleans only — never echo credential values.
+      // /api/brief LLM path is open when LLM_API_KEY is set; only collect stays token-gated.
+      llmOpen: llmConfigured(),
+      collectTokenConfigured: Boolean(process.env.COLLECT_API_TOKEN),
       collect: true,
       subscriptions: loadSubscriptions().subscriptions.filter((s) => s.active !== false).length,
     });
@@ -247,21 +248,8 @@ async function main() {
       }
 
       const forceOffline = Boolean(req.body?.forceOffline);
-      // Only the LLM-backed path spends the operator's quota; the template
-      // engine stays open so the public demo keeps working.
-      if (!forceOffline && llmConfigured()) {
-        try {
-          requireApiToken(req, {
-            envVar: "BRIEF_API_TOKEN",
-            fallbackEnvVar: "COLLECT_API_TOKEN",
-            action: "LLM-backed briefing runs",
-          });
-        } catch (e) {
-          const err = e as HttpErrorLike;
-          err.message = `${err.message} The offline template path stays open — resend with "forceOffline": true.`;
-          throw err;
-        }
-      }
+      // LLM path is open to anyone who hits the URL (rate-limited below).
+      // Force offline still skips the model for template-only runs.
 
       const result = await runBriefingPipeline({
         sourceText: String(req.body?.sourceText || ""),

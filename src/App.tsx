@@ -219,10 +219,10 @@ type ThemeRow = { id?: string; label_en?: string };
 function briefErrorMessage(status: number, serverError?: string): string {
   const detail = serverError || `Request failed (HTTP ${status}).`;
   if (status === 401 || status === 403) {
-    return `${detail} Tick "Force offline" to use the template engine — that path stays open without a token.`;
+    return detail;
   }
   if (status === 429) {
-    return `${detail} This shared demo caps briefing runs per visitor; the offline template path is still available once the window resets.`;
+    return `${detail} This shared demo caps briefing runs per visitor; try again after the window resets, or tick Force offline for the template path.`;
   }
   if (status === 413) {
     return `${detail} Paste a shorter public excerpt and re-run.`;
