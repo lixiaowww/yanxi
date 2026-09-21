@@ -257,24 +257,15 @@ function applyDeterministicLayers(
       ];
 
   if (next.briefing_en) {
-    const topNuggets = substance_cut.nuggets
-      .slice(0, 3)
-      .map((n) => n.evidence)
-      .join(" · ");
-    const substanceLead =
-      substance_cut.band === "thin"
-        ? `Substance cut=${substance_cut.band} (${substance_cut.label_zh}). `
-        : topNuggets
-          ? `Substance nuggets: ${topNuggets}. `
-          : "";
     const socialNote =
       source_class.class === "social_commentary"
-        ? "Source class=social_commentary — treat as rumor/atmosphere memo only; do not raise confidence. "
+        ? "Treat as atmosphere/rumor memo only; do not raise confidence from this source alone. "
         : "";
+    // Keep so_what readable — do not prepend raw nugget dumps (shown separately in UI).
     next.briefing_en = {
       ...next.briefing_en,
       confidence: confidence_factors.level,
-      so_what: `${socialNote}${substanceLead}${next.briefing_en.so_what || ""}`.trim(),
+      so_what: `${socialNote}${next.briefing_en.so_what || ""}`.trim(),
     };
   }
 

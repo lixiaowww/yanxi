@@ -211,38 +211,40 @@ export function offlineBriefing(
   const so_what =
     corpus.length > 1
       ? hint
-        ? `${hint.soWhat} Compare direction vs instrument language across the ${corpus.length} sources before raising confidence.`
-        : "Compare direction language vs implementing-instrument language across sources; use scorecard valves before raising confidence. Offline mode does not invent conclusions."
+        ? `${hint.soWhat} With ${corpus.length} excerpts, compare meeting-style direction vs any 通知/办法 language before raising confidence.`
+        : `With ${corpus.length} excerpts, compare direction language vs implementing detail; do not invent facts beyond the paste.`
       : hint
-        ? `${hint.soWhat} Use info_triage (kinds + P1–P4) and the full signaling_scorecard; offline mode does not invent conclusions.`
-        : "Use info_triage for 信息种类 + P1–P4, then read the full signaling_scorecard. Offline mode does not invent conclusions.";
+        ? hint.soWhat
+        : substance_cut_band_hint(scorecard.band);
 
   const scenarios = policyRelated
     ? [
         {
-          label: hint?.base || "Base — stated priorities continue in public messaging",
+          label: hint?.base || "Public messaging continues to repeat the same priorities",
           likelihood: "medium" as const,
-          basis: `Scorecard band=${scorecard.band} across ${corpus.length} source(s). Continuity reading only${hint ? ` · domain_hint=${hint.id}` : ""}.`,
+          basis: "Continuity reading from this paste only (hypothesis).",
           tag: "hypothesis" as const,
         },
         {
-          label: hint?.downside || "Downside — implementation lag until 细则/办法 appear",
+          label: hint?.downside || "Implementation stays thin until a named 细则/办法 appears",
           likelihood: (detailMiss ? "medium" : "low") as "medium" | "low",
-          basis: "detail-named-instrument miss raises this scenario weight (hypothesis only).",
+          basis: "No clear implementing instrument in the paste (hypothesis).",
           tag: "hypothesis" as const,
         },
         {
-          label: hint?.upside || "Upside — follow-on public instruments reinforce the same vocabulary",
+          label: hint?.upside || "A later public instrument reinforces the same vocabulary",
           likelihood: (hasInstrument ? "medium" : "low") as "medium" | "low",
-          basis: "Raised slightly if any merged source already shows instrument vocabulary.",
+          basis: hasInstrument
+            ? "Instrument cues already present in paste (hypothesis)."
+            : "Would need a follow-on public notice (hypothesis).",
           tag: "hypothesis" as const,
         },
       ]
     : [
         {
-          label: "Insufficient policy card match",
+          label: "Keep outlook minimal — weak policy-card match",
           likelihood: "low" as const,
-          basis: "Few policy cards matched; keep outlook minimal.",
+          basis: "Few policy cards matched.",
           tag: "hypothesis" as const,
         },
       ];
@@ -250,10 +252,10 @@ export function offlineBriefing(
   const watchpoints = policyRelated
     ? [
         ...(hint?.watch || []),
-        "Cross-check meeting language against later 通知/办法 in open corpus",
-        "Original outlet placement if not evidenced in paste",
+        "Find a later 通知/办法 that names the same priorities",
+        "Confirm outlet/title if not in the paste",
       ].slice(0, 5)
-    : ["Re-run with fuller public policy excerpts"];
+    : ["Paste a fuller public policy excerpt and re-run"];
 
   return {
     source_digest_zh: digest,
@@ -262,10 +264,7 @@ export function offlineBriefing(
     signaling_valves: valves,
     briefing_en: {
       what,
-      context:
-        matchedCards.length > 0
-          ? `Background cards: ${matchedCards.join(", ")}. Signaling band=${scorecard.band}. Sources: ${corpus.map((s) => s.label).join(", ")}.`
-          : `Sources: ${corpus.map((s) => s.label).join(", ")}. Scorecard still runs on public-media cues.`,
+      context: `Public Mandarin excerpt(s): ${corpus.map((s) => s.label).join(", ")}. Signaling band=${scorecard.band} (hypothesis calibrator only).`,
       so_what,
       confidence: confidenceFromBand(scorecard.band),
       sources_used: corpus.map((s) => s.label),
@@ -276,13 +275,21 @@ export function offlineBriefing(
       watchpoints,
     },
     open_questions: [
-      "Are all source labels tied to full public URLs/titles?",
-      hint
-        ? `For ${hint.id}: which scorecard rows marked unclear need a second public source?`
-        : "Which scorecard rows marked unclear need a third public source?",
+      "Is there a public URL/title for this excerpt?",
       corpus.length > 1
-        ? "Do meeting-language and instrument-language sources agree on priorities?"
-        : "Is an implementing instrument available for the same priority terms?",
+        ? "Do the merged excerpts agree on priorities and instruments?"
+        : "Is there a matching implementing notice for the same priorities?",
+      "Which claims still need a second open source?",
     ],
   };
+}
+
+function substance_cut_band_hint(band: string): string {
+  if (band === "high") {
+    return "Public cues look relatively strong in this excerpt; still verify with a second open source before raising confidence.";
+  }
+  if (band === "medium") {
+    return "Mixed public cues — separate slogan/direction language from any concrete numbers, deadlines, or named instruments.";
+  }
+  return "Thin public cues in this excerpt — treat as low-information direction language until denser detail appears.";
 }
