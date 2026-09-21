@@ -79,13 +79,13 @@ export function detectItemRole(opts: {
 }
 
 const ROLE_LABEL: Record<ItemRole, string> = {
-  direction_meeting: "方向/会议语",
-  implementing_instrument: "细则/工具语",
-  sector_or_risk: "行业/风险语",
-  diplomatic: "外交语",
-  defense_public: "国防公开语",
-  social_or_ideology: "社会/党建语",
-  other: "其他",
+  direction_meeting: "Direction / meeting",
+  implementing_instrument: "Implementing instrument",
+  sector_or_risk: "Sector / risk",
+  diplomatic: "Diplomatic",
+  defense_public: "Defense (public)",
+  social_or_ideology: "Social / party education",
+  other: "Other",
 };
 
 export function roleLabelZh(role: ItemRole): string {
@@ -113,28 +113,38 @@ export function buildSectionCorroborationBoard(opts: {
 
   const next_steps_zh: string[] = [];
   if (!items.length) {
-    next_steps_zh.push("本栏暂无条目：补充公开摘录或白名单源");
+    next_steps_zh.push("No items in this column yet — add a public excerpt or whitelist feed");
   } else {
     if (maxCorr < 2) {
-      next_steps_zh.push("栏内最高印证 < 2：优先补「方向语 + 细则语」配对或第二公开源");
+      next_steps_zh.push(
+        "Max corroboration < 2: prioritize direction+instrument pairing or a second public source"
+      );
     }
     if (hasDirection && !hasInstrument) {
-      next_steps_zh.push("已有会议/方向语，缺具名通知/办法/细则");
+      next_steps_zh.push("Has meeting/direction language; missing named notice/measure/detail");
     }
     if (hasInstrument && !hasDirection) {
-      next_steps_zh.push("已有工具语，可补对应中央/部委会议或通稿方向语以便对照");
+      next_steps_zh.push(
+        "Has instrument language; add matching central/ministry meeting or wire direction for contrast"
+      );
     }
     if (pairable) {
-      next_steps_zh.push("栏内已同时具备方向语与工具语：合并跑简报可验证印证是否上升");
+      next_steps_zh.push(
+        "Column already has direction + instrument: merge-run a brief to check if corroboration rises"
+      );
     }
     if (items.some((i) => i.substance === "thin")) {
-      next_steps_zh.push("存在 substance=thin 条目：优先找带数字/时限/责任主体的公开摘录");
+      next_steps_zh.push(
+        "Has substance=thin items: prefer public excerpts with numbers/deadlines/responsible bodies"
+      );
     }
     if (items.some((i) => i.sourceClass === "social_commentary")) {
-      next_steps_zh.push("含社交转述：不得单独抬置信度，须换官方/通稿主源");
+      next_steps_zh.push(
+        "Includes social commentary: do not raise confidence alone; swap in official/wire primary"
+      );
     }
     for (const g of gaps.slice(0, 3)) {
-      next_steps_zh.push(`缺线索汇总：${g}`);
+      next_steps_zh.push(`Gap summary: ${g}`);
     }
   }
 
@@ -143,7 +153,7 @@ export function buildSectionCorroborationBoard(opts: {
     const a = items.find((i) => i.hasMeetingCue || i.role === "direction_meeting");
     const b = items.find((i) => i.hasInstrumentCue || i.role === "implementing_instrument");
     if (a && b && a.fixtureId !== b.fixtureId) {
-      pair_hint_zh = `建议配对：\`${a.fixtureId}\`（方向） + \`${b.fixtureId}\`（细则）`;
+      pair_hint_zh = `Suggested pair: \`${a.fixtureId}\` (direction) + \`${b.fixtureId}\` (instrument)`;
     }
   }
 
@@ -164,14 +174,14 @@ export function buildSectionCorroborationBoard(opts: {
 
 export function renderBoardMarkdown(board: SectionCorroborationBoard): string[] {
   const lines = [
-    `#### 印证看板 · ${board.label_zh}`,
+    `#### Corroboration board · ${board.label_zh}`,
     "",
-    `- 条目 **${board.itemCount}** · 最高印证 **${board.maxCorr}/3** · 平均 **${board.avgCorr}** · 可配对=${board.pairable ? "是" : "否"}`,
-    `- 角色覆盖: ${board.rolesPresent.map(roleLabelZh).join("、") || "—"}`,
+    `- Items **${board.itemCount}** · max corr **${board.maxCorr}/3** · avg **${board.avgCorr}** · pairable=${board.pairable ? "yes" : "no"}`,
+    `- Roles: ${board.rolesPresent.map(roleLabelZh).join(", ") || "—"}`,
     "",
   ];
   if (board.items.length) {
-    lines.push("| 样例 | 角色 | corr | conf | substance | 缺什么 |");
+    lines.push("| Fixture | Role | corr | conf | substance | Missing |");
     lines.push("|------|------|------|------|-----------|--------|");
     for (const i of board.items) {
       lines.push(
@@ -185,7 +195,7 @@ export function renderBoardMarkdown(board: SectionCorroborationBoard): string[] 
     lines.push("");
   }
   if (board.next_steps_zh.length) {
-    lines.push("**抬升印证的下一步**");
+    lines.push("**Next steps to raise corroboration**");
     for (const s of board.next_steps_zh) lines.push(`- ${s}`);
     lines.push("");
   }

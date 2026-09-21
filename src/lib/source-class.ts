@@ -68,24 +68,24 @@ export function detectSourceClass(
 function finalize(cls: SourceClass, evidence: string[]): SourceClassResult {
   const label_zh =
     cls === "official_or_wire"
-      ? "官方/通稿类"
+      ? "Official / wire"
       : cls === "policy_instrument"
-        ? "政策工具文件类"
+        ? "Policy instrument file"
         : cls === "press_commentary"
-          ? "报刊评论类"
+          ? "Press commentary"
           : cls === "social_commentary"
-            ? "社交转述/自媒体（降权）"
-            : "未分类公开文本";
+            ? "Social commentary / self-media (down-weighted)"
+            : "Unclassified public text";
 
   const rules =
     cls === "social_commentary"
       ? [
-          "不得单独将 confidence 抬至 high",
-          "不得单独作为官方主张的印证源",
-          "仅作舆情备忘；主简报须待官方/通稿复核",
-          "默认不进白名单自动采集（仅用户粘贴）",
+          "Must not alone raise confidence to high",
+          "Must not alone corroborate an official claim",
+          "Atmosphere memo only; main brief needs official/wire check",
+          "Default: not in whitelist auto-collect (paste only)",
         ]
-      : ["按公开源层级参与印证与置信度因子"];
+      : ["Participates in corroboration and confidence factors by public-source tier"];
 
   return {
     framing: "civilian-source-class",

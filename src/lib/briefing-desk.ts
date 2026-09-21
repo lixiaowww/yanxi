@@ -30,10 +30,10 @@ export type DeskSectionMeta = {
 export const DESK_CATALOG: DeskSectionMeta[] = [
   {
     id: "economy_investment",
-    label_zh: "经济投资",
+    label_zh: "Economy & investment",
     label_en: "Economy & investment",
     blurb_zh:
-      "财政货币、产业投资、专项资金、地方债/房地产、会议落地工具等（含原「总体」中可核验的经济部署）",
+      "Fiscal/monetary, industrial investment, special funds, local debt/property, meeting→instrument detail (incl. verifiable macro deployments)",
     rx: /财政政策|货币政策|扩大内需|稳增长|投资|专项资金|专项债|芯片|半导体|人工智能|专精特新|地方债|房地产|保交楼|化债|制造业|营商环境|中央经济工作会议|政府工作报告|十四五|十五五|高质量发展|新质生产力|双循环|统一大市场|积极的财政|稳健的货币/,
     kinds: [
       "industrial_tech_policy",
@@ -49,27 +49,29 @@ export const DESK_CATALOG: DeskSectionMeta[] = [
   },
   {
     id: "foreign_affairs",
-    label_zh: "外交",
+    label_zh: "Foreign affairs",
     label_en: "Foreign affairs",
-    blurb_zh: "外交话语、双边关系、一带一路、制裁/合作等公开表述",
+    blurb_zh: "Diplomatic discourse, bilateral ties, Belt and Road, sanctions/cooperation in open text",
     rx: /外交部|外事|一带一路|人类命运共同体|中加|加方|加拿大|制裁|双边|多边|联合国|G7|CPTPP/,
     kinds: ["foreign_affairs"],
     order: 2,
   },
   {
     id: "defense_public",
-    label_zh: "国防（公开表述）",
+    label_zh: "Defense — public discourse only",
     label_en: "Defense — public discourse only",
-    blurb_zh: "国防/军队/军工公开报道与白皮书式语言；非作战情报、非目标跟踪",
+    blurb_zh:
+      "Open defense/military/industry reporting and white-paper style language; not operational intel or targeting",
     rx: /国防|军队|解放军|军委|军工|武警|演训|战备|国防白皮书|强军|军民融合|海空|航母/,
     kinds: ["defense_public"],
     order: 3,
   },
   {
     id: "social_governance",
-    label_zh: "社会治理",
+    label_zh: "Social governance",
     label_en: "Social governance",
-    blurb_zh: "民生、基层治理、舆情、共同富裕、党建教育等公开社会治理表述",
+    blurb_zh:
+      "Livelihood, grassroots governance, public opinion, common prosperity, party education — open social-governance language",
     rx: /社会治理|基层治理|民生|共同富裕|舆情|正能量|和谐稳定|主题教育|意识形态|巡视|乡村振兴|粮食安全|三农/,
     kinds: ["social_governance", "ideology_party", "rural_revitalization"],
     order: 4,

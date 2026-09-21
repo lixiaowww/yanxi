@@ -11,4 +11,4 @@ Yanxi is a **public-source research briefing** tool.
 - Do not implement unauthorized scraping, login-wall bypass, or personal targeting.
 - Context cards and policy outlooks are `background` or `hypothesis` — not proven secret facts.
 - Forecasts use scenarios + watchpoints + confidence; forbid “will definitely / guaranteed / secretly plans”.
-- Prefer Mandarin paste workflows; keep human review language in UI.
+- Prefer Mandarin paste workflows; **UI chrome and analyst labels are English** — Chinese appears only in the source paste and quoted excerpts.

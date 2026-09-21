@@ -14,6 +14,7 @@ Civilian open-source Mandarin → English contextual briefing. Not an intelligen
 - Input: public Mandarin text the user is allowed to use.
 - Output: draft briefing for **human review** — `background` / `hypothesis` tags required on context notes.
 - Policy outlook is **scenario + watchpoints**, never “will definitely happen”.
+- **UI is English**; Chinese remains only in the source paste and quoted excerpts.
 - UI / README / demo copy: no Command Center, Upload Intelligence, or spy-tool language.
 
 ## Where to work

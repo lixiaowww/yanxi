@@ -54,10 +54,11 @@ function buildInfoValue(
   if (briefing.adoption && briefing.adoption.adopted === false) {
     return {
       level: "low",
-      label_zh: "不采纳 — 无细节/无数据",
+      label_zh: "Not adopted — no detail/data",
       next_zh: [
-        briefing.adoption.reason_zh || "补带数字、时限或具名通知/办法的公开摘录",
-        "方向语/会议套话单独不生成实质简报",
+        briefing.adoption.reason_zh ||
+          "Paste a public excerpt with numbers, deadlines, or a named notice/measure",
+        "Direction/meeting formula alone does not produce a substantive brief",
       ],
     };
   }
@@ -66,35 +67,35 @@ function buildInfoValue(
   const missing = briefing.corroboration?.missing || [];
   const next: string[] = [];
   if (band === "thin" || corr < 2) {
-    next.push("补同主题公开细则/通知，与会议语合并再跑");
+    next.push("Add a same-topic public implementing notice and re-run with the meeting text");
   }
   if (corr < 1) {
-    next.push("增加第二公开源（通稿之外的落实文件或地方复述）");
+    next.push("Add a second public source (implementing file or local restatement beyond the wire)");
   }
   if (missing.length) {
     next.push(...missing.slice(0, 2));
   }
   if (!next.length) {
-    next.push("核验数字/时限/责任主体是否可在公开页复核");
+    next.push("Verify numbers / deadlines / responsible bodies against a public page");
   }
 
   if (band === "dense" && corr >= 2) {
     return {
       level: "high",
-      label_zh: "信息密度较高（干货 + 印证线索）",
+      label_zh: "Higher info density (detail + corroboration cues)",
       next_zh: next.slice(0, 3),
     };
   }
   if (band === "thin" && corr <= 1) {
     return {
       level: "low",
-      label_zh: "信息价值偏低（套话/单源为主）— 建议先补细则再读简报",
+      label_zh: "Low info value (formula / single-source) — add detail before reading the brief",
       next_zh: next.slice(0, 4),
     };
   }
   return {
     level: "medium",
-    label_zh: "信息价值中等（有部分干货或双线索）",
+    label_zh: "Medium info value (some detail or dual cues)",
     next_zh: next.slice(0, 3),
   };
 }
@@ -286,21 +287,21 @@ function applyDeterministicLayers(
       horizon: "near",
       scenarios: [],
       watchpoints: [
-        "补：带数字/时限的公开摘录",
-        "补：具名通知/办法/实施方案",
-        "补：专项资金或责任主体+工具并列的公开文本",
+        "Add: public excerpt with numbers / deadlines",
+        "Add: named notice / measure / implementation plan",
+        "Add: funding line or responsible body + instrument in the same paste",
       ],
     };
     next.open_questions = [
-      "本段是否只有会议方向语、没有落地工具？",
-      "能否找到同主题的公开细则再合并粘贴？",
+      "Is this meeting direction only, with no implementing instrument?",
+      "Can you find a same-topic public implementing text and paste both?",
     ];
     next.substance_cut = {
       ...substance_cut,
       nuggets: [],
       empty_calories: [
         ...(substance_cut.empty_calories || []),
-        "采纳规则：无硬干货 → 整篇不采纳",
+        "Adoption rule: no hard detail → whole brief rejected",
       ].slice(0, 5),
       analyst_prompt_zh: adoption.reason_zh,
     };
@@ -350,11 +351,11 @@ function applyDeterministicLayers(
   if (adoption.adopted) {
     if (substance_cut.empty_calories.length) wpExtra.push(...substance_cut.empty_calories.slice(0, 2));
     if (corroboration.missing.length) {
-      wpExtra.push(`缺印证: ${corroboration.missing[0]}`);
+      wpExtra.push(`Missing corroboration: ${corroboration.missing[0]}`);
     }
     if (canada_policy_link.level !== "none" && canada_policy_link.hits[0]) {
       wpExtra.push(
-        `加国公开政策对照: ${canada_policy_link.hits[0].theme_zh}（须核验现行公开文本）`
+        `Canada public-policy overlay: ${canada_policy_link.hits[0].theme_en || canada_policy_link.hits[0].theme_zh} (verify current public text)`
       );
     }
     if (next.policy_outlook) {
@@ -368,7 +369,7 @@ function applyDeterministicLayers(
 
   if (source_class.class === "social_commentary" && adoption.adopted) {
     next.open_questions = [
-      "社交转述的主源官方/通稿链接是什么？",
+      "What is the official/wire URL for the primary claim behind this social commentary?",
       ...(next.open_questions || []),
     ].slice(0, 6);
   }

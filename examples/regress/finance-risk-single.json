@@ -18,7 +18,7 @@
         "primary_kind_in": ["finance_risk"],
         "corroboration_max": 1,
         "confidence_max": "medium",
-        "missing_includes_any": ["具名通知", "第二公开源", "落实文件"]
+        "missing_includes_any": ["Named notice", "Second public source", "Implementing document"]
       }
     }
   ]

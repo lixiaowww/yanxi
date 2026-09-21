@@ -80,10 +80,10 @@ export function buildCanadaNexus(sourceText: string): CanadaNexus {
 
   const label_zh =
     level === "direct"
-      ? "加拿大关联（明示）"
+      ? "Canada nexus — named in source"
       : level === "possible"
-        ? "加拿大关联（可能/主题邻近）"
-        : "无加拿大关联线索";
+        ? "Canada nexus — possible topic adjacency"
+        : "No Canada nexus cue";
 
   const label_en =
     level === "direct"

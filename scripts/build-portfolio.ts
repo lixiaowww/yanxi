@@ -142,17 +142,24 @@ if (fs.existsSync(regressJson)) {
 const portfolio = {
   product: "yanxi",
   framing: "civilian-open-source-research-portfolio",
-  title: "研析 Yanxi",
-  tagline_zh: "公开中文材料 → 英文研究简报草稿（人在回路）",
+  title: "Yanxi",
+  tagline_zh: "Public Mandarin → English research briefing drafts for human review",
   tagline_en: "Public Mandarin → English research briefing drafts for human review",
-  not_zh: "不是情报产品、不是监听工具、不针对加拿大人或在加人士",
+  not_zh: "Not an intelligence product, not a surveillance tool, not personal targeting of Canadians",
+  not_en: "Not an intelligence product, not a surveillance tool, not personal targeting of Canadians",
   method: {
-    pillar1_zh: "潜规则 = 公开报道启发式：先枚举再加权（signaling scorecard）",
-    pillar2_zh: "多源印证 = corroboration 0–3；缺源清单；栏内配对合并实测",
-    confidence_zh: "因子化置信度（substance × 印证 × 出处 × 源类）；社交转述硬封顶 low",
-    substance_zh: "八股剥离 → 只留数字/时限/工具/责任主体等可核验干货",
-    canada_zh: "加拿大关联 + 公开政策/法规 URL 对照（非法律意见）",
-    ontology_zh: "Civic Ontology Lite：栏目优先背景卡 ≤8；非 OWL/情报本体",
+    pillar1_zh: "Unwritten rules = open-reporting heuristics: enumerate then weight (signaling scorecard)",
+    pillar1_en: "Unwritten rules = open-reporting heuristics: enumerate then weight (signaling scorecard)",
+    pillar2_zh: "Multi-source corroboration = score 0–3; missing-source list; in-column pair merge tests",
+    pillar2_en: "Multi-source corroboration = score 0–3; missing-source list; in-column pair merge tests",
+    confidence_zh: "Factorized confidence (substance × corroboration × provenance × source class); social commentary hard-capped at low",
+    confidence_en: "Factorized confidence (substance × corroboration × provenance × source class); social commentary hard-capped at low",
+    substance_zh: "Strip formula language → keep numbers / deadlines / instruments / responsible bodies",
+    substance_en: "Strip formula language → keep numbers / deadlines / instruments / responsible bodies",
+    canada_zh: "Canada nexus + public policy/law URL overlay (not legal advice)",
+    canada_en: "Canada nexus + public policy/law URL overlay (not legal advice)",
+    ontology_zh: "Civic Ontology Lite: desk-first context cards ≤8; not OWL / intel ontology",
+    ontology_en: "Civic Ontology Lite: desk-first context cards ≤8; not OWL / intel ontology",
   },
   columns,
   regress,
@@ -170,6 +177,7 @@ const portfolio = {
     "Quotes must be substrings of the paste (claim gate)",
     "Outlook = scenarios + watchpoints; never will-definitely",
     "Context cards = Civic Ontology Lite (background/hypothesis only)",
+    "UI is English; Chinese appears only in source paste and quoted excerpts",
   ],
   generatedAt: new Date().toISOString(),
 };
@@ -183,28 +191,27 @@ const mdPath = path.join(outDir, "portfolio.md");
 const md = [
   `# ${portfolio.title}`,
   "",
-  `> ${portfolio.tagline_zh}`,
   `> ${portfolio.tagline_en}`,
   "",
-  `**${portfolio.not_zh}**`,
+  `**${portfolio.not_en}**`,
   "",
-  "## 方法两支柱",
+  "## Method pillars",
   "",
-  `1. ${portfolio.method.pillar1_zh}`,
-  `2. ${portfolio.method.pillar2_zh}`,
+  `1. ${portfolio.method.pillar1_en}`,
+  `2. ${portfolio.method.pillar2_en}`,
   "",
-  `- ${portfolio.method.confidence_zh}`,
-  `- ${portfolio.method.substance_zh}`,
-  `- ${portfolio.method.canada_zh}`,
-  `- ${portfolio.method.ontology_zh}`,
+  `- ${portfolio.method.confidence_en}`,
+  `- ${portfolio.method.substance_en}`,
+  `- ${portfolio.method.canada_en}`,
+  `- ${portfolio.method.ontology_en}`,
   "",
-  "## 五栏摘要",
+  "## Desk columns",
   "",
 ];
 for (const col of columns) {
-  md.push(`### ${col.label_zh} · ${col.label_en}`);
+  md.push(`### ${col.label_en}`);
   md.push("");
-  md.push(`${col.blurb_zh} · 条目 ${col.itemCount} · 最高印证 ${col.maxCorr}/3`);
+  md.push(`${col.blurb_zh} · items ${col.itemCount} · max corr ${col.maxCorr}/3`);
   md.push("");
   for (const it of col.items.slice(0, 2)) {
     md.push(`- \`${it.fixtureId}\` · ${it.kind}/${it.importance} · corr=${it.corr} · conf=${it.conf}`);
@@ -212,7 +219,7 @@ for (const col of columns) {
   }
   md.push("");
 }
-md.push("## 回归绿勾");
+md.push("## Regression");
 md.push("");
 md.push(
   regress.ok
@@ -221,9 +228,9 @@ md.push(
 );
 for (const h of regress.highlights) md.push(`- ${h}`);
 md.push("");
-md.push("## Civic Ontology Lite（背景卡目录）");
+md.push("## Civic Ontology Lite (context-card catalog)");
 md.push("");
-md.push("栏目优先挂卡 · background/hypothesis only · 详见 `docs/ONTOLOGY-LITE.md`");
+md.push("Desk-first cards · background/hypothesis only · see `docs/ONTOLOGY-LITE.md`");
 md.push("");
 for (const c of portfolio.ontology_catalog) {
   md.push(
@@ -231,10 +238,10 @@ for (const c of portfolio.ontology_catalog) {
   );
 }
 md.push("");
-md.push("## 加国公开政策对照入口（可点击核验）");
+md.push("## Canada public-policy overlay (click to verify)");
 md.push("");
 for (const th of portfolio.canada_policy_catalog.slice(0, 6)) {
-  md.push(`### ${th.theme_zh}`);
+  md.push(`### ${th.theme_en}`);
   for (const r of th.public_refs) {
     md.push(`- [${r.title}](${r.url}) · ${r.publisher}`);
   }

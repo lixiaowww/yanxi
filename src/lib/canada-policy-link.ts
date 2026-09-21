@@ -222,10 +222,10 @@ export function buildCanadaPolicyLink(sourceText: string): CanadaPolicyLink {
 
   const label_zh =
     level === "named_instrument"
-      ? "加国公开法规/政策：点名级线索"
+      ? "Canada public law/policy: named-instrument cue"
       : level === "topical"
-        ? "加国公开政策：主题邻近"
-        : "无加国公开政策对照线索";
+        ? "Canada public policy: topical adjacency"
+        : "No Canada public-policy overlay cue";
 
   return {
     framing: "civilian-canada-public-policy-overlay",
@@ -233,7 +233,7 @@ export function buildCanadaPolicyLink(sourceText: string): CanadaPolicyLink {
     label_zh,
     hits: hits.slice(0, 6),
     disclaimer_zh:
-      "仅为读者关注的公开政策主题对照，不是法律意见，也不构成对任何个人的调查。链接指向政府公开页；请人工核验现行合并文本。",
+      "Reader-interest overlay of open Canadian policy themes — not legal advice and not an investigation of any person. Links point to government public pages; verify current consolidated text.",
     rationale:
       level === "none"
         ? "No topical cue matched the Canada public-policy overlay lexicon."

@@ -40,10 +40,11 @@ export function evaluateAdoption(substance: SubstanceCut): AdoptionDecision {
     return {
       framing: "civilian-detail-adoption",
       adopted: true,
-      label_zh: "已采纳（含可核验细节/数据）",
-      reason_zh: paired && !core.length
-        ? `检出责任主体+具名产品/行业（${hard.length} 条）。`
-        : `检出 ${hard.length} 条硬干货（数字/时限/工具/资金等）。`,
+      label_zh: "Adopted (verifiable detail/data)",
+      reason_zh:
+        paired && !core.length
+          ? `Found responsible body + named sector/product (${hard.length} cue(s)).`
+          : `Found ${hard.length} hard cue(s) (numbers / deadlines / instruments / funding).`,
       hard_nuggets: hard.slice(0, 10),
       rejected_as: null,
       tag: "hypothesis",
@@ -52,9 +53,9 @@ export function evaluateAdoption(substance: SubstanceCut): AdoptionDecision {
   return {
     framing: "civilian-detail-adoption",
     adopted: false,
-    label_zh: "不采纳（无细节/无数据）",
+    label_zh: "Not adopted (no detail/data)",
     reason_zh:
-      "仅有方向语/套话，缺少可核验数字、时限、具名通知/办法、资金安排，或「责任主体+具名产品/行业」组合 — 不生成实质简报。",
+      "Direction/formula language only — missing verifiable numbers, deadlines, named notices/measures, funding lines, or a responsible-body + named-sector pair. No substantive brief generated.",
     hard_nuggets: [],
     rejected_as: "direction_only",
     tag: "hypothesis",

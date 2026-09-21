@@ -66,21 +66,21 @@ export function buildCorroboration(opts: {
     score += 1;
     drivers.push("multi_source_merge");
   } else {
-    missing.push("第二公开源（会议/通稿之外的细则或地方复述）");
+    missing.push("Second public source (implementing file or local restatement beyond the wire)");
   }
 
   if (hasInstrument(sourceText)) {
     score += 1;
     drivers.push("named_or_cue_instrument");
   } else {
-    missing.push("具名通知/办法/细则");
+    missing.push("Named notice / measure / implementing detail");
   }
 
   if (hasMeeting(sourceText) && hasInstrument(sourceText)) {
     score += 1;
     drivers.push("meeting_plus_instrument_sequence");
   } else if (hasMeeting(sourceText) && !hasInstrument(sourceText)) {
-    missing.push("与会议语对应的落实文件");
+    missing.push("Implementing document matching the meeting language");
   }
 
   if (hasNumericOrTimeline(sourceText) || substance.band === "dense") {
@@ -89,19 +89,19 @@ export function buildCorroboration(opts: {
       drivers.push("numeric_or_dense_substance");
     }
   } else if (substance.band === "thin") {
-    missing.push("可核验数字/时限/责任主体");
+    missing.push("Verifiable numbers / deadlines / responsible bodies");
   }
 
   const score_0_to_3 = Math.min(3, score) as 0 | 1 | 2 | 3;
 
   const label_zh =
     score_0_to_3 >= 3
-      ? "印证强（多线索可交叉）"
+      ? "Strong corroboration (cross-checkable cues)"
       : score_0_to_3 === 2
-        ? "印证中等（方向+工具或双源）"
+        ? "Moderate corroboration (direction+instrument or dual source)"
         : score_0_to_3 === 1
-          ? "印证弱（单源或单一线索）"
-          : "几乎无印证（单源且无线索）";
+          ? "Weak corroboration (single source or single cue)"
+          : "Minimal corroboration (single source, thin cues)";
 
   const label_en =
     score_0_to_3 >= 3

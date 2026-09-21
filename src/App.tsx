@@ -72,6 +72,7 @@ type Briefing = {
   corroboration?: {
     score_0_to_3?: number;
     label_zh?: string;
+    label_en?: string;
     missing?: string[];
     drivers?: string[];
   };
@@ -283,15 +284,15 @@ export function App() {
   return (
     <div className="wrap">
       <header>
-        <h1>研析 Yanxi</h1>
+        <h1>Yanxi</h1>
         <p>
-          Civilian open-source research: public Mandarin → English briefing with context cards,
+          Civilian open-source research: public Mandarin paste → English briefing with context cards,
           signaling scorecard, kinds/priority triage, claim gates, and whitelist collect/RSS.
-          GrantWright urlSafety + htmlToText reused for fetch. Draft for human review only.
+          Draft for human review only. Chinese appears only in the source paste and quoted excerpts.
         </p>
         <span className="badge">Not an intelligence product · Public whitelist only · Human review required</span>
         <p className="meta" style={{ marginTop: "0.65rem" }}>
-          <a href="/portfolio">Portfolio 一页</a>
+          <a href="/portfolio">Portfolio</a>
           <span> · </span>
           <a href="/outbox/portfolio.md" target="_blank" rel="noreferrer">
             portfolio.md
@@ -347,7 +348,7 @@ export function App() {
                 checked={forceOffline}
                 onChange={(e) => setForceOffline(e.target.checked)}
               />
-              Force offline（跳过 LLM，只用模板）
+              Force offline (skip LLM, template only)
             </label>
             <label style={{ display: "flex", gap: "0.4rem", alignItems: "center" }}>
               <input
@@ -355,7 +356,7 @@ export function App() {
                 checked={markSocial}
                 onChange={(e) => setMarkSocial(e.target.checked)}
               />
-              Mark as social commentary（降权）
+              Mark as social commentary (down-weight)
             </label>
             <button type="button" onClick={run} disabled={loading}>
               {loading ? "Running…" : "Generate briefing"}
@@ -378,7 +379,9 @@ export function App() {
 
         <section className="panel result-panel">
           {!result || !b ? (
-            <p className="meta">生成后这里显示可读简报。点击摘录可在左侧高亮原文。</p>
+            <p className="meta">
+              Readable briefing appears here after generate. Click a source quote to highlight it on the left.
+            </p>
           ) : (
             <article className="brief-reader">
               <header className="brief-status">
@@ -389,29 +392,31 @@ export function App() {
                     }`}
                   >
                     {b.adoption?.adopted === false
-                      ? "不采纳"
+                      ? "Not adopted"
                       : b.adoption?.adopted
-                        ? "已采纳"
-                        : "待判定"}
+                        ? "Adopted"
+                        : "Pending"}
                   </span>
                   <span className={`chip ${result.mode === "llm" ? "chip-ok" : "chip-warn"}`}>
-                    {result.mode === "llm" ? "LLM 简报" : "模板简报"}
+                    {result.mode === "llm" ? "LLM brief" : "Template brief"}
                   </span>
                   <span className={`chip ${result.gate.passed ? "chip-ok" : "chip-bad"}`}>
-                    门禁 {result.gate.passed ? "通过" : "未通过"}
+                    Gate {result.gate.passed ? "pass" : "fail"}
                   </span>
                   {result.infoValue ? (
                     <span className={`chip value-${result.infoValue.level}`}>
-                      信息量 {result.infoValue.level === "high" ? "较高" : result.infoValue.level === "low" ? "偏低" : "中等"}
+                      Info value {result.infoValue.level}
                     </span>
                   ) : null}
                   {b.confidence_factors?.level ? (
                     <span className={`chip conf-${b.confidence_factors.level}`}>
-                      证据置信 {b.confidence_factors.level}
+                      Confidence {b.confidence_factors.level}
                     </span>
                   ) : null}
-                  {b.desk_section?.label_zh ? (
-                    <span className="chip desk-badge">{b.desk_section.label_zh}</span>
+                  {b.desk_section?.label_en || b.desk_section?.label_zh ? (
+                    <span className="chip desk-badge">
+                      {b.desk_section.label_en || b.desk_section.label_zh}
+                    </span>
                   ) : null}
                   {b.canada_nexus && b.canada_nexus.level !== "none" ? (
                     <span
@@ -421,7 +426,10 @@ export function App() {
                           : "chip nexus-badge nexus-possible"
                       }
                     >
-                      {b.canada_nexus.level === "direct" ? "涉加（明示）" : "涉加（可能）"}
+                      {b.canada_nexus.label_en ||
+                        (b.canada_nexus.level === "direct"
+                          ? "Canada nexus (named)"
+                          : "Canada nexus (possible)")}
                     </span>
                   ) : null}
                 </div>
@@ -432,15 +440,15 @@ export function App() {
                 ) : null}
                 {result.mode === "offline" && b.adoption?.adopted !== false ? (
                   <p className="status-note">
-                    当前为模板输出
+                    Template output
                     {result.offlineReason?.startsWith("llm_error")
-                      ? "（LLM 暂不可用已回退）"
+                      ? " (LLM unavailable — fell back)"
                       : result.offlineReason?.startsWith("force_offline")
-                        ? "（已勾选跳过 LLM）"
+                        ? " (force offline checked)"
                         : result.llmConfigured
                           ? ""
-                          : "（未配置 LLM）"}
-                    。先看「这是什么 / 意味着什么 / 还缺什么」。
+                          : " (no LLM configured)"}
+                    . Start with What / So what / What&apos;s missing.
                   </p>
                 ) : null}
                 {result.infoValue?.level === "low" && b.adoption?.adopted !== false ? (
@@ -450,7 +458,7 @@ export function App() {
 
               {b.adoption?.adopted === false ? (
                 <section className="read-block reject-block">
-                  <h2>不采纳说明</h2>
+                  <h2>Not adopted</h2>
                   <p className="prose">{b.briefing_en?.so_what || b.adoption.reason_zh}</p>
                   <ul className="action-list">
                     {(b.policy_outlook?.watchpoints || result.infoValue?.next_zh || []).map((w, i) => (
@@ -461,25 +469,25 @@ export function App() {
               ) : (
                 <>
               <section className="read-block">
-                <h2>这是什么</h2>
+                <h2>What</h2>
                 <p className="prose">{b.briefing_en?.what || "—"}</p>
               </section>
 
               <section className="read-block">
-                <h2>意味着什么</h2>
+                <h2>So what</h2>
                 <p className="prose">{b.briefing_en?.so_what || "—"}</p>
               </section>
 
               {b.substance_cut ? (
                 <section className={`read-block substance-panel substance-${b.substance_cut.band || "thin"}`}>
                   <h2>
-                    可核验干货
+                    Verifiable detail
                     <span className={`substance-badge substance-${b.substance_cut.band || "thin"}`}>
                       {b.substance_cut.band === "dense"
-                        ? "较实"
+                        ? "dense"
                         : b.substance_cut.band === "mixed"
-                          ? "混杂"
-                          : "偏虚"}
+                          ? "mixed"
+                          : "thin"}
                     </span>
                   </h2>
                   <p className="meta">{b.substance_cut.label_zh}</p>
@@ -493,16 +501,20 @@ export function App() {
                       ))}
                     </ul>
                   ) : (
-                    <p className="prose muted">没有检出数字、时限、具名通知或责任主体——本段多半是方向/套话。</p>
+                    <p className="prose muted">
+                      No numbers, deadlines, named notices, or responsible bodies detected — mostly direction / formula language.
+                    </p>
                   )}
                   {(b.substance_cut.empty_calories || []).length ? (
-                    <p className="meta">空热量提示：{(b.substance_cut.empty_calories || []).slice(0, 2).join("；")}</p>
+                    <p className="meta">
+                      Empty-calorie notes: {(b.substance_cut.empty_calories || []).slice(0, 2).join("; ")}
+                    </p>
                   ) : null}
                 </section>
               ) : null}
 
               <section className="read-block next-panel">
-                <h2>还缺什么 · 下一步</h2>
+                <h2>What&apos;s missing · next</h2>
                 <ul className="action-list">
                   {Array.from(
                     new Set([
@@ -519,19 +531,24 @@ export function App() {
                 </ul>
                 {b.corroboration ? (
                   <p className="meta">
-                    印证强度：{b.corroboration.score_0_to_3}/3（{b.corroboration.label_zh}）
+                    Corroboration {b.corroboration.score_0_to_3}/3 (
+                    {b.corroboration.label_en || b.corroboration.label_zh})
                   </p>
                 ) : null}
               </section>
 
               {(b.policy_outlook?.scenarios || []).length ? (
                 <section className="read-block">
-                  <h2>可能情景（假设，非预测定论）</h2>
+                  <h2>Scenarios (hypothesis — not forecasts)</h2>
                   <ol className="scenario-list">
                     {(b.policy_outlook?.scenarios || []).map((s, i) => (
                       <li key={i}>
                         <span className={`likelihood likelihood-${s.likelihood || "low"}`}>
-                          {s.likelihood === "high" ? "较可能" : s.likelihood === "medium" ? "或然" : "较低可能"}
+                          {s.likelihood === "high"
+                            ? "more likely"
+                            : s.likelihood === "medium"
+                              ? "plausible"
+                              : "less likely"}
                         </span>
                         <span className="prose">{s.label}</span>
                       </li>
@@ -542,11 +559,11 @@ export function App() {
 
               {b.canada_policy_link && b.canada_policy_link.level !== "none" ? (
                 <section className="read-block policy-link-panel">
-                  <h2>加国公开政策入口（非法律意见）</h2>
+                  <h2>Canada public-policy links (not legal advice)</h2>
                   <ul className="action-list">
                     {(b.canada_policy_link.hits || []).map((h, i) => (
                       <li key={i}>
-                        <strong>{h.theme_zh}</strong>
+                        <strong>{h.theme_en || h.theme_zh}</strong>
                         <ul className="ref-links">
                           {(h.public_refs || []).map((ref, j) =>
                             ref.url ? (
@@ -566,7 +583,7 @@ export function App() {
 
               {(b.source_digest_zh || []).length ? (
                 <section className="read-block">
-                  <h2>原文要点（点击可高亮左侧）</h2>
+                  <h2>Source excerpts (click to highlight left)</h2>
                   <ul className="digest-list">
                     {(b.source_digest_zh || []).map((row, idx) => {
                       const q = row.quote || "";
@@ -599,12 +616,12 @@ export function App() {
               ) : null}
 
               <details className="meta-fold">
-                <summary>分析员细节（背景、分诊、记分卡等）</summary>
+                <summary>Analyst detail (context, triage, scorecard)</summary>
                 <p className="meta">{b.briefing_en?.context}</p>
                 {b.info_triage ? (
                   <p className="meta">
-                    种类 {b.info_triage.primary_kind} · 研究优先级{" "}
-                    {b.info_triage.importance?.grade} · 信号档 {b.signaling_scorecard?.band}
+                    Kind {b.info_triage.primary_kind} · research priority{" "}
+                    {b.info_triage.importance?.grade} · signaling {b.signaling_scorecard?.band}
                   </p>
                 ) : null}
                 {b.confidence_factors ? (
@@ -612,15 +629,15 @@ export function App() {
                 ) : null}
                 {b.ontology_lite?.hits?.length ? (
                   <p className="meta">
-                    背景卡：{b.ontology_lite.hits.map((h) => h.id).join("、")}
+                    Context cards: {b.ontology_lite.hits.map((h) => h.id).join(", ")}
                   </p>
                 ) : null}
-                {result.offlineReason ? <p className="meta">offline：{result.offlineReason}</p> : null}
+                {result.offlineReason ? <p className="meta">offline: {result.offlineReason}</p> : null}
                 <p className="meta">cards={result.matchedCards.join(", ") || "(none)"}</p>
               </details>
 
               <button type="button" className="secondary" onClick={() => setShowRaw((v) => !v)}>
-                {showRaw ? "收起 JSON" : "原始 JSON"}
+                {showRaw ? "Hide JSON" : "Raw JSON"}
               </button>
               {showRaw ? <pre>{JSON.stringify(result, null, 2)}</pre> : null}
             </article>
