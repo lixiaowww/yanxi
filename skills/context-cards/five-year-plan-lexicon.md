@@ -1,7 +1,7 @@
 ---
 name: five-year-plan-lexicon
 type: institution
-desk: overall_goals
+desk: economy_investment
 match: "五年规划" "十四五" "十五五" "规划纲要" "中长期" "远景目标" "二〇三五" "2035"
 description: Background gloss for five-year plan / long-horizon planning vocabulary.
 tag: background

@@ -49,7 +49,7 @@ for (const f of fixtures) {
     forceOffline: true,
   });
   if (!result.gate.passed) continue;
-  const primary = (result.briefing.desk_section?.primary || "overall_goals") as DeskSectionId;
+  const primary = (result.briefing.desk_section?.primary || "economy_investment") as DeskSectionId;
   texts.set(f.id, f.sourceText);
   bySection.get(primary)!.push({
     fixtureId: f.id,

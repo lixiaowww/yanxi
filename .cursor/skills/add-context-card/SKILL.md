@@ -15,7 +15,7 @@ User asks to teach Yanxi a new political / historical / cultural term set, or to
 2. Frontmatter must include (Civic Ontology Lite):
    - `name:` short id
    - `type:` one of `institution` | `lexicon` | `history_frame` | `intl_compare` | `method`
-   - `desk:` `all` or comma-separated desk ids (`overall_goals`, `economy_investment`, `foreign_affairs`, `defense_public`, `social_governance`)
+   - `desk:` `all` or comma-separated desk ids (`economy_investment`, `foreign_affairs`, `defense_public`, `social_governance`)
    - `match:` space-separated `"关键词"` quoted strings (Mandarin terms that trigger the card)
    - `description:` one line
    - `tag:` `background` or `hypothesis`

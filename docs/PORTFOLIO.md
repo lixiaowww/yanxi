@@ -14,10 +14,11 @@ npm run dev            # 打开 http://localhost:5179/portfolio
 
 1. 产品一句话 + 红线（非情报 / 非针对个人）  
 2. 方法两支柱：潜规则启发式 + 多源印证  
-3. 五栏摘要（总体目标 / 经济投资 / 外交 / 国防公开 / 社会治理）  
+3. 四栏摘要（经济投资 / 外交 / 国防公开 / 社会治理）— 已去掉虚「总体目标」  
 4. 回归绿勾（`regress-latest.json`）  
 5. Civic Ontology Lite 背景卡目录（栏目优先 · 非 OWL）— 见 `docs/ONTOLOGY-LITE.md`  
 6. 加国公开政策对照 **可点击 URL**（Justice Laws / GAC / CBSA…）· 非法律意见  
+7. **采纳门槛**：无数字/时限/细则/资金（或主体+具名产品）→ 不生成实质简报  
 
 ## 文件
 

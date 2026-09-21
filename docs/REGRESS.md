@@ -34,7 +34,7 @@ Reports: `outbox/test-reports/regress-*.md` + `regress-latest.json`
         "substance_band_in": ["thin", "mixed"],
         "corroboration_max": 1,
         "confidence_max": "medium",
-        "desk_primary_in": ["overall_goals"]
+        "desk_primary_in": ["economy_investment"]
       }
     },
     {

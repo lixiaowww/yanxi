@@ -87,8 +87,8 @@ export type BriefingJson = {
     tag?: string;
   };
   /**
-   * Portfolio desk section (总体目标/经济投资/外交/国防公开表述/社会治理).
-   * Civilian topic bucket — not an ops-floor imitation.
+   * Portfolio desk section (经济投资/外交/国防公开表述/社会治理).
+   * 「总体目标」已移除。Civilian topic bucket — not an ops-floor imitation.
    */
   desk_section?: {
     framing?: string;
@@ -98,6 +98,16 @@ export type BriefingJson = {
     secondary?: string[];
     evidence?: string[];
     rationale?: string;
+    tag?: string;
+  };
+  /** Reject direction-only pastes lacking hard data/instruments. */
+  adoption?: {
+    framing?: string;
+    adopted?: boolean;
+    label_zh?: string;
+    reason_zh?: string;
+    hard_nuggets?: { kind?: string; label_zh?: string; evidence?: string }[];
+    rejected_as?: string | null;
     tag?: string;
   };
   source_class?: {
@@ -456,7 +466,6 @@ export function runClaimGate(
   const desk = briefing.desk_section;
   if (desk) {
     const allowed = new Set([
-      "overall_goals",
       "economy_investment",
       "foreign_affairs",
       "defense_public",
@@ -484,6 +493,26 @@ export function runClaimGate(
         severity: "soft",
         message: "desk_section.primary not in civilian desk taxonomy.",
         evidence: String(desk.primary),
+      });
+    }
+  }
+
+  const adoption = briefing.adoption;
+  if (adoption) {
+    if (adoption.framing && adoption.framing !== "civilian-detail-adoption") {
+      findings.push({
+        id: "adoption-framing-invalid",
+        severity: "soft",
+        message: "adoption must use civilian-detail-adoption framing.",
+        evidence: String(adoption.framing),
+      });
+    }
+    if (adoption.adopted === false && (briefing.briefing_en?.confidence || "").toLowerCase() === "high") {
+      findings.push({
+        id: "adoption-reject-confidence",
+        severity: "soft",
+        message: "Rejected (no hard detail) briefs cannot carry high confidence.",
+        evidence: "confidence=high",
       });
     }
   }

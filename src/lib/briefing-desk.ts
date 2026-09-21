@@ -1,10 +1,12 @@
 /**
  * Civilian briefing desk: fixed portfolio sections for human-review digests.
  * Not an intelligence "desk" / watch floor imitation — topic buckets only.
+ *
+ * Direction-only "总体目标" removed — vague macro slogans are not a desk;
+ * CEWC/plan vocabulary routes to economy_investment when substantive.
  */
 
 export const DESK_SECTIONS = [
-  "overall_goals",
   "economy_investment",
   "foreign_affairs",
   "defense_public",
@@ -27,22 +29,23 @@ export type DeskSectionMeta = {
 
 export const DESK_CATALOG: DeskSectionMeta[] = [
   {
-    id: "overall_goals",
-    label_zh: "总体目标",
-    label_en: "Overall goals & direction",
-    blurb_zh: "中央会议、五年规划、高质量发展等方向性公开表述",
-    rx: /中央经济工作会议|中央全会|两会|政府工作报告|十四五|十五五|高质量发展|新质生产力|中国式现代化|新发展格局|双循环|统一大市场/,
-    kinds: ["leadership_meeting", "macro_policy", "five_year_plan", "dual_circulation"],
-    order: 1,
-  },
-  {
     id: "economy_investment",
     label_zh: "经济投资",
     label_en: "Economy & investment",
-    blurb_zh: "财政货币、产业投资、地方债/房地产、营商与专项资金等公开线索",
-    rx: /财政政策|货币政策|扩大内需|稳增长|投资|专项资金|专项债|芯片|半导体|人工智能|专精特新|地方债|房地产|保交楼|化债|制造业|营商环境/,
-    kinds: ["industrial_tech_policy", "finance_risk", "economic_data", "implementing_instrument"],
-    order: 2,
+    blurb_zh:
+      "财政货币、产业投资、专项资金、地方债/房地产、会议落地工具等（含原「总体」中可核验的经济部署）",
+    rx: /财政政策|货币政策|扩大内需|稳增长|投资|专项资金|专项债|芯片|半导体|人工智能|专精特新|地方债|房地产|保交楼|化债|制造业|营商环境|中央经济工作会议|政府工作报告|十四五|十五五|高质量发展|新质生产力|双循环|统一大市场|积极的财政|稳健的货币/,
+    kinds: [
+      "industrial_tech_policy",
+      "finance_risk",
+      "economic_data",
+      "implementing_instrument",
+      "leadership_meeting",
+      "macro_policy",
+      "five_year_plan",
+      "dual_circulation",
+    ],
+    order: 1,
   },
   {
     id: "foreign_affairs",
@@ -51,7 +54,7 @@ export const DESK_CATALOG: DeskSectionMeta[] = [
     blurb_zh: "外交话语、双边关系、一带一路、制裁/合作等公开表述",
     rx: /外交部|外事|一带一路|人类命运共同体|中加|加方|加拿大|制裁|双边|多边|联合国|G7|CPTPP/,
     kinds: ["foreign_affairs"],
-    order: 3,
+    order: 2,
   },
   {
     id: "defense_public",
@@ -60,7 +63,7 @@ export const DESK_CATALOG: DeskSectionMeta[] = [
     blurb_zh: "国防/军队/军工公开报道与白皮书式语言；非作战情报、非目标跟踪",
     rx: /国防|军队|解放军|军委|军工|武警|演训|战备|国防白皮书|强军|军民融合|海空|航母/,
     kinds: ["defense_public"],
-    order: 4,
+    order: 3,
   },
   {
     id: "social_governance",
@@ -69,7 +72,7 @@ export const DESK_CATALOG: DeskSectionMeta[] = [
     blurb_zh: "民生、基层治理、舆情、共同富裕、党建教育等公开社会治理表述",
     rx: /社会治理|基层治理|民生|共同富裕|舆情|正能量|和谐稳定|主题教育|意识形态|巡视|乡村振兴|粮食安全|三农/,
     kinds: ["social_governance", "ideology_party", "rural_revitalization"],
-    order: 5,
+    order: 4,
   },
 ];
 
@@ -108,7 +111,6 @@ export function assignDeskSection(
       score += 1.2;
       evidence.push(`kind:${opts.primaryKind}`);
     }
-    // Extra weight for explicit defense lexicon (often under-tagged by info_triage)
     if (sec.id === "defense_public" && /国防|解放军|军委|强军|军工/.test(text)) {
       score += 0.8;
     }
@@ -118,14 +120,15 @@ export function assignDeskSection(
   scores.sort((a, b) => b.score - a.score);
 
   if (!scores.length) {
+    const meta = DESK_CATALOG[0];
     return {
       framing: "civilian-briefing-desk-section",
-      primary: "overall_goals",
-      label_zh: "总体目标",
-      label_en: "Overall goals & direction",
+      primary: meta.id,
+      label_zh: meta.label_zh,
+      label_en: meta.label_en,
       secondary: [],
       evidence: [],
-      rationale: "No strong desk cue; default to overall_goals for human refiling.",
+      rationale: "No strong desk cue; default to economy_investment for human refiling.",
       tag: "hypothesis",
     };
   }

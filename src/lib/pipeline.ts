@@ -11,6 +11,7 @@ import { assignDeskSection } from "./briefing-desk.js";
 import { matchOntologyLite } from "./ontology-lite.js";
 import { detectSourceClass, type SourceClass } from "./source-class.js";
 import { buildConfidenceFactors, buildCorroboration } from "./confidence.js";
+import { evaluateAdoption, filterDigestByHardNuggets } from "./adoption.js";
 import { appendGateAudit } from "./audit-log.js";
 
 export type SourceInput = {
@@ -47,7 +48,19 @@ export type BriefResponse = {
   sourceCount: number;
 };
 
-function buildInfoValue(briefing: BriefingJson): BriefResponse["infoValue"] {
+function buildInfoValue(
+  briefing: BriefingJson
+): BriefResponse["infoValue"] {
+  if (briefing.adoption && briefing.adoption.adopted === false) {
+    return {
+      level: "low",
+      label_zh: "不采纳 — 无细节/无数据",
+      next_zh: [
+        briefing.adoption.reason_zh || "补带数字、时限或具名通知/办法的公开摘录",
+        "方向语/会议套话单独不生成实质简报",
+      ],
+    };
+  }
   const band = briefing.substance_cut?.band || "thin";
   const corr = briefing.corroboration?.score_0_to_3 ?? 0;
   const missing = briefing.corroboration?.missing || [];
@@ -242,6 +255,9 @@ function applyDeterministicLayers(
     confidence_factors,
   };
 
+  const adoption = evaluateAdoption(substance_cut);
+  next.adoption = adoption;
+
   next.context_notes = ontologyMatch.hits.length
     ? ontologyMatch.hits.map((h) => ({
         card: h.id,
@@ -256,12 +272,61 @@ function applyDeterministicLayers(
         },
       ];
 
-  if (next.briefing_en) {
+  if (!adoption.adopted) {
+    next.source_digest_zh = [];
+    next.briefing_en = {
+      what: "Not adopted: paste lacks verifiable detail (numbers, deadlines, named instruments, or funding lines).",
+      context: adoption.reason_zh,
+      so_what:
+        "Direction-only / formula language is filtered out. Paste an implementing notice or an excerpt with concrete data, then re-run.",
+      confidence: "low",
+      sources_used: ctx.sourceLabels,
+    };
+    next.policy_outlook = {
+      horizon: "near",
+      scenarios: [],
+      watchpoints: [
+        "补：带数字/时限的公开摘录",
+        "补：具名通知/办法/实施方案",
+        "补：专项资金或责任主体+工具并列的公开文本",
+      ],
+    };
+    next.open_questions = [
+      "本段是否只有会议方向语、没有落地工具？",
+      "能否找到同主题的公开细则再合并粘贴？",
+    ];
+    next.substance_cut = {
+      ...substance_cut,
+      nuggets: [],
+      empty_calories: [
+        ...(substance_cut.empty_calories || []),
+        "采纳规则：无硬干货 → 整篇不采纳",
+      ].slice(0, 5),
+      analyst_prompt_zh: adoption.reason_zh,
+    };
+  } else {
+    next.source_digest_zh = filterDigestByHardNuggets(
+      next.source_digest_zh,
+      adoption.hard_nuggets
+    );
+    if (!next.source_digest_zh.length && adoption.hard_nuggets.length) {
+      next.source_digest_zh = adoption.hard_nuggets.slice(0, 4).map((n) => ({
+        point: n.label_zh,
+        quote: n.evidence.slice(0, 40),
+        source_label: ctx.sourceLabels[0],
+      }));
+    }
+    next.substance_cut = {
+      ...substance_cut,
+      nuggets: adoption.hard_nuggets,
+    };
+  }
+
+  if (next.briefing_en && adoption.adopted) {
     const socialNote =
       source_class.class === "social_commentary"
         ? "Treat as atmosphere/rumor memo only; do not raise confidence from this source alone. "
         : "";
-    // Keep so_what readable — do not prepend raw nugget dumps (shown separately in UI).
     next.briefing_en = {
       ...next.briefing_en,
       confidence: confidence_factors.level,
@@ -269,25 +334,39 @@ function applyDeterministicLayers(
     };
   }
 
-  const wpExtra: string[] = [];
-  if (substance_cut.empty_calories.length) wpExtra.push(...substance_cut.empty_calories.slice(0, 2));
-  if (corroboration.missing.length) {
-    wpExtra.push(`缺印证: ${corroboration.missing[0]}`);
-  }
-  if (canada_policy_link.level !== "none" && canada_policy_link.hits[0]) {
-    wpExtra.push(
-      `加国公开政策对照: ${canada_policy_link.hits[0].theme_zh}（须核验现行公开文本）`
-    );
-  }
-  if (next.policy_outlook) {
-    const wp = next.policy_outlook.watchpoints || [];
-    next.policy_outlook = {
-      ...next.policy_outlook,
-      watchpoints: [...wpExtra, ...wp].slice(0, 7),
+  if (!adoption.adopted && next.confidence_factors) {
+    next.confidence_factors = {
+      ...next.confidence_factors,
+      level: "low",
+      caps_applied: [
+        ...(next.confidence_factors.caps_applied || []),
+        "adoption_reject_no_hard_detail",
+      ],
+      rationale: `${next.confidence_factors.rationale} Adoption=reject (no hard detail/data).`,
     };
   }
 
-  if (source_class.class === "social_commentary") {
+  const wpExtra: string[] = [];
+  if (adoption.adopted) {
+    if (substance_cut.empty_calories.length) wpExtra.push(...substance_cut.empty_calories.slice(0, 2));
+    if (corroboration.missing.length) {
+      wpExtra.push(`缺印证: ${corroboration.missing[0]}`);
+    }
+    if (canada_policy_link.level !== "none" && canada_policy_link.hits[0]) {
+      wpExtra.push(
+        `加国公开政策对照: ${canada_policy_link.hits[0].theme_zh}（须核验现行公开文本）`
+      );
+    }
+    if (next.policy_outlook) {
+      const wp = next.policy_outlook.watchpoints || [];
+      next.policy_outlook = {
+        ...next.policy_outlook,
+        watchpoints: [...wpExtra, ...wp].slice(0, 7),
+      };
+    }
+  }
+
+  if (source_class.class === "social_commentary" && adoption.adopted) {
     next.open_questions = [
       "社交转述的主源官方/通稿链接是什么？",
       ...(next.open_questions || []),
@@ -305,7 +384,7 @@ function userMessage(sources: SourceInput[]): string {
     "Tag each digest quote with source_label matching one of the source labels below.",
     "First enumerate ALL signaling heuristics, then weight them.",
     "Also triage: kinds + P1–P4. Never use secrecy markings.",
-    "Strip formulaic party-speak; lead analysis with verifiable substance nuggets only.",
+    "Strip formulaic party-speak; ADOPT only excerpts with hard detail (numbers, deadlines, named 通知/办法, funding) or responsible-body+named-sector. Otherwise reject.",
     "Factorize confidence; social commentary cannot alone corroborate or reach high confidence.",
     "-----",
     ...blocks,

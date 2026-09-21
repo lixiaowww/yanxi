@@ -132,6 +132,10 @@ pre {
   color: var(--text);
   max-width: 62ch;
 }
+.reject-block {
+  border-color: color-mix(in srgb, var(--bad) 45%, var(--border));
+  background: color-mix(in srgb, var(--bad) 8%, #0c1117);
+}
 .prose.muted { color: var(--muted); }
 
 .nugget-list, .action-list, .scenario-list {

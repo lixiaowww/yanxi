@@ -1,6 +1,7 @@
 /**
  * Produce a multi-section civilian briefing desk report + within-section corroboration boards.
- * 总体目标 / 经济投资 / 外交 / 国防（公开） / 社会治理
+ * 经济投资 / 外交 / 国防（公开） / 社会治理
+ * （已去掉虚「总体目标」栏）
  */
 import fs from "fs";
 import path from "path";
@@ -60,7 +61,7 @@ for (const f of fixtures) {
   }
 
   const desk = result.briefing.desk_section;
-  const primary = (desk?.primary || "overall_goals") as DeskSectionId;
+  const primary = (desk?.primary || "economy_investment") as DeskSectionId;
   const row: SectionBrief = {
     fixtureId: f.id,
     domain: f.domain,
@@ -163,37 +164,6 @@ for (const sec of DESK_CATALOG) {
         reinforced: beforeMin < 2 && afterCorr >= 2,
       });
     }
-  } else if (sec.id === "overall_goals") {
-    const a = pickDirection(rows);
-    const economyRows = bySection.get("economy_investment") || [];
-    const b = pickInstrument(economyRows);
-    if (a && b) {
-      const merged = await runBriefingPipeline({
-        sources: [
-          { label: a.fixtureId, text: a.sourceText },
-          { label: b.fixtureId, text: b.sourceText },
-        ],
-        forceOffline: true,
-      });
-      const afterCorr = merged.briefing.corroboration?.score_0_to_3 ?? 0;
-      const beforeMax = Math.max(a.corr, b.corr);
-      const beforeMin = Math.min(a.corr, b.corr);
-      pairDeltas.push({
-        sectionId: sec.id,
-        pair: `${a.fixtureId} + ${b.fixtureId}（跨栏·经济投资细则）`,
-        beforeMax,
-        beforeMin,
-        afterCorr,
-        afterConf: merged.briefing.confidence_factors?.level || "?",
-        rose: afterCorr > beforeMax,
-        reinforced: beforeMin < 2 && afterCorr >= 2,
-      });
-      board.next_steps_zh.unshift(
-        `跨栏建议：总体目标 \`${a.fixtureId}\` × 经济投资细则 \`${b.fixtureId}\`（合并实测见总览）`
-      );
-      board.pair_hint_zh = `跨栏配对：\`${a.fixtureId}\`（方向） + \`${b.fixtureId}\`（细则·经济投资）`;
-      board.pairable = true;
-    }
   }
 }
 
@@ -204,7 +174,7 @@ const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
 const md: string[] = [
   `# 分栏目简报桌面 + 印证报告 — ${stamp}`,
   "",
-  "民用公开源 · 按 **总体目标 / 经济投资 / 外交 / 国防（公开表述） / 社会治理** 归类。",
+  "民用公开源 · 按 **经济投资 / 外交 / 国防（公开表述） / 社会治理** 归类（已去掉虚「总体目标」）。",
   "非情报产品；预测均为 hypothesis；国防栏仅公开话语。",
   "",
   "## 全桌印证总览",

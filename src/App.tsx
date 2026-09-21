@@ -1,11 +1,17 @@
 import { useEffect, useMemo, useState } from "react";
 
-const SAMPLE = `据新华社北京电，近日召开的中央经济工作会议强调，要坚持高质量发展，因地制宜发展新质生产力，继续推进改革开放，在发展中保障和改善民生，维护社会和谐稳定。会议指出，当前外部环境复杂多变，要增强忧患意识，同时坚定信心，推动经济持续回升向好。`;
+const SAMPLE = `据新华社北京电，近日召开的中央经济工作会议强调，要坚持高质量发展。会议要求有关部门于2026年底前出台配套办法，安排专项资金不少于50亿元支持芯片与半导体中小企业试点。`;
 
 type DigestRow = { point?: string; quote?: string; source_label?: string };
 type Briefing = {
   source_digest_zh?: DigestRow[];
   context_notes?: { card?: string; note?: string; tag?: string }[];
+  adoption?: {
+    adopted?: boolean;
+    label_zh?: string;
+    reason_zh?: string;
+    hard_nuggets?: { kind?: string; label_zh?: string; evidence?: string }[];
+  };
   info_triage?: {
     primary_kind?: string;
     kinds?: { kind?: string; label_zh?: string; score?: number; evidence?: string }[];
@@ -377,6 +383,17 @@ export function App() {
             <article className="brief-reader">
               <header className="brief-status">
                 <div className="status-chips">
+                  <span
+                    className={`chip ${
+                      b.adoption?.adopted === false ? "chip-bad" : b.adoption?.adopted ? "chip-ok" : "chip-warn"
+                    }`}
+                  >
+                    {b.adoption?.adopted === false
+                      ? "不采纳"
+                      : b.adoption?.adopted
+                        ? "已采纳"
+                        : "待判定"}
+                  </span>
                   <span className={`chip ${result.mode === "llm" ? "chip-ok" : "chip-warn"}`}>
                     {result.mode === "llm" ? "LLM 简报" : "模板简报"}
                   </span>
@@ -408,7 +425,12 @@ export function App() {
                     </span>
                   ) : null}
                 </div>
-                {result.mode === "offline" ? (
+                {b.adoption?.adopted === false ? (
+                  <p className="status-note warn">
+                    <strong>{b.adoption.label_zh}</strong> — {b.adoption.reason_zh}
+                  </p>
+                ) : null}
+                {result.mode === "offline" && b.adoption?.adopted !== false ? (
                   <p className="status-note">
                     当前为模板输出
                     {result.offlineReason?.startsWith("llm_error")
@@ -421,11 +443,23 @@ export function App() {
                     。先看「这是什么 / 意味着什么 / 还缺什么」。
                   </p>
                 ) : null}
-                {result.infoValue?.level === "low" ? (
+                {result.infoValue?.level === "low" && b.adoption?.adopted !== false ? (
                   <p className="status-note warn">{result.infoValue.label_zh}</p>
                 ) : null}
               </header>
 
+              {b.adoption?.adopted === false ? (
+                <section className="read-block reject-block">
+                  <h2>不采纳说明</h2>
+                  <p className="prose">{b.briefing_en?.so_what || b.adoption.reason_zh}</p>
+                  <ul className="action-list">
+                    {(b.policy_outlook?.watchpoints || result.infoValue?.next_zh || []).map((w, i) => (
+                      <li key={i}>{w}</li>
+                    ))}
+                  </ul>
+                </section>
+              ) : (
+                <>
               <section className="read-block">
                 <h2>这是什么</h2>
                 <p className="prose">{b.briefing_en?.what || "—"}</p>
@@ -553,6 +587,8 @@ export function App() {
                   </ul>
                 </section>
               ) : null}
+                </>
+              )}
 
               {result.gate.findings.length > 0 ? (
                 <pre className="findings">

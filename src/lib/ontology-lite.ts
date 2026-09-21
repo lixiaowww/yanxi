@@ -75,10 +75,12 @@ function parseMatch(s: string): string[] {
 function parseDesk(s: string): Array<DeskSectionId | "all"> {
   const raw = (s || "all").trim();
   if (!raw || raw === "all") return ["all"];
+  const allowed = new Set<string>(["all", "economy_investment", "foreign_affairs", "defense_public", "social_governance"]);
   return raw
     .split(/[,\s]+/)
     .map((x) => x.trim())
-    .filter(Boolean) as Array<DeskSectionId | "all">;
+    .map((x) => (x === "overall_goals" ? "economy_investment" : x))
+    .filter((x): x is DeskSectionId | "all" => allowed.has(x));
 }
 
 function parseType(s: string): OntologyType {

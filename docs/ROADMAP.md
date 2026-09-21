@@ -33,4 +33,5 @@
 - [x] 策展源档位权重 A–D/U（`source_tier` → confidence caps；非 ML）  
 - [x] 免费部署：Render Blueprint（`render.yaml` + `docs/DEPLOY.md`）  
 - [x] 简报价值：offline 原因可见 + 干货/缺什么优先 UI（`infoValue`）  
+- [x] 删除虚「总体目标」栏；无细节/无数据 → 整篇不采纳（`adoption`）  
 - [ ] 听力 / PDF / SMTP（仍 Later）  

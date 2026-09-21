@@ -1,7 +1,7 @@
 ---
 name: dual-circulation-lexicon
 type: lexicon
-desk: overall_goals,economy_investment
+desk: economy_investment
 match: "双循环" "国内大循环" "国际循环" "统一大市场" "供应链" "产业链" "安全可控" "国产替代" "卡脖子"
 description: Background gloss for dual circulation / supply-chain security public vocabulary.
 tag: background

@@ -16,8 +16,8 @@
         "gate": true,
         "substance_band_in": ["thin", "mixed"],
         "corroboration_max": 1,
-        "confidence_max": "medium",
-        "desk_primary_in": ["overall_goals", "economy_investment"],
+        "confidence_max": "low",
+        "desk_primary_in": ["economy_investment"],
         "primary_kind_in": ["leadership_meeting", "macro_policy"]
       }
     },
