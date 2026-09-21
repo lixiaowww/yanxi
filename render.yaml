@@ -23,6 +23,18 @@ services:
         sync: false
       - key: COLLECT_API_TOKEN
         generateValue: true
+      # Gate for LLM-backed POST /api/brief runs. Render generates the value;
+      # never commit a real secret here. Unset in production = LLM runs refused.
+      - key: BRIEF_API_TOKEN
+        generateValue: true
+      # /api/brief per-IP rate limit (offline template runs included).
+      - key: BRIEF_RATE_MAX
+        value: "20"
+      - key: BRIEF_RATE_WINDOW_MS
+        value: "600000"
+      # Render puts exactly one proxy hop in front of the app.
+      - key: TRUST_PROXY_HOPS
+        value: "1"
       - key: LLM_API_KEY
         sync: false
       - key: YANXI_AUDIT

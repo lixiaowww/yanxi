@@ -190,6 +190,21 @@ type DomainRow = {
 
 type ThemeRow = { id?: string; label_en?: string };
 
+/** Turn server refusals into short English guidance instead of a bare status. */
+function briefErrorMessage(status: number, serverError?: string): string {
+  const detail = serverError || `Request failed (HTTP ${status}).`;
+  if (status === 401 || status === 403) {
+    return `${detail} Tick "Force offline" to use the template engine — that path stays open without a token.`;
+  }
+  if (status === 429) {
+    return `${detail} This shared demo caps briefing runs per visitor; the offline template path is still available once the window resets.`;
+  }
+  if (status === 413) {
+    return `${detail} Paste a shorter public excerpt and re-run.`;
+  }
+  return detail;
+}
+
 export function App() {
   const [sourceText, setSourceText] = useState(SAMPLE);
   const [label, setLabel] = useState("sample-xinhua-style-excerpt");
@@ -273,8 +288,8 @@ export function App() {
           sourceClass: markSocial ? "social_commentary" : undefined,
         }),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || res.statusText);
+      const data = await res.json().catch(() => ({}) as { error?: string });
+      if (!res.ok) throw new Error(briefErrorMessage(res.status, data.error));
       setResult(data);
       const first = data.briefing?.source_digest_zh?.[0]?.quote;
       if (first && sourceText.includes(first)) setActiveQuote(first);
@@ -295,8 +310,8 @@ export function App() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(subscriptionId ? { subscriptionId } : {}),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || res.statusText);
+      const data = await res.json().catch(() => ({}) as { error?: string });
+      if (!res.ok) throw new Error(briefErrorMessage(res.status, data.error));
       await refreshSubs();
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));

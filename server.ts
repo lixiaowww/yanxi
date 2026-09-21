@@ -10,29 +10,94 @@ import { listOutboxBriefs } from "./src/lib/outbox.js";
 import { loadWhitelistPublic } from "./src/lib/public-fetch.js";
 import { listDomainFixtures } from "./src/lib/domains.js";
 import { DESK_CATALOG, HOT_THEME_CATALOG, assignDeskSection } from "./src/lib/briefing-desk.js";
+import { llmConfigured } from "./src/lib/llm.js";
+import {
+  clientKey,
+  createFixedWindowLimiter,
+  httpError,
+  readFileInsideDir,
+  requireApiToken,
+  trustProxyHops,
+  type HttpErrorLike,
+} from "./src/lib/api-guard.js";
 
 const PORT = Number(process.env.PORT || 5179);
 const PUBLIC_BASE_URL = process.env.PUBLIC_BASE_URL || `http://localhost:${PORT}`;
 
-function assertLocalCollectToken(req: express.Request): void {
-  const needed = process.env.COLLECT_API_TOKEN;
-  if (process.env.NODE_ENV === "production" && !needed) {
-    const err = new Error("Collect disabled in production until COLLECT_API_TOKEN is set");
-    (err as Error & { status: number }).status = 403;
-    throw err;
+/** Request body cap — pastes are excerpts, not whole corpora. */
+const JSON_BODY_LIMIT = process.env.BRIEF_BODY_LIMIT || "128kb";
+/** Total characters accepted across sourceText + sources[] before we refuse. */
+const MAX_SOURCE_CHARS = Number(process.env.BRIEF_MAX_SOURCE_CHARS || 24000);
+
+const briefLimiter = createFixedWindowLimiter({
+  windowMs: Number(process.env.BRIEF_RATE_WINDOW_MS || 10 * 60 * 1000),
+  max: Number(process.env.BRIEF_RATE_MAX || 20),
+});
+const collectLimiter = createFixedWindowLimiter({
+  windowMs: Number(process.env.BRIEF_RATE_WINDOW_MS || 10 * 60 * 1000),
+  max: Number(process.env.COLLECT_RATE_MAX || 6),
+});
+
+function enforceRateLimit(
+  req: express.Request,
+  limiter: ReturnType<typeof createFixedWindowLimiter>,
+  action: string
+): void {
+  const decision = limiter.check(clientKey(req));
+  if (!decision.allowed) {
+    throw httpError(
+      429,
+      `Rate limit reached for ${action}. Try again in ${decision.retryAfterSeconds}s.`,
+      decision.retryAfterSeconds
+    );
   }
-  if (!needed) return;
-  const got = String(req.headers["x-yanxi-token"] || req.query.token || "");
-  if (got !== needed) {
-    const err = new Error("Unauthorized collect trigger");
-    (err as Error & { status: number }).status = 401;
-    throw err;
+}
+
+function sendApiError(res: express.Response, e: unknown, fallbackStatus = 400): void {
+  const err = e as Partial<HttpErrorLike>;
+  const status = err?.status || fallbackStatus;
+  if (err?.retryAfterSeconds) res.setHeader("Retry-After", String(err.retryAfterSeconds));
+  res.status(status).json({ error: e instanceof Error ? e.message : String(e) });
+}
+
+/** Total paste size across both request shapes, without copying the text. */
+function countSourceChars(body: unknown): number {
+  const b = (body || {}) as { sourceText?: unknown; sources?: unknown };
+  let total = typeof b.sourceText === "string" ? b.sourceText.length : 0;
+  if (Array.isArray(b.sources)) {
+    for (const s of b.sources) {
+      const text = (s as { text?: unknown })?.text;
+      if (typeof text === "string") total += text.length;
+    }
   }
+  return total;
 }
 
 async function main() {
   const app = express();
-  app.use(express.json({ limit: "1mb" }));
+  // Render puts one proxy hop in front of the app; locally there is none.
+  app.set("trust proxy", trustProxyHops());
+  app.use(express.json({ limit: JSON_BODY_LIMIT }));
+
+  // Body-parser rejections (oversized / malformed JSON) must read as clear
+  // English JSON, not an HTML stack trace.
+  app.use((err: Error & { type?: string; status?: number }, _req: express.Request, res: express.Response, next: express.NextFunction) => {
+    if (!err) {
+      next();
+      return;
+    }
+    if (err.type === "entity.too.large") {
+      res.status(413).json({
+        error: `Request body too large (limit ${JSON_BODY_LIMIT}). Paste a shorter public excerpt.`,
+      });
+      return;
+    }
+    if (err.type === "entity.parse.failed") {
+      res.status(400).json({ error: "Request body is not valid JSON." });
+      return;
+    }
+    next(err);
+  });
 
   app.get("/api/health", (_req, res) => {
     res.json({
@@ -41,6 +106,9 @@ async function main() {
       framing: "civilian-open-source-research",
       llm: Boolean(process.env.LLM_API_KEY),
       cursorHarness: Boolean(process.env.CURSOR_API_KEY),
+      // Booleans only — never echo credential or token values.
+      llmRunsNeedToken: llmConfigured(),
+      briefTokenConfigured: Boolean(process.env.BRIEF_API_TOKEN || process.env.COLLECT_API_TOKEN),
       collect: true,
       subscriptions: loadSubscriptions().subscriptions.filter((s) => s.active !== false).length,
     });
@@ -151,7 +219,8 @@ async function main() {
 
   app.post("/api/collect/run", async (req, res) => {
     try {
-      assertLocalCollectToken(req);
+      enforceRateLimit(req, collectLimiter, "collect runs");
+      requireApiToken(req, { envVar: "COLLECT_API_TOKEN", action: "collect runs" });
       const onlyId = req.body?.subscriptionId ? String(req.body.subscriptionId) : undefined;
       const results = await runAllActiveSubscriptions({
         onlyId,
@@ -159,13 +228,41 @@ async function main() {
       });
       res.json({ ok: true, results });
     } catch (e) {
-      const status = (e as { status?: number }).status || 400;
-      res.status(status).json({ error: e instanceof Error ? e.message : String(e) });
+      sendApiError(res, e);
     }
   });
 
   app.post("/api/brief", async (req, res) => {
     try {
+      // Every call is throttled per client IP, offline or not: the free
+      // instance itself is a shared resource.
+      enforceRateLimit(req, briefLimiter, "briefing runs");
+
+      const chars = countSourceChars(req.body);
+      if (chars > MAX_SOURCE_CHARS) {
+        throw httpError(
+          413,
+          `Source text too long (${chars} characters, limit ${MAX_SOURCE_CHARS}). Paste a shorter public excerpt.`
+        );
+      }
+
+      const forceOffline = Boolean(req.body?.forceOffline);
+      // Only the LLM-backed path spends the operator's quota; the template
+      // engine stays open so the public demo keeps working.
+      if (!forceOffline && llmConfigured()) {
+        try {
+          requireApiToken(req, {
+            envVar: "BRIEF_API_TOKEN",
+            fallbackEnvVar: "COLLECT_API_TOKEN",
+            action: "LLM-backed briefing runs",
+          });
+        } catch (e) {
+          const err = e as HttpErrorLike;
+          err.message = `${err.message} The offline template path stays open — resend with "forceOffline": true.`;
+          throw err;
+        }
+      }
+
       const result = await runBriefingPipeline({
         sourceText: String(req.body?.sourceText || ""),
         sourceLabel: req.body?.sourceLabel ? String(req.body.sourceLabel) : undefined,
@@ -175,7 +272,7 @@ async function main() {
               text: String(s?.text || ""),
             }))
           : undefined,
-        forceOffline: Boolean(req.body?.forceOffline),
+        forceOffline,
         sourceClass: req.body?.sourceClass
           ? (String(req.body.sourceClass) as
               | "official_or_wire"
@@ -187,17 +284,21 @@ async function main() {
       });
       res.json(result);
     } catch (e) {
-      res.status(400).json({ error: e instanceof Error ? e.message : String(e) });
+      sendApiError(res, e);
     }
   });
 
   app.get("/feeds/:id.xml", (req, res) => {
-    const feedPath = path.join(process.cwd(), "outbox", "feeds", `${req.params.id}.xml`);
-    if (!fs.existsSync(feedPath)) {
+    // `:id` arrives percent-decoded, so `..%2F` would otherwise escape outbox/.
+    const body = readFileInsideDir(
+      path.join(process.cwd(), "outbox", "feeds"),
+      `${req.params.id}.xml`
+    );
+    if (body === null) {
       res.status(404).type("text/plain").send("Feed not found — run npm run collect first");
       return;
     }
-    res.type("application/rss+xml").send(fs.readFileSync(feedPath, "utf8"));
+    res.type("application/rss+xml").send(body);
   });
 
   app.get("/outbox/briefs/:file", (req, res) => {
@@ -206,14 +307,14 @@ async function main() {
       res.status(400).send("bad filename");
       return;
     }
-    const full = path.join(process.cwd(), "outbox", "briefs", name);
-    if (!fs.existsSync(full)) {
+    const body = readFileInsideDir(path.join(process.cwd(), "outbox", "briefs"), name);
+    if (body === null) {
       res.status(404).send("not found");
       return;
     }
     if (name.endsWith(".json")) res.type("application/json");
     else res.type("text/markdown; charset=utf-8");
-    res.send(fs.readFileSync(full, "utf8"));
+    res.send(body);
   });
 
   const isProd = process.env.NODE_ENV === "production";
