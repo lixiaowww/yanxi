@@ -66,12 +66,25 @@ for (const f of selected) {
   const body: Block = [
     `# ${f.domain} (\`${f.id}\`)`,
     "",
-    `> gate=${result.gate.passed ? "PASS" : "FAIL"} · adopted=${adopted ? "yes" : "no"} · triage=${b.info_triage?.primary_kind || "?"}/${b.info_triage?.importance?.grade || "?"} · substance=${b.substance_cut?.band || "?"} · domain=${ca?.domain_label_en || ca?.domain || "—"}`,
+    `> gate=${result.gate.passed ? "PASS" : "FAIL"} · adopted=${adopted ? "yes" : "no"} · triage=${b.info_triage?.primary_kind || "?"}/${b.info_triage?.importance?.grade || "?"} · substance=${b.substance_cut?.band || "?"} · domain=${ca?.domain_label_en || ca?.domain || "—"} · freshness=${b.temporal?.freshness?.band || "?"} · as_of=${b.temporal?.source_as_of || "unknown"}`,
     "",
     "## Source excerpt",
     f.sourceText.slice(0, 280) + (f.sourceText.length > 280 ? "…" : ""),
     "",
   ];
+
+  if (b.temporal) {
+    body.push(
+      "## Time",
+      `- briefed: ${b.temporal.briefed_at || "?"}`,
+      `- source as-of: ${b.temporal.source_as_of || "unknown"} (${b.temporal.source_as_of_precision || "none"})${b.temporal.source_as_of_evidence ? ` · “${b.temporal.source_as_of_evidence}”` : ""}`,
+      `- freshness: ${b.temporal.freshness?.label_en || "?"} — ${b.temporal.freshness?.basis_en || ""}`,
+      ...(b.temporal.forward_deadlines_en?.length
+        ? [`- forward deadlines: ${b.temporal.forward_deadlines_en.join("; ")}`]
+        : []),
+      ""
+    );
+  }
 
   if (!adopted) {
     body.push(

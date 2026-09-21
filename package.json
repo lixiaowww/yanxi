@@ -18,8 +18,9 @@
     "test:regress": "tsx scripts/test-regress.ts",
     "test:review": "tsx scripts/sample-briefs-review.ts",
     "test:intake": "tsx scripts/test-intake-baseline.ts",
+    "test:temporal": "tsx scripts/test-temporal.ts",
     "portfolio": "tsx scripts/build-portfolio.ts",
-    "test": "npm run lint && npm run demo && npm run test:domains && npm run test:desk && npm run test:regress && npm run test:intake",
+    "test": "npm run lint && npm run demo && npm run test:domains && npm run test:desk && npm run test:regress && npm run test:intake && npm run test:temporal",
     "collect": "tsx scripts/collect-and-brief.ts",
     "collect:daemon": "tsx scripts/collect-daemon.ts",
     "harness:brief": "tsx scripts/cursor-harness-brief.ts"

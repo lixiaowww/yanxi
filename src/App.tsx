@@ -25,6 +25,20 @@ type Briefing = {
     second_cut_engine?: string;
     reason_en?: string;
   };
+  temporal?: {
+    briefed_at?: string;
+    collected_at?: string;
+    source_as_of?: string;
+    source_as_of_precision?: string;
+    source_as_of_evidence?: string;
+    freshness?: {
+      band?: string;
+      label_en?: string;
+      age_days?: number;
+      basis_en?: string;
+    };
+    forward_deadlines_en?: string[];
+  };
   info_triage?: {
     primary_kind?: string;
     kinds?: { kind?: string; label_zh?: string; score?: number; evidence?: string }[];
@@ -240,6 +254,7 @@ function briefErrorMessage(status: number, serverError?: string): string {
 export function App() {
   const [sourceText, setSourceText] = useState(SAMPLE);
   const [label, setLabel] = useState("sample-xinhua-style-excerpt");
+  const [sourcePublishedAt, setSourcePublishedAt] = useState("");
   const [forceOffline, setForceOffline] = useState(false);
   const [markSocial, setMarkSocial] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -318,6 +333,7 @@ export function App() {
           sourceLabel: label,
           forceOffline,
           sourceClass: markSocial ? "social_commentary" : undefined,
+          sourcePublishedAt: sourcePublishedAt.trim() || undefined,
         }),
       });
       const data = await res.json().catch(() => ({}) as { error?: string });
@@ -428,6 +444,15 @@ export function App() {
             Source label
           </label>
           <input id="label" value={label} onChange={(e) => setLabel(e.target.value)} />
+          <label htmlFor="pubdate" style={{ marginTop: "0.75rem" }}>
+            Source date (optional, YYYY-MM-DD) — used when the paste has no dateline
+          </label>
+          <input
+            id="pubdate"
+            type="date"
+            value={sourcePublishedAt}
+            onChange={(e) => setSourcePublishedAt(e.target.value)}
+          />
           <div className="row">
             <label style={{ display: "flex", gap: "0.4rem", alignItems: "center" }}>
               <input
@@ -505,6 +530,19 @@ export function App() {
                       Info value {result.infoValue.level}
                     </span>
                   ) : null}
+                  {b.temporal?.freshness?.label_en ? (
+                    <span
+                      className={`chip ${
+                        b.temporal.freshness.band === "fresh" || b.temporal.freshness.band === "recent"
+                          ? "chip-ok"
+                          : b.temporal.freshness.band === "unknown"
+                            ? "chip-warn"
+                            : "chip-bad"
+                      }`}
+                    >
+                      {b.temporal.freshness.label_en}
+                    </span>
+                  ) : null}
                   {b.confidence_factors?.level ? (
                     <span className={`chip conf-${b.confidence_factors.level}`}>
                       Confidence {b.confidence_factors.level}
@@ -551,6 +589,21 @@ export function App() {
                           ? ""
                           : " (no LLM configured)"}
                     . Read What → So what → Scenarios → Watchpoints.
+                  </p>
+                ) : null}
+                {b.temporal ? (
+                  <p className="status-note">
+                    Time: briefed {b.temporal.briefed_at?.slice(0, 19) || "?"}
+                    {b.temporal.source_as_of
+                      ? ` · source as-of ${b.temporal.source_as_of} (${b.temporal.source_as_of_precision || "?"})`
+                      : " · source as-of unknown"}
+                    {b.temporal.source_as_of_evidence
+                      ? ` · cue “${b.temporal.source_as_of_evidence}”`
+                      : ""}
+                    {b.temporal.forward_deadlines_en?.length
+                      ? ` · forward: ${b.temporal.forward_deadlines_en.join("; ")}`
+                      : ""}
+                    {b.temporal.freshness?.basis_en ? ` — ${b.temporal.freshness.basis_en}` : ""}
                   </p>
                 ) : null}
                 {b.content_analysis?.domain_label_en ? (

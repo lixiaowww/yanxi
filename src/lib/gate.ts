@@ -153,6 +153,24 @@ export type BriefingJson = {
     };
     tag?: string;
   };
+  /** Source / brief clocks for freshness judgement. */
+  temporal?: {
+    framing?: string;
+    briefed_at?: string;
+    collected_at?: string;
+    source_as_of?: string;
+    source_as_of_precision?: string;
+    source_as_of_evidence?: string;
+    source_as_of_method?: string;
+    freshness?: {
+      band?: string;
+      label_en?: string;
+      age_days?: number;
+      basis_en?: string;
+    };
+    forward_deadlines_en?: string[];
+    tag?: string;
+  };
   source_class?: {
     framing?: string;
     class?: string;

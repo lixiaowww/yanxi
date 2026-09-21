@@ -16,6 +16,7 @@ import { appendGateAudit } from "./audit-log.js";
 import { composeDigestRows, composeRejectionWhat, extractFacts, type FactSet } from "./facts.js";
 import { buildContentAnalysis } from "./analysis.js";
 import { resolveIntake, intakeAllowsBrief, type IntakeDecision } from "./intake.js";
+import { buildTemporalCut } from "./temporal.js";
 
 export type SourceInput = {
   label: string;
@@ -31,6 +32,10 @@ export type BriefRequest = {
   forceOffline?: boolean;
   /** Optional override — social_commentary hard-caps confidence. */
   sourceClass?: SourceClass;
+  /** When the paste/item was collected or received (ISO). */
+  collectedAt?: string;
+  /** Operator-supplied publication date (YYYY-MM-DD or ISO). */
+  sourcePublishedAt?: string;
 };
 
 export type BriefResponse = {
@@ -195,6 +200,8 @@ export async function runBriefingPipeline(req: BriefRequest): Promise<BriefRespo
     sources,
     forcedSourceClass: req.sourceClass,
     intake,
+    collectedAt: req.collectedAt,
+    sourcePublishedAt: req.sourcePublishedAt,
   });
   const finalCards =
     briefing.ontology_lite?.hits
@@ -242,6 +249,8 @@ function applyDeterministicLayers(
     sources?: SourceInput[];
     forcedSourceClass?: SourceClass;
     intake?: IntakeDecision;
+    collectedAt?: string;
+    sourcePublishedAt?: string;
   }
 ): BriefingJson {
   const scorecard = buildSignalingScorecard(sourceText);
@@ -322,6 +331,15 @@ function applyDeterministicLayers(
       }
     : undefined;
 
+  const factsEarly = extractFacts(sourceText);
+  const temporal = buildTemporalCut({
+    text: sourceText,
+    collectedAt: ctx.collectedAt,
+    sourcePublishedAt: ctx.sourcePublishedAt,
+    forwardDeadlinesEn: factsEarly.deadline.map((d) => d.value_en).filter(Boolean),
+  });
+  next.temporal = temporal;
+
   next.context_notes = ontologyMatch.hits.length
     ? ontologyMatch.hits.map((h) => ({
         card: h.id,
@@ -336,7 +354,7 @@ function applyDeterministicLayers(
         },
       ];
 
-  const facts = extractFacts(sourceText);
+  const facts = factsEarly;
   const analysis =
     next.content_analysis ??
     buildContentAnalysis(facts, {
@@ -444,13 +462,24 @@ function applyDeterministicLayers(
   // gaps (substance band, corroboration, source tier) live in their own fields
   // and in the collapsed analyst-detail panel, not in the briefing narrative.
   if (adoption.adopted && next.policy_outlook) {
+    const freshnessWatch =
+      temporal.freshness.band === "unknown"
+        ? ["Confirm publication or meeting date — paste has no dated dateline"]
+        : temporal.freshness.band === "stale" || temporal.freshness.band === "aging"
+          ? [
+              `Re-check for a newer public text (source as-of ${temporal.source_as_of || "?"} looks ${temporal.freshness.band})`,
+            ]
+          : [];
     next.policy_outlook = {
       ...next.policy_outlook,
       watchpoints: [
-        ...new Set(next.policy_outlook.watchpoints?.length
-          ? next.policy_outlook.watchpoints
-          : analysis.watchpoints),
-      ].slice(0, 6),
+        ...new Set([
+          ...(next.policy_outlook.watchpoints?.length
+            ? next.policy_outlook.watchpoints
+            : analysis.watchpoints || []),
+          ...freshnessWatch,
+        ]),
+      ].slice(0, 8),
     };
   }
 

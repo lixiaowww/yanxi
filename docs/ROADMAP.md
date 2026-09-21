@@ -38,6 +38,8 @@
 - [x] 热点频道 `hot_topics`（台海 / 电动汽车 / 中国 AI / 芯片 / 关键矿产）  
 - [x] 内容影响分析（`facts` + `analysis`；读者正文非方法论）  
 - [x] 公开站 LLM 路径开放（无 brief token；靠 IP 限流）  
+- [x] Intake 两刀（hard nuggets + local_gray / 可选 Jev）  
+- [x] **时效时钟**：`temporal`（source_as_of / briefed_at / collected_at + freshness band）  
 
 ## Next — P0（最高优先级）
 

@@ -29,11 +29,16 @@ async function briefAndStore(
   try {
     const result = await runBriefingPipeline(
       sources && sources.length > 1
-        ? { sources, forceOffline: subscription.forceOffline !== false }
+        ? {
+            sources,
+            forceOffline: subscription.forceOffline !== false,
+            collectedAt: item.collectedAt,
+          }
         : {
             sourceText: item.sourceText,
             sourceLabel: item.label,
             forceOffline: subscription.forceOffline !== false,
+            collectedAt: item.collectedAt,
           }
     );
     const rec = writeOutboxBrief(subscription, item, result, root);

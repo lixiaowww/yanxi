@@ -48,6 +48,11 @@ function toMarkdown(rec: Omit<OutboxRecord, "markdownPath" | "jsonPath">): strin
     `- **id:** ${rec.id}`,
     `- **created:** ${rec.createdAt}`,
     `- **source:** ${rec.source.label}${rec.source.url ? ` · ${rec.source.url}` : ""}`,
+    ...(b.temporal
+      ? [
+          `- **temporal:** briefed ${b.temporal.briefed_at?.slice(0, 19) || "?"} · source as-of ${b.temporal.source_as_of || "unknown"} (${b.temporal.source_as_of_precision || "none"}) · ${b.temporal.freshness?.label_en || "Freshness unknown"}`,
+        ]
+      : []),
     `- **mode:** ${rec.result.mode}`,
     `- **gate:** ${rec.result.gate.passed ? "PASS" : "FAIL"}`,
     `- **triage:** ${triage?.primary_kind || "?"} / ${triage?.importance?.grade || "?"}`,

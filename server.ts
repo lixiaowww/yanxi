@@ -269,6 +269,10 @@ async function main() {
               | "social_commentary"
               | "unknown_public")
           : undefined,
+        collectedAt: req.body?.collectedAt ? String(req.body.collectedAt) : undefined,
+        sourcePublishedAt: req.body?.sourcePublishedAt
+          ? String(req.body.sourcePublishedAt)
+          : undefined,
       });
       res.json(result);
     } catch (e) {
