@@ -75,7 +75,14 @@ function parseMatch(s: string): string[] {
 function parseDesk(s: string): Array<DeskSectionId | "all"> {
   const raw = (s || "all").trim();
   if (!raw || raw === "all") return ["all"];
-  const allowed = new Set<string>(["all", "economy_investment", "foreign_affairs", "defense_public", "social_governance"]);
+  const allowed = new Set<string>([
+    "all",
+    "hot_topics",
+    "economy_investment",
+    "foreign_affairs",
+    "defense_public",
+    "social_governance",
+  ]);
   return raw
     .split(/[,\s]+/)
     .map((x) => x.trim())

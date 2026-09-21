@@ -6,7 +6,7 @@ import fs from "fs";
 import path from "path";
 import { listDomainFixtures } from "../src/lib/domains.js";
 import { runBriefingPipeline } from "../src/lib/pipeline.js";
-import { DESK_CATALOG, type DeskSectionId } from "../src/lib/briefing-desk.js";
+import { DESK_CATALOG, HOT_THEME_CATALOG, type DeskSectionId } from "../src/lib/briefing-desk.js";
 import { listCanadaPolicyCatalog } from "../src/lib/canada-policy-link.js";
 import { listOntologyCatalog } from "../src/lib/ontology-lite.js";
 import {
@@ -162,6 +162,10 @@ const portfolio = {
     ontology_en: "Civic Ontology Lite: desk-first context cards ≤8; not OWL / intel ontology",
   },
   columns,
+  hot_theme_catalog: HOT_THEME_CATALOG.map((t) => ({
+    id: t.id,
+    label_en: t.label_en,
+  })),
   regress,
   canada_policy_catalog: listCanadaPolicyCatalog(),
   ontology_catalog: listOntologyCatalog().map((c) => ({

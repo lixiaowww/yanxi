@@ -34,4 +34,6 @@
 - [x] 免费部署：Render Blueprint（`render.yaml` + `docs/DEPLOY.md`）  
 - [x] 简报价值：offline 原因可见 + 干货/缺什么优先 UI（`infoValue`）  
 - [x] 删除虚「总体目标」栏；无细节/无数据 → 整篇不采纳（`adoption`）  
+- [x] UI 统一英文（中文仅保留原文粘贴与摘录）  
+- [x] 热点频道 `hot_topics`（台海 / 电动汽车 / 中国 AI / 芯片 / 关键矿产）  
 - [ ] 听力 / PDF / SMTP（仍 Later）  

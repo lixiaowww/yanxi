@@ -33,6 +33,7 @@ type PortfolioData = {
   not_en?: string;
   method: Record<string, string>;
   columns: Column[];
+  hot_theme_catalog?: { id: string; label_en: string }[];
   regress: {
     ok: boolean;
     cases: number;
@@ -129,6 +130,16 @@ export function Portfolio() {
 
       <section className="portfolio-section">
         <h2>Desk columns</h2>
+        <p className="meta">
+          Hot topics aggregates Taiwan Strait, EVs, China AI, semiconductors, and critical minerals
+          when those cues appear in the paste.
+        </p>
+        {(data.hot_theme_catalog || []).length ? (
+          <p className="meta">
+            Themes:{" "}
+            {(data.hot_theme_catalog || []).map((t) => t.label_en).join(" · ")}
+          </p>
+        ) : null}
         <div className="portfolio-columns">
           {data.columns.map((col) => (
             <article key={col.id} className="portfolio-col">

@@ -14,7 +14,7 @@
       ],
       "expect": {
         "gate": true,
-        "desk_primary_in": ["economy_investment"],
+        "desk_primary_in": ["hot_topics"],
         "corroboration_max": 1,
         "substance_band_in": ["thin", "mixed"]
       }

@@ -46,6 +46,7 @@ type Briefing = {
     label_en?: string;
     secondary?: string[];
     evidence?: string[];
+    hot_themes?: { id?: string; label_en?: string; evidence?: string }[];
     rationale?: string;
   };
   ontology_lite?: {
@@ -418,6 +419,11 @@ export function App() {
                       {b.desk_section.label_en || b.desk_section.label_zh}
                     </span>
                   ) : null}
+                  {(b.desk_section?.hot_themes || []).slice(0, 4).map((th) => (
+                    <span key={th.id || th.label_en} className="chip hot-theme-badge">
+                      {th.label_en || th.id}
+                    </span>
+                  ))}
                   {b.canada_nexus && b.canada_nexus.level !== "none" ? (
                     <span
                       className={

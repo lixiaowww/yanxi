@@ -97,6 +97,7 @@ export type BriefingJson = {
     label_en?: string;
     secondary?: string[];
     evidence?: string[];
+    hot_themes?: { id?: string; label_en?: string; evidence?: string }[];
     rationale?: string;
     tag?: string;
   };
@@ -466,6 +467,7 @@ export function runClaimGate(
   const desk = briefing.desk_section;
   if (desk) {
     const allowed = new Set([
+      "hot_topics",
       "economy_investment",
       "foreign_affairs",
       "defense_public",

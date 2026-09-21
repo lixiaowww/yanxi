@@ -1,16 +1,29 @@
-# 简报栏目（Desk）
+# Briefing desk sections
 
-民用公开源归类桶 — **不是**情报值班桌。
+Civilian public-source topic buckets — **not** an ops watch floor.
 
-| id | 中文 | 说明 |
-|----|------|------|
-| `economy_investment` | 经济投资 | 财政货币、产业、专项资金、细则；原「总体」中可核验经济部署并入此栏 |
-| `foreign_affairs` | 外交 | 外交话语、双边、制裁/合作等 |
-| `defense_public` | 国防（公开表述） | 仅公开报道/白皮书式语言 |
-| `social_governance` | 社会治理 | 民生、基层、舆情、三农等 |
+| id | Label | Notes |
+|----|-------|-------|
+| `hot_topics` | Hot topics | Aggregates recurring public themes: Taiwan Strait, EVs, China AI, semiconductors, critical minerals |
+| `economy_investment` | Economy & investment | Fiscal/monetary, funds, property/debt, verifiable macro deployments (non-hot industrial) |
+| `foreign_affairs` | Foreign affairs | Diplomatic discourse, bilateral, sanctions/cooperation |
+| `defense_public` | Defense — public discourse only | Open reporting / white-paper style only |
+| `social_governance` | Social governance | Livelihood, grassroots, public opinion, rural |
 
-**已删除 `overall_goals`（总体目标）** — 虚方向语不单列栏目。
+**Removed `overall_goals`** — direction-only slogans are not a desk.
 
-## 采纳规则
+## Hot themes (inside `hot_topics`)
 
-无硬干货（数字 / 时限 / 具名通知·办法 / 资金，或「责任主体+具名行业/产品」）→ **整篇不采纳**。见 `src/lib/adoption.ts`。
+| id | Label |
+|----|-------|
+| `taiwan_strait` | Taiwan Strait |
+| `electric_vehicles` | Electric vehicles |
+| `china_ai` | China AI |
+| `semiconductors` | Semiconductors |
+| `critical_minerals` | Critical minerals |
+
+Matched themes appear as chips on the brief and in `desk_section.hot_themes`. Routing prefers `hot_topics` when a theme cue is present.
+
+## Adoption rule
+
+No hard detail (numbers / deadlines / named notice·measure / funding, or responsible-body + named sector) → **whole brief not adopted**. See `src/lib/adoption.ts`.

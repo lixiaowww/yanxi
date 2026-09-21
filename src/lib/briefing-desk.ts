@@ -4,9 +4,11 @@
  *
  * Direction-only "总体目标" removed — vague macro slogans are not a desk;
  * CEWC/plan vocabulary routes to economy_investment when substantive.
+ * Recurring public hot themes (Taiwan Strait, EVs, China AI, …) aggregate in hot_topics.
  */
 
 export const DESK_SECTIONS = [
+  "hot_topics",
   "economy_investment",
   "foreign_affairs",
   "defense_public",
@@ -14,6 +16,58 @@ export const DESK_SECTIONS = [
 ] as const;
 
 export type DeskSectionId = (typeof DESK_SECTIONS)[number];
+
+/** Curated public hot-theme buckets inside the hot_topics channel. */
+export const HOT_THEME_IDS = [
+  "taiwan_strait",
+  "electric_vehicles",
+  "china_ai",
+  "semiconductors",
+  "critical_minerals",
+] as const;
+
+export type HotThemeId = (typeof HOT_THEME_IDS)[number];
+
+export type HotThemeHit = {
+  id: HotThemeId;
+  label_en: string;
+  evidence: string;
+  tag: "hypothesis";
+};
+
+export type HotThemeMeta = {
+  id: HotThemeId;
+  label_en: string;
+  rx: RegExp;
+};
+
+export const HOT_THEME_CATALOG: HotThemeMeta[] = [
+  {
+    id: "taiwan_strait",
+    label_en: "Taiwan Strait",
+    rx: /台海|两岸|海峡两岸|台湾问题|一个中国|反独促统|金门|马祖|武统|赖清德|民进党|解放军.*台|台.*军演|环台/,
+  },
+  {
+    id: "electric_vehicles",
+    label_en: "Electric vehicles",
+    rx: /电动汽车|新能源汽车|新能源车|电动车|动力电池|锂电池|充电桩|比亚迪|特斯拉中国|整车出口.*电|汽车出口/,
+  },
+  {
+    id: "china_ai",
+    label_en: "China AI",
+    rx: /人工智能|大模型|生成式\s*AI|生成式人工智能|ChatGPT|DeepSeek|算力|智算|AI\s*芯片|机器学习|算法备案/,
+  },
+  {
+    id: "semiconductors",
+    label_en: "Semiconductors",
+    rx: /芯片|半导体|集成电路|晶圆|光刻|先进制程|国产替代.*芯|存储芯片/,
+  },
+  {
+    id: "critical_minerals",
+    label_en: "Critical minerals",
+    rx: /关键矿产|稀土|锂矿|镍矿|钴矿|石墨出口管制|出口管制.*稀土/,
+  },
+];
 
 export type DeskSectionMeta = {
   id: DeskSectionId;
@@ -29,12 +83,22 @@ export type DeskSectionMeta = {
 
 export const DESK_CATALOG: DeskSectionMeta[] = [
   {
+    id: "hot_topics",
+    label_zh: "Hot topics",
+    label_en: "Hot topics",
+    blurb_zh:
+      "Aggregated public hot themes: Taiwan Strait, EVs, China AI, semiconductors, critical minerals — still adoption-gated on hard detail",
+    rx: /台海|两岸|台湾问题|电动汽车|新能源汽车|电动车|人工智能|大模型|DeepSeek|芯片|半导体|稀土|关键矿产|出口管制/,
+    kinds: [],
+    order: 0,
+  },
+  {
     id: "economy_investment",
     label_zh: "Economy & investment",
     label_en: "Economy & investment",
     blurb_zh:
-      "Fiscal/monetary, industrial investment, special funds, local debt/property, meeting→instrument detail (incl. verifiable macro deployments)",
-    rx: /财政政策|货币政策|扩大内需|稳增长|投资|专项资金|专项债|芯片|半导体|人工智能|专精特新|地方债|房地产|保交楼|化债|制造业|营商环境|中央经济工作会议|政府工作报告|十四五|十五五|高质量发展|新质生产力|双循环|统一大市场|积极的财政|稳健的货币/,
+      "Fiscal/monetary, industrial investment, special funds, local debt/property, meeting→instrument detail (excl. hot-theme AI/EV/chips which route to Hot topics)",
+    rx: /财政政策|货币政策|扩大内需|稳增长|投资|专项资金|专项债|专精特新|地方债|房地产|保交楼|化债|制造业|营商环境|中央经济工作会议|政府工作报告|十四五|十五五|高质量发展|新质生产力|双循环|统一大市场|积极的财政|稳健的货币/,
     kinds: [
       "industrial_tech_policy",
       "finance_risk",
@@ -85,6 +149,8 @@ export type DeskAssignment = {
   label_en: string;
   secondary: DeskSectionId[];
   evidence: string[];
+  /** When primary is hot_topics (or secondary), matched theme tags. */
+  hot_themes: HotThemeHit[];
   rationale: string;
   tag: "hypothesis";
 };
@@ -94,11 +160,28 @@ function evidenceFor(text: string, rx: RegExp): string | null {
   return m ? m[0].slice(0, 40) : null;
 }
 
+export function matchHotThemes(sourceText: string): HotThemeHit[] {
+  const text = sourceText || "";
+  const hits: HotThemeHit[] = [];
+  for (const th of HOT_THEME_CATALOG) {
+    const ev = evidenceFor(text, th.rx);
+    if (!ev) continue;
+    hits.push({
+      id: th.id,
+      label_en: th.label_en,
+      evidence: ev,
+      tag: "hypothesis",
+    });
+  }
+  return hits.slice(0, 6);
+}
+
 export function assignDeskSection(
   sourceText: string,
   opts?: { primaryKind?: string }
 ): DeskAssignment {
   const text = sourceText || "";
+  const hot_themes = matchHotThemes(text);
   const scores: { id: DeskSectionId; score: number; evidence: string[] }[] = [];
 
   for (const sec of DESK_CATALOG) {
@@ -116,13 +199,17 @@ export function assignDeskSection(
     if (sec.id === "defense_public" && /国防|解放军|军委|强军|军工/.test(text)) {
       score += 0.8;
     }
+    if (sec.id === "hot_topics" && hot_themes.length) {
+      score += 2 + Math.min(1.5, hot_themes.length * 0.4);
+      evidence.push(...hot_themes.map((h) => `theme:${h.id}`));
+    }
     if (score > 0) scores.push({ id: sec.id, score, evidence });
   }
 
   scores.sort((a, b) => b.score - a.score);
 
   if (!scores.length) {
-    const meta = DESK_CATALOG[0];
+    const meta = DESK_CATALOG.find((s) => s.id === "economy_investment")!;
     return {
       framing: "civilian-briefing-desk-section",
       primary: meta.id,
@@ -130,6 +217,7 @@ export function assignDeskSection(
       label_en: meta.label_en,
       secondary: [],
       evidence: [],
+      hot_themes: [],
       rationale: "No strong desk cue; default to economy_investment for human refiling.",
       tag: "hypothesis",
     };
@@ -145,12 +233,15 @@ export function assignDeskSection(
     label_zh: meta.label_zh,
     label_en: meta.label_en,
     secondary,
-    evidence: scores[0].evidence.slice(0, 4),
-    rationale: `Routed by public-text cues + triage kind. Secondary: ${secondary.join(", ") || "none"}.`,
+    evidence: scores[0].evidence.slice(0, 6),
+    hot_themes,
+    rationale: hot_themes.length
+      ? `Hot-topic channel preferred (${hot_themes.map((h) => h.id).join(", ")}). Secondary: ${secondary.join(", ") || "none"}.`
+      : `Routed by public-text cues + triage kind. Secondary: ${secondary.join(", ") || "none"}.`,
     tag: "hypothesis",
   };
 }
 
 export function deskSectionMeta(id: DeskSectionId): DeskSectionMeta {
-  return DESK_CATALOG.find((s) => s.id === id) || DESK_CATALOG[0];
+  return DESK_CATALOG.find((s) => s.id === id) || DESK_CATALOG.find((s) => s.id === "economy_investment")!;
 }

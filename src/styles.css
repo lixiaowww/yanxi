@@ -289,6 +289,16 @@ pre {
   border: 1px solid color-mix(in srgb, var(--accent) 55%, var(--border));
   color: #cfe0ff;
 }
+.hot-theme-badge {
+  display: inline-block;
+  padding: 0.08rem 0.45rem;
+  border-radius: 4px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  background: color-mix(in srgb, #c4a574 28%, transparent);
+  border: 1px solid color-mix(in srgb, #c4a574 55%, var(--border));
+  color: #f0e2b8;
+}
 .desk-line { margin-top: 0.35rem; }
 
 .mode-banner {
