@@ -18,6 +18,13 @@ type Briefing = {
     reason_zh?: string;
     hard_nuggets?: { kind?: string; label_zh?: string; evidence?: string }[];
   };
+  intake?: {
+    label?: string;
+    first_cut?: string;
+    second_cut?: string | null;
+    second_cut_engine?: string;
+    reason_en?: string;
+  };
   info_triage?: {
     primary_kind?: string;
     kinds?: { kind?: string; label_zh?: string; score?: number; evidence?: string }[];
@@ -468,14 +475,24 @@ export function App() {
                 <div className="status-chips">
                   <span
                     className={`chip ${
-                      b.adoption?.adopted === false ? "chip-bad" : b.adoption?.adopted ? "chip-ok" : "chip-warn"
+                      b.intake?.label === "defer"
+                        ? "chip-warn"
+                        : b.adoption?.adopted === false
+                          ? "chip-bad"
+                          : b.adoption?.adopted
+                            ? "chip-ok"
+                            : "chip-warn"
                     }`}
                   >
-                    {b.adoption?.adopted === false
-                      ? "Not adopted"
-                      : b.adoption?.adopted
-                        ? "Adopted"
-                        : "Pending"}
+                    {b.intake?.label === "defer"
+                      ? "Deferred (watch)"
+                      : b.intake?.label === "social_downweight"
+                        ? "Social down-weight"
+                        : b.adoption?.adopted === false
+                          ? "Not adopted"
+                          : b.adoption?.adopted
+                            ? "Adopted"
+                            : "Pending"}
                   </span>
                   <span className={`chip ${result.mode === "llm" ? "chip-ok" : "chip-warn"}`}>
                     {result.mode === "llm" ? "LLM brief" : "Template brief"}
@@ -545,9 +562,17 @@ export function App() {
 
               {b.adoption?.adopted === false ? (
                 <section className="read-block reject-block">
-                  <h2>Not adopted</h2>
+                  <h2>{b.intake?.label === "defer" ? "Deferred — watch queue" : "Not adopted"}</h2>
                   <p className="prose">{b.briefing_en?.what || b.adoption.label_zh}</p>
                   <p className="prose">{b.briefing_en?.so_what || b.adoption.reason_zh}</p>
+                  {b.intake?.reason_en ? <p className="meta">{b.intake.reason_en}</p> : null}
+                  {(b.policy_outlook?.watchpoints || []).length ? (
+                    <ul className="action-list">
+                      {(b.policy_outlook?.watchpoints || []).map((w, i) => (
+                        <li key={i}>{w}</li>
+                      ))}
+                    </ul>
+                  ) : null}
                 </section>
               ) : (
                 <>

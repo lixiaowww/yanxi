@@ -15,6 +15,7 @@ import { evaluateAdoption, filterDigestByHardNuggets } from "./adoption.js";
 import { appendGateAudit } from "./audit-log.js";
 import { composeDigestRows, composeRejectionWhat, extractFacts, type FactSet } from "./facts.js";
 import { buildContentAnalysis } from "./analysis.js";
+import { resolveIntake, intakeAllowsBrief, type IntakeDecision } from "./intake.js";
 
 export type SourceInput = {
   label: string;
@@ -53,6 +54,24 @@ export type BriefResponse = {
 function buildInfoValue(
   briefing: BriefingJson
 ): BriefResponse["infoValue"] {
+  const intakeLabel = briefing.intake?.label;
+  if (intakeLabel === "defer") {
+    return {
+      level: "low",
+      label_zh: "Deferred — watch queue (no hard detail yet)",
+      next_zh: [
+        briefing.intake?.reason_en || "Keep on a watch queue for an implementing notice",
+        "Re-run when a public notice, amount, or deadline-tied instrument appears",
+      ],
+    };
+  }
+  if (intakeLabel === "social_downweight") {
+    return {
+      level: "low",
+      label_zh: "Social commentary — down-weighted",
+      next_zh: ["Paste an official or wire excerpt before treating as a primary source"],
+    };
+  }
   if (briefing.adoption && briefing.adoption.adopted === false) {
     return {
       level: "low",
@@ -124,7 +143,21 @@ export async function runBriefingPipeline(req: BriefRequest): Promise<BriefRespo
   const joined = sources.map((s) => s.text).join("\n");
   const { prompt, matchedCards } = composeBriefingSystemPrompt(joined);
   const configured = llmConfigured();
-  const useLlm = !req.forceOffline && configured;
+
+  // First cut + optional second cut before spending LLM quota.
+  const substanceEarly = buildSubstanceCut(joined);
+  const adoptionEarly = evaluateAdoption(substanceEarly);
+  const classEarly = detectSourceClass(joined, {
+    forced: req.sourceClass,
+    labels: sources.map((s) => s.label),
+  });
+  const intake = await resolveIntake({
+    adopted: adoptionEarly.adopted,
+    sourceClass: classEarly.class,
+    text: joined,
+    substance: substanceEarly,
+  });
+  const allowLlm = !req.forceOffline && configured && intakeAllowsBrief(intake.label);
 
   let briefing: BriefingJson;
   let mode: "llm" | "offline" = "offline";
@@ -137,7 +170,10 @@ export async function runBriefingPipeline(req: BriefRequest): Promise<BriefRespo
     briefing = offlineBriefing(joined, matchedCards, sources[0].label, sources);
     offlineReason =
       "llm_not_configured: set LLM_API_KEY + LLM_BASE_URL + LLM_MODEL (or keep offline)";
-  } else if (useLlm) {
+  } else if (!intakeAllowsBrief(intake.label)) {
+    briefing = offlineBriefing(joined, matchedCards, sources[0].label, sources);
+    offlineReason = `intake_${intake.label}: skipped LLM — ${intake.reason_en}`;
+  } else if (allowLlm) {
     try {
       briefing = await callLlmJson(prompt, userMessage(sources));
       mode = "llm";
@@ -158,6 +194,7 @@ export async function runBriefingPipeline(req: BriefRequest): Promise<BriefRespo
     sourceLabels: sources.map((s) => s.label),
     sources,
     forcedSourceClass: req.sourceClass,
+    intake,
   });
   const finalCards =
     briefing.ontology_lite?.hits
@@ -204,6 +241,7 @@ function applyDeterministicLayers(
     /** Per-source texts — corroboration needs them to observe cross-source overlap. */
     sources?: SourceInput[];
     forcedSourceClass?: SourceClass;
+    intake?: IntakeDecision;
   }
 ): BriefingJson {
   const scorecard = buildSignalingScorecard(sourceText);
@@ -271,6 +309,18 @@ function applyDeterministicLayers(
 
   const adoption = evaluateAdoption(substance_cut);
   next.adoption = adoption;
+  next.intake = ctx.intake
+    ? {
+        framing: ctx.intake.framing,
+        label: ctx.intake.label,
+        first_cut: ctx.intake.first_cut,
+        second_cut: ctx.intake.second_cut,
+        second_cut_engine: ctx.intake.second_cut_engine,
+        reason_en: ctx.intake.reason_en,
+        jev: ctx.intake.jev,
+        tag: ctx.intake.tag,
+      }
+    : undefined;
 
   next.context_notes = ontologyMatch.hits.length
     ? ontologyMatch.hits.map((h) => ({
@@ -299,31 +349,42 @@ function applyDeterministicLayers(
     });
 
   if (!adoption.adopted) {
+    const deferred = ctx.intake?.label === "defer";
     // No manufactured analysis or forecasts for a paste with no content facts.
     next.content_analysis = undefined;
     next.source_digest_zh = [];
     next.briefing_en = {
       what: composeRejectionWhat(facts),
-      context:
-        "No content analysis produced: the excerpt states no action, instrument, amount, deadline or scope to analyse.",
-      so_what: `Analysis needs at least one of: the document to be issued and by whom, the amount and funding channel, the deadline, the pilot or geographic scope, or a quantified target. ${missingFactsSentence(facts)}`,
+      context: deferred
+        ? "Deferred to the watch queue: thematic or institutional cues without an actionable instrument yet."
+        : "No content analysis produced: the excerpt states no action, instrument, amount, deadline or scope to analyse.",
+      so_what: deferred
+        ? `Watch for a later public notice, funded line, or deadline-tied instrument. ${ctx.intake?.reason_en || ""} ${missingFactsSentence(facts)}`.trim()
+        : `Analysis needs at least one of: the document to be issued and by whom, the amount and funding channel, the deadline, the pilot or geographic scope, or a quantified target. ${missingFactsSentence(facts)}`,
       confidence: "low",
       sources_used: ctx.sourceLabels,
     };
     next.policy_outlook = {
       horizon: "near",
       scenarios: [],
-      watchpoints: [],
+      watchpoints: deferred
+        ? [
+            "Whether an implementing notice or funded pilot is published on the same subject",
+            "Whether a named body takes ownership of the timeline or product list",
+          ]
+        : [],
     };
     next.open_questions = [];
     next.substance_cut = {
       ...substance_cut,
-      nuggets: [],
+      nuggets: deferred ? substance_cut.nuggets : [],
       empty_calories: [
         ...(substance_cut.empty_calories || []),
-        "Adoption rule: no hard detail → whole brief rejected",
+        deferred
+          ? "Intake second cut: defer (watch queue) — no full brief"
+          : "Adoption rule: no hard detail → whole brief rejected",
       ].slice(0, 5),
-      analyst_prompt_zh: adoption.reason_zh,
+      analyst_prompt_zh: deferred ? ctx.intake?.reason_en || adoption.reason_zh : adoption.reason_zh,
     };
   } else {
     // The offline composer already builds fact-stated rows per source; only an

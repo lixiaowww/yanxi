@@ -41,14 +41,12 @@
 
 ## Next — P0（最高优先级）
 
-- [ ] **Jev（TypeSafe System One）= 第二刀（灰区旁路）**：对众多候选条目做快速决断  
-  `admit | defer | reject_thin | social_downweight` → 是否值得进 LLM / outbox  
-  - **第一刀不变**：白名单（能否抓）+ hard nuggets / `adoption`（有没有数·期·名·钱）——本地、必跑、不可被 Jev 覆盖  
-  - Jev 只看第一刀之后的**灰区**；无 Key 则跳过，管道行为与今日相同  
-  - **不**写简报正文；**不**覆盖 ethics/quote gate；**不**把概率当事件置信度  
-  - 输出标 `hypothesis` / intake triage  
-  - 验收：批量 collect 样例上，规则误放行空壳 / 误杀有细节 的比例可测下降  
-  - **前置**：`examples/intake-gold.json` + `npm run test:intake`（clear 13/13；灰区分歧为 Jev 目标；裸词误放行已压到 0）  
+- [x] **Jev / 第二刀 intake（灰区）**：`admit | defer | reject_thin | social_downweight`  
+  - **第一刀不变**：白名单 + hard nuggets / `adoption`（本地、必跑）  
+  - **第二刀**：`local_gray` 启发式默认开启；配置 `TYPESAFE_API_KEY` 时改走 TypeSafe Jev Choice（仅 defer↔reject_thin）  
+  - **不**写简报正文；**不**覆盖 ethics/quote gate；**不**升级为 admit  
+  - 非 admit 时跳过 LLM（省额度）  
+  - 金标：`examples/intake-gold.json` · `npm run test:intake`  
 
 ## Later
 

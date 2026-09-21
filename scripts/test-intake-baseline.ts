@@ -1,6 +1,6 @@
 /**
- * Intake gold baseline: first cut (whitelist-eligible paste + hard nuggets)
- * vs editorial gold labels. Gray disagreements are the Jev second-cut target set.
+ * Intake gold baseline: first cut + second cut (local gray / optional Jev)
+ * vs editorial gold labels.
  *
  * Civilian public fixtures only — not an intelligence ranking.
  */
@@ -10,7 +10,12 @@ import { listDomainFixtures } from "../src/lib/domains.js";
 import { buildSubstanceCut } from "../src/lib/substance.js";
 import { evaluateAdoption } from "../src/lib/adoption.js";
 import { detectSourceClass } from "../src/lib/source-class.js";
-import { firstCutIntakeLabel, type IntakeLabel, INTAKE_LABELS } from "../src/lib/intake.js";
+import {
+  firstCutIntakeLabel,
+  resolveIntake,
+  type IntakeLabel,
+  INTAKE_LABELS,
+} from "../src/lib/intake.js";
 
 type GoldCase = {
   id: string;
@@ -38,7 +43,10 @@ type Row = {
   zone: string;
   gold: IntakeLabel;
   firstCut: IntakeLabel;
-  agree: boolean;
+  final: IntakeLabel;
+  engine: string;
+  firstAgree: boolean;
+  finalAgree: boolean;
   adopted: boolean;
   substance: string;
   nuggetKinds: string[];
@@ -78,13 +86,23 @@ for (const c of gold.cases) {
     adopted: adoption.adopted,
     sourceClass: detected.class,
   });
+  const intake = await resolveIntake({
+    adopted: adoption.adopted,
+    sourceClass: detected.class,
+    text,
+    substance: cut,
+    allowJev: process.env.JEV_IN_TESTS === "1",
+  });
 
   rows.push({
     id: c.id,
     zone: c.zone,
     gold: c.gold,
     firstCut,
-    agree: firstCut === c.gold,
+    final: intake.label,
+    engine: intake.second_cut_engine,
+    firstAgree: firstCut === c.gold,
+    finalAgree: intake.label === c.gold,
     adopted: adoption.adopted,
     substance: cut.band,
     nuggetKinds: [...new Set(cut.nuggets.map((n) => n.kind))],
@@ -94,13 +112,10 @@ for (const c of gold.cases) {
 
 const clear = rows.filter((r) => r.zone === "clear");
 const gray = rows.filter((r) => r.zone === "gray");
-const clearAgree = clear.filter((r) => r.agree).length;
-const grayDisagree = gray.filter((r) => !r.agree).length;
-const falseAdmit = rows.filter(
-  (r) => r.firstCut === "admit" && (r.gold === "defer" || r.gold === "reject_thin" || r.gold === "social_downweight")
-);
-const falseReject = rows.filter((r) => r.firstCut === "reject_thin" && r.gold === "admit");
-const goldDefer = rows.filter((r) => r.gold === "defer");
+const clearFinal = clear.filter((r) => r.finalAgree).length;
+const grayFinal = gray.filter((r) => r.finalAgree).length;
+const falseAdmit = rows.filter((r) => r.final === "admit" && r.gold !== "admit");
+const falseReject = rows.filter((r) => r.final === "reject_thin" && r.gold === "admit");
 
 const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
 const reportDir = path.join(root, "outbox", "test-reports");
@@ -109,36 +124,35 @@ fs.mkdirSync(reportDir, { recursive: true });
 const md = [
   `# Intake gold baseline — ${stamp}`,
   "",
-  "First cut = hard-nugget adoption (+ social class). Gold is editorial. Gray disagreements = Jev second-cut targets.",
+  "First cut = hard-nugget adoption (+ social). Second cut = local gray heuristic (Jev optional via TYPESAFE_API_KEY).",
   "",
   "## Summary",
   "",
   `| Metric | Value |`,
   `|--------|-------|`,
   `| Cases | ${rows.length} |`,
-  `| Clear-zone accuracy | ${clearAgree}/${clear.length} |`,
-  `| Gray cases | ${gray.length} |`,
-  `| Gray where first cut ≠ gold | ${grayDisagree}/${gray.length} |`,
-  `| False admit (first=admit, gold≠admit) | ${falseAdmit.length} |`,
-  `| False reject (first=reject, gold=admit) | ${falseReject.length} |`,
-  `| Gold defer (Jev-shaped) | ${goldDefer.length} |`,
+  `| Clear-zone final accuracy | ${clearFinal}/${clear.length} |`,
+  `| Gray-zone final accuracy | ${grayFinal}/${gray.length} |`,
+  `| False admit (final) | ${falseAdmit.length} |`,
+  `| False reject admit (final) | ${falseReject.length} |`,
   "",
-  "## Disagreements (Jev candidates)",
+  "## Remaining disagreements",
   "",
   ...rows
-    .filter((r) => !r.agree)
+    .filter((r) => !r.finalAgree)
     .flatMap((r) => [
-      `- **${r.id}** · zone=${r.zone} · first=\`${r.firstCut}\` · gold=\`${r.gold}\` · substance=${r.substance} · kinds=${r.nuggetKinds.join(",") || "—"}`,
+      `- **${r.id}** · zone=${r.zone} · first=\`${r.firstCut}\` · final=\`${r.final}\` (${r.engine}) · gold=\`${r.gold}\``,
       `  - ${r.why_en}`,
     ]),
+  rows.every((r) => r.finalAgree) ? "_None._" : "",
   "",
   "## All cases",
   "",
-  "| ID | Zone | First cut | Gold | Agree | Substance |",
-  "|----|------|-----------|------|-------|-----------|",
+  "| ID | Zone | First | Final | Engine | Gold | Final OK |",
+  "|----|------|-------|-------|--------|------|----------|",
   ...rows.map(
     (r) =>
-      `| ${r.id} | ${r.zone} | ${r.firstCut} | ${r.gold} | ${r.agree ? "yes" : "NO"} | ${r.substance} |`
+      `| ${r.id} | ${r.zone} | ${r.firstCut} | ${r.final} | ${r.engine} | ${r.gold} | ${r.finalAgree ? "yes" : "NO"} |`
   ),
   "",
   "> Civilian public fixtures · Not an intelligence product",
@@ -154,11 +168,10 @@ fs.writeFileSync(
       stamp,
       summary: {
         cases: rows.length,
-        clearAccuracy: `${clearAgree}/${clear.length}`,
-        grayDisagree: `${grayDisagree}/${gray.length}`,
+        clearFinal: `${clearFinal}/${clear.length}`,
+        grayFinal: `${grayFinal}/${gray.length}`,
         falseAdmit: falseAdmit.length,
         falseReject: falseReject.length,
-        goldDefer: goldDefer.length,
       },
       rows,
     },
@@ -171,16 +184,15 @@ fs.writeFileSync(
 console.log(md.join("\n"));
 console.log(`\n✅ intake baseline → ${reportPath}`);
 
-// Gate: clear zone must stay high; we expect gray disagreements (that is the point).
-if (clear.length && clearAgree / clear.length < 0.85) {
-  console.error("Clear-zone accuracy below 85% — first cut or gold labels need repair.");
+if (clear.length && clearFinal / clear.length < 0.85) {
+  console.error("Clear-zone final accuracy below 85%.");
   process.exit(1);
 }
 if (falseAdmit.length > 0) {
-  console.error(`First cut false-admits ${falseAdmit.length} gold non-admit case(s) — tighten adoption.`);
+  console.error(`Final false-admits ${falseAdmit.length} — stop.`);
   process.exit(1);
 }
-if (grayDisagree < 3) {
-  console.error("Expected ≥3 gray disagreements to justify a second cut; expand gold set.");
+if (gray.length && grayFinal / gray.length < 0.8) {
+  console.error(`Gray-zone final accuracy ${grayFinal}/${gray.length} below 80%.`);
   process.exit(1);
 }

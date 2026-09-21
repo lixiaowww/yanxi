@@ -137,6 +137,22 @@ export type BriefingJson = {
     rejected_as?: string | null;
     tag?: string;
   };
+  /** Two-cut intake: first=hard nuggets; second=gray defer (local or Jev). */
+  intake?: {
+    framing?: string;
+    label?: string;
+    first_cut?: string;
+    second_cut?: string | null;
+    second_cut_engine?: string;
+    reason_en?: string;
+    jev?: {
+      model?: string;
+      choice?: string;
+      confidence?: number;
+      probabilities?: Record<string, number>;
+    };
+    tag?: string;
+  };
   source_class?: {
     framing?: string;
     class?: string;
