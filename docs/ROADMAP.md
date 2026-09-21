@@ -36,4 +36,21 @@
 - [x] 删除虚「总体目标」栏；无细节/无数据 → 整篇不采纳（`adoption`）  
 - [x] UI 统一英文（中文仅保留原文粘贴与摘录）  
 - [x] 热点频道 `hot_topics`（台海 / 电动汽车 / 中国 AI / 芯片 / 关键矿产）  
-- [ ] 听力 / PDF / SMTP（仍 Later）  
+- [x] 内容影响分析（`facts` + `analysis`；读者正文非方法论）  
+- [x] 公开站 LLM 路径开放（无 brief token；靠 IP 限流）  
+
+## Next — P0（最高优先级）
+
+- [ ] **Jev（TypeSafe System One）= 第二刀（灰区旁路）**：对众多候选条目做快速决断  
+  `admit | defer | reject_thin | social_downweight` → 是否值得进 LLM / outbox  
+  - **第一刀不变**：白名单（能否抓）+ hard nuggets / `adoption`（有没有数·期·名·钱）——本地、必跑、不可被 Jev 覆盖  
+  - Jev 只看第一刀之后的**灰区**；无 Key 则跳过，管道行为与今日相同  
+  - **不**写简报正文；**不**覆盖 ethics/quote gate；**不**把概率当事件置信度  
+  - 输出标 `hypothesis` / intake triage  
+  - 验收：批量 collect 样例上，规则误放行空壳 / 误杀有细节 的比例可测下降  
+  - **前置（进行中）**：人审样例包 `npm run test:review`；证据窗不中切；再攒灰区金标再接线  
+
+## Later
+
+- [ ] 听力 / PDF / SMTP  
+

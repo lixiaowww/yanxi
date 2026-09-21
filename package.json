@@ -16,6 +16,7 @@
     "test:desk": "tsx scripts/desk-briefings.ts",
     "test:corroboration": "tsx scripts/desk-briefings.ts",
     "test:regress": "tsx scripts/test-regress.ts",
+    "test:review": "tsx scripts/sample-briefs-review.ts",
     "portfolio": "tsx scripts/build-portfolio.ts",
     "test": "npm run lint && npm run demo && npm run test:domains && npm run test:desk && npm run test:regress",
     "collect": "tsx scripts/collect-and-brief.ts",

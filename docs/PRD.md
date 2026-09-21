@@ -90,6 +90,7 @@
 | F7 | 样例文本一键填充 | P1 |
 | F8 | 多源 URL 白名单抓取 | P2 |
 | F9 | 作者自定义 context card 向导 | P2 |
+| F10 | Jev System One：**第二刀** intake（admit/defer/reject_thin）；**第一刀仍是白名单 + hard nuggets/adoption**；Jev 不写正文、不覆盖 gate | P0 |
 
 ## 7. 非功能需求
 

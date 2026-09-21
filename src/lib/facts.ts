@@ -83,6 +83,10 @@ const TRIMMABLE = "。！？；，、：·\n\r\t　 ,;:!?…“”\"'‘’()（
  * Widen [index, index+len) to a clause/sentence boundary and trim punctuation.
  * Only slices — the result stays an exact substring so the claim gate and the
  * UI source highlight keep working.
+ *
+ * When the clause exceeds maxLen we keep the match itself and shrink from the
+ * far side. start is never left mid-phrase (must be 0, after a break, or the
+ * match index) — avoids evidence like "底前出台…" for a hit on "50亿元".
  */
 function spanAround(
   text: string,
@@ -91,15 +95,22 @@ function spanAround(
   breaks: string,
   maxLen: number
 ): string {
+  const matchEnd = Math.min(text.length, index + Math.max(0, len));
   let start = index;
   while (start > 0 && !breaks.includes(text[start - 1])) start -= 1;
-  let end = index + len;
+  let end = matchEnd;
   while (end < text.length && !breaks.includes(text[end])) end += 1;
 
   if (end - start > maxLen) {
+    const excess = end - start - maxLen;
     const leftRoom = index - start;
-    start += Math.min(end - start - maxLen, leftRoom);
-    if (end - start > maxLen) end = Math.max(index + len, start + maxLen);
+    start += Math.min(excess, leftRoom);
+    if (end - start > maxLen) end = Math.max(matchEnd, start + maxLen);
+    // Refuse mid-phrase starts after a hard shrink.
+    if (start > 0 && start !== index && !breaks.includes(text[start - 1])) {
+      start = index;
+      if (end - start > maxLen) end = Math.max(matchEnd, start + maxLen);
+    }
   }
   while (start < end && TRIMMABLE.includes(text[start])) start += 1;
   while (end > start && TRIMMABLE.includes(text[end - 1])) end -= 1;

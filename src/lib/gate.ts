@@ -83,7 +83,14 @@ export type BriefingJson = {
     substance_score_0_to_1?: number;
     band?: string;
     label_zh?: string;
-    nuggets?: { kind?: string; label_zh?: string; evidence?: string; tag?: string }[];
+    nuggets?: {
+      kind?: string;
+      label_zh?: string;
+      value_zh?: string;
+      value_en?: string;
+      evidence?: string;
+      tag?: string;
+    }[];
     boilerplate_hits?: { cue?: string; evidence?: string }[];
     empty_calories?: string[];
     analyst_prompt_zh?: string;
