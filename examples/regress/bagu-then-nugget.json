@@ -2,7 +2,7 @@
   "id": "bagu-then-nugget",
   "title_zh": "党八股骨架 → 同篇插入可核验干货后升档",
   "framing": "civilian-public-style-chain",
-  "notes": "Same excerpt family: formula-only vs formula+nuggets. Public-style synthetic text.",
+  "notes": "Same excerpt family: formula-only vs formula+nuggets, one source in both stages. Substance must rise; corroboration must NOT, because adding detail to the same single source cross-checks nothing. Public-style synthetic text.",
   "stages": [
     {
       "id": "t0_formula_only",
@@ -31,7 +31,9 @@
         "gate": true,
         "substance_band_in": ["dense", "mixed"],
         "substance_gt_stage": "t0_formula_only",
-        "corroboration_gt_stage": "t0_formula_only"
+        "corroboration_max": 0,
+        "confidence_max": "low",
+        "missing_includes_any": ["Second public source"]
       }
     }
   ]

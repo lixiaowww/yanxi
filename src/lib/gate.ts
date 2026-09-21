@@ -121,10 +121,24 @@ export type BriefingJson = {
   };
   corroboration?: {
     framing?: string;
+    method?: string;
     score_0_to_3?: number;
+    source_count?: number;
+    distinct_source_count?: number;
+    cross_checked?: boolean;
+    shared_subjects?: string[];
+    independent_issuers?: string[];
     label_zh?: string;
     label_en?: string;
     drivers?: string[];
+    single_source_cues?: {
+      framing?: string;
+      count_0_to_3?: number;
+      drivers?: string[];
+      label_en?: string;
+      note?: string;
+      tag?: string;
+    };
     missing?: string[];
     tag?: string;
   };
@@ -658,6 +672,14 @@ export function runClaimGate(
       severity: "soft",
       message: "corroboration.score_0_to_3 must be 0–3.",
       evidence: String(corr.score_0_to_3),
+    });
+  }
+  if (corr && (corr.score_0_to_3 ?? 0) >= 2 && (corr.distinct_source_count ?? 0) < 2) {
+    findings.push({
+      id: "corroboration-single-source-inflated",
+      severity: "soft",
+      message: "corroboration ≥2 claims a cross-check, but fewer than 2 distinct sources were supplied.",
+      evidence: `score=${corr.score_0_to_3} distinct_sources=${corr.distinct_source_count ?? 0}`,
     });
   }
 

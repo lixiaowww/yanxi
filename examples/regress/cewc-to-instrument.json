@@ -35,7 +35,7 @@
       ],
       "expect": {
         "gate": true,
-        "corroboration_min": 2,
+        "corroboration_min": 3,
         "corroboration_gt_stage": "t0_meeting_only",
         "confidence_min": "medium",
         "substance_band_in": ["mixed", "dense"]

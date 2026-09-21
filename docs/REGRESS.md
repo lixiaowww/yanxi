@@ -2,8 +2,9 @@
 
 Prove the two pillars with **assertions**, not vibes:
 
-1. Meeting-only / formula-only → thin or weak corroboration  
-2. Add instrument / nuggets → corroboration and/or substance **rises**  
+1. Meeting-only / formula-only → thin substance, nothing cross-checked  
+2. Add nuggets to the *same* source → substance **rises**, corroboration does **not**;
+   merge a *second* source on the same subject → corroboration **rises**  
 3. Social commentary → confidence hard-capped `low`  
 4. Desk routing + Canada nexus/policy overlays stay stable  
 

@@ -16,8 +16,9 @@
         "gate": true,
         "desk_primary_in": ["economy_investment"],
         "primary_kind_in": ["finance_risk"],
-        "corroboration_max": 1,
-        "confidence_max": "medium",
+        "corroboration_max": 0,
+        "confidence_max": "low",
+        "caps_include_any": ["single_source_not_cross_checked_cap_low"],
         "missing_includes_any": ["Named notice", "Second public source", "Implementing document"]
       }
     }

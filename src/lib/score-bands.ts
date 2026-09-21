@@ -1,0 +1,211 @@
+/**
+ * Presentation helpers for the rule-based heuristics (substance, corroboration, source tier,
+ * signaling). They turn the internal ordering numbers into an ordinal band plus a short
+ * English basis clause, so a reader judges the cues instead of trusting a figure.
+ *
+ * None of the underlying numbers are calibrated: there is no labelled corpus and no held-out
+ * evaluation anywhere in this repo. They order and flag; they do not measure.
+ * See `docs/RELIABILITY.md` and `docs/SUBSTANCE.md`. Never render a raw score to a human.
+ */
+
+export type CorroborationBand = "minimal" | "weak" | "moderate" | "strong";
+
+export const HEURISTIC_BASIS_NOTE =
+  "Bands come from hand-set rule cues, not a calibrated model — they order and flag, they do not measure.";
+
+const CORROBORATION_DRIVER_EN: Record<string, string> = {
+  multi_source_merge: "two or more public sources",
+  cross_source_subject_match: "two sources naming the same subject",
+  cross_source_detail_match: "the same numbers or dates in more than one source",
+  independent_issuer_agreement: "agreement between independent issuers",
+  three_plus_sources_same_subject: "three or more sources on one subject",
+  cross_source_topic_overlap_only: "general topic overlap only",
+  single_source_names_traceable_record: "one source naming a public record a reviewer can pull",
+  named_or_cue_instrument: "a named notice or measure in the text",
+  meeting_plus_instrument_sequence: "meeting language paired with an instrument",
+  numeric_or_dense_substance: "numbers or deadlines",
+};
+
+const SUBSTANCE_KIND_EN: Record<string, string> = {
+  numeric_target: "numbers",
+  timeline: "deadlines",
+  named_instrument: "named instruments",
+  responsible_body: "responsible bodies",
+  pilot_or_scope: "pilot scope",
+  constraint_or_ban: "bans or red lines",
+  resource_or_funding: "funding lines",
+  named_sector_or_place: "named sectors",
+  delta_or_priority_shift: "priority shifts",
+};
+
+const SIGNALING_CATEGORY_EN: Record<string, string> = {
+  sequence: "party/state sequence",
+  implementing_detail: "implementing detail",
+  press_placement: "press placement",
+  speech_verbs: "speech verbs",
+  attribution: "attribution",
+  concreteness: "concreteness",
+  rollout_scope: "rollout scope",
+  tone_framing: "tone framing",
+};
+
+const TIER_PRIOR_EN: Record<string, string> = {
+  A: "named policy instrument",
+  B: "official wire or ministry statement",
+  C: "press commentary or public think-tank note",
+  D: "social commentary (paste-only)",
+  U: "unknown public text",
+};
+
+function humanize(key: string): string {
+  return key.replace(/_/g, " ");
+}
+
+function joinClauses(items: string[], max = 3): string {
+  const rows = [...new Set(items)].slice(0, max);
+  if (rows.length <= 1) return rows[0] || "";
+  return `${rows.slice(0, -1).join(", ")} and ${rows[rows.length - 1]}`;
+}
+
+/** Ordinal band for the internal 0–3 corroboration counter. Ordering only. */
+export function corroborationBand(score?: number | null): CorroborationBand {
+  const s = typeof score === "number" && Number.isFinite(score) ? score : 0;
+  if (s >= 3) return "strong";
+  if (s >= 2) return "moderate";
+  if (s >= 1) return "weak";
+  return "minimal";
+}
+
+export function corroborationBandLabel(band: CorroborationBand): string {
+  return band.charAt(0).toUpperCase() + band.slice(1);
+}
+
+/** One clause naming the cues that produced the corroboration band. */
+export function corroborationBasisEn(opts: {
+  drivers?: string[];
+  sourceCount?: number;
+  missing?: string[];
+}): string {
+  const phrases = (opts.drivers || []).map((d) => CORROBORATION_DRIVER_EN[d] || humanize(d));
+  const sourceNote =
+    typeof opts.sourceCount === "number" && opts.sourceCount > 0
+      ? opts.sourceCount === 1
+        ? "single public source"
+        : `${opts.sourceCount} public sources`
+      : "";
+
+  if (!phrases.length) {
+    const gap = (opts.missing || [])[0];
+    const base = "no instrument, numeric or second-source cues detected";
+    return gap ? `${base}; still needed: ${gap}` : base;
+  }
+  const from = `from ${joinClauses(phrases)}`;
+  return sourceNote ? `${from} (${sourceNote})` : from;
+}
+
+/**
+ * Full human-facing corroboration line: band + what produced it, never the score.
+ * `labelEn` (from `corroboration.label_en`) already states the cross-check status,
+ * so it is preferred over the raw driver list when available.
+ */
+export function corroborationLineEn(opts: {
+  score?: number | null;
+  labelEn?: string;
+  drivers?: string[];
+  sourceCount?: number;
+  missing?: string[];
+}): string {
+  const band = corroborationBand(opts.score);
+  const status = (opts.labelEn || "").trim();
+  const basis = corroborationBasisEn(opts);
+  const tail = status ? (opts.drivers?.length ? `${status}; ${basis}` : status) : basis;
+  return `Corroboration ${band} — ${tail}`;
+}
+
+/** Within-passage cue clause. Reading signal only — not independent verification. */
+export function singleSourceCueBasisEn(cues?: { drivers?: string[] }): string {
+  const phrases = (cues?.drivers || []).map((d) => CORROBORATION_DRIVER_EN[d] || humanize(d));
+  if (!phrases.length) return "no within-passage detail cues";
+  return `within-passage cues: ${joinClauses(phrases, 3)}`;
+}
+
+/** One clause naming the verifiable cue types detected in the paste. */
+export function substanceBasisEn(nuggets?: { kind?: string }[]): string {
+  const kinds = [...new Set((nuggets || []).map((n) => n.kind).filter(Boolean) as string[])];
+  if (!kinds.length) {
+    return "no numbers, deadlines, named notices or responsible bodies detected";
+  }
+  const named = kinds.map((k) => SUBSTANCE_KIND_EN[k] || humanize(k));
+  return `${joinClauses(named, 4)} detected`;
+}
+
+/** One clause naming which heuristic categories fired in the signaling scorecard. */
+export function signalingBasisEn(rules?: { category?: string; status?: string }[]): string {
+  const observed = [...new Set(
+    (rules || []).filter((r) => r.status === "hit").map((r) => r.category || "")
+  )].filter(Boolean);
+  if (!observed.length) return "no signaling cue category clearly observed";
+  return `cues observed in ${joinClauses(observed.map((c) => SIGNALING_CATEGORY_EN[c] || humanize(c)), 3)}`;
+}
+
+const CAP_EN: Record<string, string> = {
+  substance_thin_cap_medium: "thin verifiable detail holds it at medium",
+  single_source_not_cross_checked_cap_low: "a single un-cross-checked source holds it at low",
+  corroboration_lt2_cap_medium: "no subject cross-check holds it at medium",
+  corroboration_no_shared_subject_cap_low: "no shared subject holds it at low",
+  corroboration_0_cap_low: "no corroboration cue holds it at low",
+  social_commentary_hard_cap_low: "social commentary is hard-capped at low",
+  weak_provenance_cap_medium: "weak provenance holds it at medium",
+};
+
+function capBasisEn(caps?: string[]): string {
+  const phrases = (caps || []).map((c) => {
+    if (CAP_EN[c]) return CAP_EN[c];
+    const tierCap = c.match(/^source_tier_([A-U])_max_(low|medium|high)$/);
+    if (tierCap) return `source tier ${tierCap[1]} caps it at ${tierCap[2]}`;
+    return humanize(c);
+  });
+  return joinClauses(phrases, 2);
+}
+
+/**
+ * Human-facing confidence line: the level plus the bands and caps that produced it.
+ * Deliberately carries no score — `score_0_to_1` is an internal blend only.
+ */
+export function confidenceLineEn(cf?: {
+  level?: string;
+  caps_applied?: string[];
+  factors?: {
+    signaling_band?: string;
+    substance_band?: string;
+    corroboration_0_to_3?: number;
+    source_tier?: string;
+  };
+}): string {
+  if (!cf?.level) return "";
+  const f = cf.factors || {};
+  const parts = [
+    f.substance_band ? `verifiable detail ${f.substance_band}` : "",
+    `corroboration ${corroborationBand(f.corroboration_0_to_3)}`,
+    f.signaling_band ? `signaling cues ${f.signaling_band}` : "",
+    f.source_tier ? `source tier ${f.source_tier} (stated editorial prior)` : "",
+  ].filter(Boolean);
+  const caps = capBasisEn(cf.caps_applied);
+  const head = `Confidence ${cf.level} — from ${parts.join(", ")}`;
+  return caps ? `${head}; ${caps}.` : `${head}.`;
+}
+
+/**
+ * Source tier line. The tier letter and the confidence cap are stated editorial priors;
+ * the internal ordering weight is deliberately not shown.
+ */
+export function sourceTierLineEn(tier?: {
+  tier?: string;
+  max_confidence?: string;
+  source_class?: string;
+}): string {
+  const id = tier?.tier || "U";
+  const what = TIER_PRIOR_EN[id] || "public text";
+  const cap = tier?.max_confidence ? `, caps confidence at ${tier.max_confidence}` : "";
+  return `Source tier ${id} · ${what} — stated editorial prior${cap}`;
+}

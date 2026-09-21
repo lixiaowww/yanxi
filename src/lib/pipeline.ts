@@ -153,6 +153,7 @@ export async function runBriefingPipeline(req: BriefRequest): Promise<BriefRespo
   briefing = applyDeterministicLayers(briefing, joined, {
     sourceCount: sources.length,
     sourceLabels: sources.map((s) => s.label),
+    sources,
     forcedSourceClass: req.sourceClass,
   });
   const finalCards =
@@ -192,7 +193,13 @@ export async function runBriefingPipeline(req: BriefRequest): Promise<BriefRespo
 function applyDeterministicLayers(
   briefing: BriefingJson,
   sourceText: string,
-  ctx: { sourceCount: number; sourceLabels: string[]; forcedSourceClass?: SourceClass }
+  ctx: {
+    sourceCount: number;
+    sourceLabels: string[];
+    /** Per-source texts — corroboration needs them to observe cross-source overlap. */
+    sources?: SourceInput[];
+    forcedSourceClass?: SourceClass;
+  }
 ): BriefingJson {
   const scorecard = buildSignalingScorecard(sourceText);
   const valves = valvesFromScorecard(scorecard);
@@ -207,6 +214,7 @@ function applyDeterministicLayers(
     sourceText,
     sourceCount: ctx.sourceCount,
     substance: substance_cut,
+    sources: ctx.sources,
   });
   const confidence_factors = buildConfidenceFactors({
     scorecard,
