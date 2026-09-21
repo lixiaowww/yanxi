@@ -109,6 +109,7 @@
 | F11 | 双源完整简报门禁：`brief_quality` complete 需 ≥2 独立公开摘录；单源强制 partial | P0 | 已交付 |
 | F12 | 时效降权：无 `source_as_of` 不可 complete；Outlook likelihood 按 freshness 封顶 | P0 | 已交付 |
 | F13 | 预测四件套：label / basis / trigger / alternative / falsifier（缺字段 soft） | P0 | 已交付 |
+| F14 | Human-in-the-loop 明确 intake：`human_review[]` 列出 source_class / intake 灰区 / 领域画像三处仍是猜测的点，非阻塞，操作者选完覆盖字段重跑即解决 | P1 | 已交付 |
 
 详细设计见 [DP-brief-quality.md](./DP-brief-quality.md)。读者交付物字段与流水线见 [DP.md](./DP.md)、[ARCHITECTURE.md](./ARCHITECTURE.md)。
 

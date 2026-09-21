@@ -195,6 +195,15 @@ type Briefing = {
     watchpoints?: string[];
     open_questions?: string[];
   };
+  human_review?: {
+    id: "source_class" | "intake_gray" | "domain_profile";
+    question_en: string;
+    options: { value: string; label_en: string }[];
+    system_pick: string;
+    system_pick_label_en: string;
+    status: "open" | "resolved";
+    resolved_value?: string;
+  }[];
 };
 
 type ApiResult = {
@@ -302,6 +311,10 @@ export function App() {
   const [showRaw, setShowRaw] = useState(false);
   const [savingBrief, setSavingBrief] = useState(false);
   const [savedBriefUrl, setSavedBriefUrl] = useState<string | null>(null);
+  // Human-in-the-loop: pending answers to open briefing.human_review points,
+  // keyed by point id. Cleared whenever the source text/label changes so a
+  // stale override never silently applies to unrelated new content.
+  const [reviewChoices, setReviewChoices] = useState<Record<string, string>>({});
 
   const parts = useMemo(
     () => highlightSource(sourceText, activeQuote),
@@ -348,6 +361,7 @@ export function App() {
     setLabel(data.sourceLabel);
     setActiveQuote(null);
     setResult(null);
+    setReviewChoices({});
   }
 
   useEffect(() => {
@@ -360,6 +374,13 @@ export function App() {
     setActiveQuote(null);
     try {
       const second = source2Text.trim();
+      // Human review overrides — only sent once the operator has actually
+      // picked an answer for that point (see the "Needs your call" panel).
+      const overrides = {
+        sourceClass: reviewChoices.source_class || (markSocial ? "social_commentary" : undefined),
+        forcedIntakeLabel: reviewChoices.intake_gray || undefined,
+        forcedDomainProfile: reviewChoices.domain_profile || undefined,
+      };
       const payload =
         second.length >= 20
           ? {
@@ -368,15 +389,15 @@ export function App() {
                 { label: source2Label || "second-public-source", text: second },
               ],
               forceOffline,
-              sourceClass: markSocial ? "social_commentary" : undefined,
               sourcePublishedAt: sourcePublishedAt.trim() || undefined,
+              ...overrides,
             }
           : {
               sourceText,
               sourceLabel: label,
               forceOffline,
-              sourceClass: markSocial ? "social_commentary" : undefined,
               sourcePublishedAt: sourcePublishedAt.trim() || undefined,
+              ...overrides,
             };
       const res = await fetch("/api/brief", {
         method: "POST",
@@ -567,6 +588,7 @@ export function App() {
             onChange={(e) => {
               setSourceText(e.target.value);
               setActiveQuote(null);
+              setReviewChoices({});
             }}
           />
           <label htmlFor="label" style={{ marginTop: "0.75rem" }}>
@@ -773,6 +795,55 @@ export function App() {
                   </p>
                 ) : null}
               </header>
+
+              {(b.human_review || []).some((p) => p.status === "open") ? (
+                <section className="read-block review-block">
+                  <h2>Needs your call</h2>
+                  <p className="meta">
+                    The layers below had to guess rather than detect with confidence. Pick an
+                    answer and re-run — nothing else about this draft changes.
+                  </p>
+                  {(b.human_review || [])
+                    .filter((p) => p.status === "open")
+                    .map((p) => (
+                      <div className="review-point" key={p.id}>
+                        <label htmlFor={`review-${p.id}`}>{p.question_en}</label>
+                        <select
+                          id={`review-${p.id}`}
+                          value={reviewChoices[p.id] ?? p.system_pick}
+                          onChange={(e) =>
+                            setReviewChoices((prev) => ({ ...prev, [p.id]: e.target.value }))
+                          }
+                        >
+                          {p.options.map((o) => (
+                            <option key={o.value} value={o.value}>
+                              {o.label_en}
+                              {o.value === p.system_pick ? " (system guess)" : ""}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    ))}
+                  <button type="button" className="secondary" onClick={run} disabled={loading}>
+                    Apply &amp; re-run
+                  </button>
+                </section>
+              ) : null}
+              {(b.human_review || []).some((p) => p.status === "resolved") ? (
+                <p className="meta review-resolved-note">
+                  Confirmed by human review:{" "}
+                  {(b.human_review || [])
+                    .filter((p) => p.status === "resolved")
+                    .map(
+                      (p) =>
+                        `${p.id.replace("_", " ")} → ${
+                          p.options.find((o) => o.value === p.resolved_value)?.label_en ||
+                          p.resolved_value
+                        }`
+                    )
+                    .join("; ")}
+                </p>
+              ) : null}
 
               {b.adoption?.adopted === false ? (
                 <section className="read-block reject-block">

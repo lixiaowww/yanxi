@@ -858,7 +858,21 @@ const GENERIC: Profile = {
   ],
 };
 
-export function pickProfile(ctx: MatchCtx): Profile {
+/** All domain profile ids + labels, for the human-review domain-picker (UI/API). */
+export function listProfileOptions(): { value: string; label_en: string }[] {
+  return [...PROFILES, GENERIC].map((p) => ({ value: p.id, label_en: p.label_en }));
+}
+
+/**
+ * `forcedId` bypasses keyword matching entirely — used when a human review
+ * override picks a specific domain instead of the general_policy fallback.
+ * Falls back to normal matching when the id is unknown.
+ */
+export function pickProfile(ctx: MatchCtx, forcedId?: string): Profile {
+  if (forcedId) {
+    const forced = [...PROFILES, GENERIC].find((p) => p.id === forcedId);
+    if (forced) return forced;
+  }
   for (const p of PROFILES) {
     if (p.match(ctx)) return p;
   }
@@ -867,10 +881,10 @@ export function pickProfile(ctx: MatchCtx): Profile {
 
 export function buildContentAnalysis(
   facts: FactSet,
-  ctx: MatchCtx & { sourceCount?: number }
+  ctx: MatchCtx & { sourceCount?: number; forcedProfileId?: string }
 ): ContentAnalysis {
   const v = buildView(facts, ctx.sourceCount ?? 1);
-  const profile = pickProfile(ctx);
+  const profile = pickProfile(ctx, ctx.forcedProfileId);
 
   const so_what = profile.soWhat(v).trim();
   const scenarios = profile

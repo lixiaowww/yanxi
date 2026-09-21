@@ -34,6 +34,7 @@ Paste save ──► outbox markdown (reader spine)
 | `src/lib/brief-quality.ts` | complete \| partial \| rejected；likelihood cap |
 | `src/lib/facts.ts` / `analysis.ts` | 内容事实抽取与分领域 so_what / 情景四件套（规则引擎，兜底 alternative/falsifier） |
 | `src/lib/scenario-enrich.ts` | 可选：LLM 一次性重写全部情景的 alternative/falsifier（ACH 同批对比），拒绝雷同/字段缺失则整批放弃，保留规则引擎文案 |
+| `src/lib/pipeline.ts`（`buildHumanReviewPoints`） | Human-in-the-loop：`human_review[]` 列出 source_class / intake 灰区 / 领域画像三处猜测点；`BriefRequest.forcedIntakeLabel` / `forcedDomainProfile` 非阻塞覆盖重跑 |
 | `src/lib/confidence.ts` | 印证分 + 因子化置信度 |
 | `src/lib/gate.ts` | L1 claim/ethics |
 | `src/lib/brief-markdown.ts` | 读者脊柱 → markdown |
@@ -59,7 +60,7 @@ skills/
 | Method | Path | 说明 |
 |--------|------|------|
 | GET | `/api/health` | `product: yanxi` |
-| POST | `/api/brief` | 单源或 `sources[]`；可选 `sourcePublishedAt` / `collectedAt` / `forceOffline` |
+| POST | `/api/brief` | 单源或 `sources[]`；可选 `sourcePublishedAt` / `collectedAt` / `forceOffline` / `sourceClass` / `forcedIntakeLabel` / `forcedDomainProfile`（human review 覆盖） |
 | POST | `/api/brief/save` | 持久化读者 markdown 到 outbox |
 | GET | `/api/subscriptions` | 订阅列表 + feedUrl |
 | GET | `/api/sources` | 白名单 |

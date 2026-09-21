@@ -299,6 +299,16 @@ async function main() {
         sourcePublishedAt: req.body?.sourcePublishedAt
           ? String(req.body.sourcePublishedAt)
           : undefined,
+        // Human-in-the-loop overrides — see briefing.human_review in the
+        // previous response for which point(s) are actually open.
+        forcedIntakeLabel: ["admit", "defer", "reject_thin"].includes(
+          String(req.body?.forcedIntakeLabel)
+        )
+          ? (String(req.body.forcedIntakeLabel) as "admit" | "defer" | "reject_thin")
+          : undefined,
+        forcedDomainProfile: req.body?.forcedDomainProfile
+          ? String(req.body.forcedDomainProfile)
+          : undefined,
       });
       res.json(result);
     } catch (e) {

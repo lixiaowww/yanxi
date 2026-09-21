@@ -44,6 +44,7 @@
 - [x] 读者脊柱 + 粘贴简报保存 outbox  
 - [x] **简报质量门禁 F11–F13**：`brief_quality` · Outlook 时效降权 · 情景四件套 · `npm run test:brief-quality`  
 - [x] F13 alternative/falsifier 去模板化：可选 LLM 同批重写（ACH 对比），软失败回退规则引擎 · `npm run test:scenario-enrich`  
+- [x] F14 Human-in-the-loop 明确 intake：source_class / intake 灰区 / 领域画像三点非阻塞覆盖 · `npm run test:human-review`  
 
 ## Next（产品）
 

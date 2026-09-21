@@ -21,7 +21,7 @@ export type IntakeDecision = {
   label: IntakeLabel;
   first_cut: IntakeLabel;
   second_cut: IntakeLabel | null;
-  second_cut_engine: "none" | "local_gray" | "jev";
+  second_cut_engine: "none" | "local_gray" | "jev" | "human_override";
   reason_en: string;
   jev?: {
     model: string;

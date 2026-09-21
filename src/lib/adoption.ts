@@ -25,6 +25,8 @@ export type AdoptionDecision = {
   hard_nuggets: SubstanceNugget[];
   rejected_as: "direction_only" | "none" | null;
   tag: "hypothesis";
+  /** Set when a human review override forced adoption despite no hard nuggets. */
+  human_override?: boolean;
 };
 
 /** True when the nugget is more than a bare vocabulary token. */

@@ -28,6 +28,7 @@ Civilian open-source Mandarin → English contextual briefing. Not an intelligen
 | Hard redlines | `skills/ethics-sandbox/SKILL.md` + `src/lib/gate.ts` |
 | Pipeline orchestration | `src/lib/pipeline.ts` |
 | Brief quality / outlook caps | `src/lib/brief-quality.ts` + `docs/DP-brief-quality.md` |
+| Human-in-the-loop review points | `src/lib/pipeline.ts` (`buildHumanReviewPoints`) + `docs/DP-brief-quality.md` §4.5 |
 | Temporal / freshness | `src/lib/temporal.ts` |
 | Ontology lite matcher | `src/lib/ontology-lite.ts` |
 | Source tier priors | `src/lib/source-tier.ts` + `docs/RELIABILITY.md` |

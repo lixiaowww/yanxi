@@ -159,6 +159,26 @@ ForecastScenario {
 | 新增 `npm run test:brief-quality` | 单源→partial；双源+日期→complete；情景含 alternative/falsifier |
 | `npm test` | 全绿 |
 
+### 4.5 Human-in-the-loop 明确 intake（2026-09-21，成品审阅后追加）
+
+**问题**：门禁/规则引擎在三处只能靠启发式猜测，猜错时人没有直接的更正入口：`source_class` 无词典命中时默认 `unknown_public`；intake 灰区（第一刀 `reject_thin`）只能靠 `local_gray`/Jev 猜 `defer` 还是 `reject_thin`；领域画像在 desk 分配无强信号默认时，`pickProfile` 挑的具体画像只是"desk 默认"的连带结果，不是真命中。
+
+**方案**：非阻塞——草稿照常整段生成，`briefing.human_review[]` 列出仍是猜测的点（`question_en` / `options` / `system_pick` / `status`），操作者在 UI 选完点「Apply & re-run」，同一段源文本 + 对应 `BriefRequest` 覆盖字段重新跑一遍：
+
+| Point id | 触发条件 | 覆盖字段 | 选项 |
+|----------|----------|----------|------|
+| `source_class` | 无词典命中（`unknown_public` 且 evidence 为空） | `sourceClass`（复用既有字段，与"标记为社交转述"共用同一通道） | 5 档 source class |
+| `intake_gray` | `intake.first_cut === "reject_thin"`（真正灰区；不含 admit/social_downweight） | `forcedIntakeLabel: "admit"\|"defer"\|"reject_thin"` | 三选一 |
+| `domain_profile` | `pickProfile` 落到 `general_policy`，**或** `desk_section` 触发了默认兜底（`assignDeskSection` 无强信号时默认 `economy_investment`——`macro_finance`/`canada_trade`/`defense_public`/`social_governance` 四个画像都直接按 `deskPrimary` 兜底匹配，导致 `general_policy` 实际上很难被触达；真正会触发的信号是 desk 默认，而不是画像本身回退） | `forcedDomainProfile: <profile id>` | 全部画像 + `general_policy` |
+
+**`intake_gray → admit` 的特殊之处**：这是唯一会改写 `adoption.adopted` 的覆盖——人工判定"这里其实有干货，规则漏检了"时，`adoption.human_override=true` 一起标记，供审计追溯；**quote 子串 / 伦理词 / 密级词硬门禁不受影响**，仍然全量跑（`gate.ts` 与覆盖机制完全独立，人工覆盖不能绕过硬红线）。
+
+**不做**：不做阻塞式人机交互（不暂停 pipeline 等答案）；不允许覆盖 `admit`/`social_downweight` 之外的 intake 结果（即离开真正灰区的判断不可被覆盖，避免变成"可随意改判"）；`resolved` 状态仅代表操作者已给出答案，不代表该判断"正确"。
+
+**代码：** `src/lib/pipeline.ts`（`buildHumanReviewPoints` / 覆盖接线）；`src/lib/analysis.ts`（`pickProfile` 增加 `forcedId`，`listProfileOptions`）；`src/lib/gate.ts`（`HumanReviewPoint` 类型）；`server.ts`（`/api/brief` 透传 `forcedIntakeLabel`/`forcedDomainProfile`）；`src/App.tsx`（"Needs your call" 面板）。
+
+**验证：** `npm run test:human-review`（开→resolved 全链路；灰区外的 intake 覆盖必须被忽略）。
+
 ---
 
 ## 5. 风险与伦理

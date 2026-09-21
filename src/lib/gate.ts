@@ -140,6 +140,8 @@ export type BriefingJson = {
     hard_nuggets?: { kind?: string; label_zh?: string; evidence?: string }[];
     rejected_as?: string | null;
     tag?: string;
+    /** Human review forced adoption despite no hard nuggets found automatically. */
+    human_override?: boolean;
   };
   /** Two-cut intake: first=hard nuggets; second=gray defer (local or Jev). */
   intake?: {
@@ -301,6 +303,27 @@ export type BriefingJson = {
     tag?: string;
   };
   open_questions?: string[];
+  /**
+   * Human-in-the-loop: points where a deterministic layer had to guess
+   * (source class had no lexicon hit, intake fell into the gray zone, or
+   * the domain profile fell back to the generic catch-all). Non-blocking —
+   * the draft above is already complete; this just says which parts of it
+   * the author should confirm or correct, and how (re-run with the same
+   * source(s) plus the matching override field on BriefRequest).
+   */
+  human_review?: HumanReviewPoint[];
+};
+
+export type HumanReviewPoint = {
+  id: "source_class" | "intake_gray" | "domain_profile";
+  question_en: string;
+  options: { value: string; label_en: string }[];
+  /** What the deterministic layer guessed, for comparison. */
+  system_pick: string;
+  system_pick_label_en: string;
+  status: "open" | "resolved";
+  /** Present once resolved — echoes the override the operator sent back. */
+  resolved_value?: string;
 };
 
 const FORBIDDEN = [

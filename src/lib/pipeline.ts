@@ -9,13 +9,13 @@ import { buildCanadaPolicyLink } from "./canada-policy-link.js";
 import { buildSubstanceCut, type SubstanceNugget } from "./substance.js";
 import { assignDeskSection } from "./briefing-desk.js";
 import { matchOntologyLite } from "./ontology-lite.js";
-import { detectSourceClass, type SourceClass } from "./source-class.js";
+import { detectSourceClass, SOURCE_CLASSES, type SourceClass } from "./source-class.js";
 import { buildConfidenceFactors, buildCorroboration } from "./confidence.js";
 import { evaluateAdoption, filterDigestByHardNuggets } from "./adoption.js";
 import { appendGateAudit } from "./audit-log.js";
 import { composeDigestRows, composeRejectionWhat, extractFacts, type FactSet } from "./facts.js";
-import { buildContentAnalysis } from "./analysis.js";
-import { resolveIntake, intakeAllowsBrief, type IntakeDecision } from "./intake.js";
+import { buildContentAnalysis, listProfileOptions, pickProfile } from "./analysis.js";
+import { resolveIntake, intakeAllowsBrief, type IntakeDecision, type IntakeLabel } from "./intake.js";
 import { buildTemporalCut } from "./temporal.js";
 import { findRelatedBriefs, type RelatedBriefHit } from "./related-briefs.js";
 import { enrichScenarioAlternatives } from "./scenario-enrich.js";
@@ -43,6 +43,14 @@ export type BriefRequest = {
   collectedAt?: string;
   /** Operator-supplied publication date (YYYY-MM-DD or ISO). */
   sourcePublishedAt?: string;
+  /**
+   * Human-in-the-loop overrides (non-blocking): re-send the same source(s)
+   * with one of these set to resolve the matching `briefing.human_review`
+   * point. Only takes effect when the system was actually in that gray
+   * zone — see `docs/DP-brief-quality.md` §4.4 for detection rules.
+   */
+  forcedIntakeLabel?: IntakeLabel;
+  forcedDomainProfile?: string;
 };
 
 export type BriefResponse = {
@@ -171,16 +179,35 @@ export async function runBriefingPipeline(req: BriefRequest): Promise<BriefRespo
   // First cut + optional second cut before spending LLM quota.
   const substanceEarly = buildSubstanceCut(joined);
   const adoptionEarly = evaluateAdoption(substanceEarly);
+  // Unforced read — used only to detect whether source class was ambiguous
+  // (no lexicon hit) before any human/UI override is applied below.
+  const autoClass = detectSourceClass(joined, { labels: sources.map((s) => s.label) });
+  const sourceClassAmbiguous = autoClass.class === "unknown_public" && autoClass.evidence.length === 0;
   const classEarly = detectSourceClass(joined, {
     forced: req.sourceClass,
     labels: sources.map((s) => s.label),
   });
-  const intake = await resolveIntake({
+  let intake = await resolveIntake({
     adopted: adoptionEarly.adopted,
     sourceClass: classEarly.class,
     text: joined,
     substance: substanceEarly,
   });
+  // Gray zone: first cut found no hard detail (not admit, not social). A
+  // human may know better than the local_gray heuristic / Jev here — see
+  // docs/DP-brief-quality.md §4.4. Never overrides admit/social_downweight.
+  const intakeGrayOpen = intake.first_cut === "reject_thin";
+  const intakeAutoLabel = intake.label;
+  if (req.forcedIntakeLabel && intakeGrayOpen && req.forcedIntakeLabel !== intake.label) {
+    intake = {
+      ...intake,
+      label: req.forcedIntakeLabel,
+      second_cut: req.forcedIntakeLabel,
+      second_cut_engine: "human_override",
+      reason_en: `Human review override: forced ${req.forcedIntakeLabel} (system suggested ${intake.second_cut ?? intake.first_cut}).`,
+    };
+  }
+  const forcedAdopt = intakeGrayOpen && req.forcedIntakeLabel === "admit";
   const allowLlm = !req.forceOffline && configured && intakeAllowsBrief(intake.label);
 
   let briefing: BriefingJson;
@@ -218,7 +245,12 @@ export async function runBriefingPipeline(req: BriefRequest): Promise<BriefRespo
     sourceLabels: sources.map((s) => s.label),
     sources,
     forcedSourceClass: req.sourceClass,
+    sourceClassAmbiguous,
     intake,
+    intakeGrayOpen,
+    intakeAutoLabel,
+    forcedAdopt,
+    forcedDomainProfile: req.forcedDomainProfile,
     collectedAt: req.collectedAt,
     sourcePublishedAt: req.sourcePublishedAt,
   });
@@ -308,7 +340,16 @@ function applyDeterministicLayers(
     /** Per-source texts — corroboration needs them to observe cross-source overlap. */
     sources?: SourceInput[];
     forcedSourceClass?: SourceClass;
+    /** True when the unforced source-class read found no lexicon cue at all. */
+    sourceClassAmbiguous?: boolean;
     intake?: IntakeDecision;
+    /** True when intake's first cut was reject_thin (the actual gray zone). */
+    intakeGrayOpen?: boolean;
+    /** intake.label before any human_override was applied — for system_pick display. */
+    intakeAutoLabel?: IntakeLabel;
+    /** Human review forced intake to "admit" despite no hard nuggets. */
+    forcedAdopt?: boolean;
+    forcedDomainProfile?: string;
     collectedAt?: string;
     sourcePublishedAt?: string;
   }
@@ -376,7 +417,17 @@ function applyDeterministicLayers(
     confidence_factors,
   };
 
-  const adoption = evaluateAdoption(substance_cut);
+  let adoption = evaluateAdoption(substance_cut);
+  if (ctx.forcedAdopt && !adoption.adopted) {
+    adoption = {
+      ...adoption,
+      adopted: true,
+      human_override: true,
+      label_zh: "Human review override: admit (no hard nuggets found automatically).",
+      reason_zh: `Human review override forced admit. Automatic read: ${adoption.reason_zh}`,
+      rejected_as: null,
+    };
+  }
   next.adoption = adoption;
   next.intake = ctx.intake
     ? {
@@ -415,16 +466,27 @@ function applyDeterministicLayers(
       ];
 
   const facts = factsEarly;
-  const analysis =
-    next.content_analysis ??
-    buildContentAnalysis(facts, {
-      text: sourceText,
-      hotThemes: (desk_section.hot_themes || []).map((h) => h.id),
-      deskPrimary: desk_section.primary,
-      primaryKind: info_triage.primary_kind,
-      cards: ontologyMatch.names,
-      sourceCount: ctx.sourceCount,
-    });
+  const analysisMatchCtx = {
+    text: sourceText,
+    hotThemes: (desk_section.hot_themes || []).map((h) => h.id),
+    deskPrimary: desk_section.primary,
+    primaryKind: info_triage.primary_kind,
+    cards: ontologyMatch.names,
+  };
+  // What the rule engine would pick on its own — kept for the human_review
+  // system_pick display even when forcedDomainProfile below overrides it.
+  const autoProfileId = pickProfile(analysisMatchCtx).id;
+  // A forced domain profile must win even if an upstream pass (offline
+  // template or LLM) already set content_analysis — that's the whole point
+  // of the override, so don't let the `??` below skip it.
+  const analysis = ctx.forcedDomainProfile
+    ? buildContentAnalysis(facts, {
+        ...analysisMatchCtx,
+        sourceCount: ctx.sourceCount,
+        forcedProfileId: ctx.forcedDomainProfile,
+      })
+    : (next.content_analysis ??
+      buildContentAnalysis(facts, { ...analysisMatchCtx, sourceCount: ctx.sourceCount }));
 
   if (!adoption.adopted) {
     const deferred = ctx.intake?.label === "defer";
@@ -488,13 +550,19 @@ function applyDeterministicLayers(
       source_class.class === "social_commentary"
         ? "This rests on social commentary rather than an official text, so the impact reading below is provisional. "
         : "";
+    const domainForced = Boolean(ctx.forcedDomainProfile);
     next.briefing_en = {
       ...next.briefing_en,
-      context: next.briefing_en.context || `${analysis.domain_label_en} — ${analysis.background}`,
+      context:
+        !domainForced && next.briefing_en.context
+          ? next.briefing_en.context
+          : `${analysis.domain_label_en} — ${analysis.background}`,
       confidence: confidence_factors.level,
-      so_what: `${socialNote}${next.briefing_en.so_what || analysis.so_what}`.trim(),
+      so_what: `${socialNote}${domainForced ? analysis.so_what : next.briefing_en.so_what || analysis.so_what}`.trim(),
     };
-    if (!next.policy_outlook?.scenarios?.length) {
+    // Same reasoning as content_analysis above: a forced domain must
+    // replace whatever scenarios an earlier pass already set.
+    if (ctx.forcedDomainProfile || !next.policy_outlook?.scenarios?.length) {
       next.policy_outlook = {
         horizon: next.policy_outlook?.horizon || "near",
         scenarios: analysis.scenarios,
@@ -595,7 +663,123 @@ function applyDeterministicLayers(
     ].slice(0, 6);
   }
 
+  next.human_review = buildHumanReviewPoints({
+    sourceClassAmbiguous: ctx.sourceClassAmbiguous,
+    forcedSourceClass: ctx.forcedSourceClass,
+    intakeGrayOpen: ctx.intakeGrayOpen,
+    intakeAutoLabel: ctx.intakeAutoLabel,
+    resolvedIntakeLabel: next.intake?.label,
+    intakeResolvedByOverride: next.intake?.second_cut_engine === "human_override",
+    adopted: adoption.adopted,
+    domain: autoProfileId,
+    // macro_finance/canada_trade/defense_public/social_governance all match
+    // on deskPrimary alone, so pickProfile's general_policy fallback is
+    // effectively unreachable once assignDeskSection has already defaulted
+    // (see docs/DP-brief-quality.md §4.4) — a defaulted desk is the signal
+    // that actually fires: whichever profile matched was picked off a desk
+    // guess, not a real keyword hit.
+    domainGuessed: Boolean(desk_section.rationale?.startsWith("No strong desk cue")),
+    forcedDomainProfile: ctx.forcedDomainProfile,
+  });
+
   return next;
+}
+
+/**
+ * The three points where a deterministic layer had to guess rather than
+ * detect with confidence (docs/DP-brief-quality.md §4.4). Non-blocking:
+ * the brief above already stands; this just names what to double-check and
+ * how (re-send the same source(s) with the matching BriefRequest override).
+ */
+function buildHumanReviewPoints(ctx: {
+  sourceClassAmbiguous?: boolean;
+  forcedSourceClass?: SourceClass;
+  intakeGrayOpen?: boolean;
+  intakeAutoLabel?: IntakeLabel;
+  resolvedIntakeLabel?: string;
+  intakeResolvedByOverride?: boolean;
+  adopted: boolean;
+  domain?: string;
+  domainGuessed?: boolean;
+  forcedDomainProfile?: string;
+}): BriefingJson["human_review"] {
+  const points: NonNullable<BriefingJson["human_review"]> = [];
+
+  if (ctx.sourceClassAmbiguous) {
+    points.push({
+      id: "source_class",
+      question_en:
+        "No lexicon cue matched this excerpt's source class. Which is it?",
+      options: SOURCE_CLASSES.map((c) => ({ value: c, label_en: sourceClassLabelEn(c) })),
+      system_pick: "unknown_public",
+      system_pick_label_en: sourceClassLabelEn("unknown_public"),
+      status: ctx.forcedSourceClass ? "resolved" : "open",
+      resolved_value: ctx.forcedSourceClass,
+    });
+  }
+
+  if (ctx.intakeGrayOpen) {
+    points.push({
+      id: "intake_gray",
+      question_en:
+        "No hard detail was found automatically, so this fell to the intake gray-zone heuristic. Confirm or override:",
+      options: [
+        { value: "admit", label_en: "Admit — treat as a full brief (I see real detail here)" },
+        { value: "defer", label_en: "Defer — watch queue, worth a re-check later" },
+        { value: "reject_thin", label_en: "Reject — no usable detail" },
+      ],
+      system_pick: ctx.intakeAutoLabel || "reject_thin",
+      system_pick_label_en: intakeLabelEn(ctx.intakeAutoLabel || "reject_thin"),
+      status: ctx.intakeResolvedByOverride ? "resolved" : "open",
+      resolved_value: ctx.intakeResolvedByOverride ? ctx.resolvedIntakeLabel : undefined,
+    });
+  }
+
+  if (ctx.adopted && (ctx.domain === "general_policy" || ctx.domainGuessed)) {
+    const resolved = Boolean(ctx.forcedDomainProfile);
+    points.push({
+      id: "domain_profile",
+      question_en: ctx.domainGuessed
+        ? "No desk/topic keyword matched this excerpt strongly, so the domain below was picked by default rather than a real hit. Confirm or pick a closer domain for sharper so-what/scenarios:"
+        : "No domain profile matched this excerpt, so analysis fell back to the generic public-policy template. Pick the closest domain for sharper so-what/scenarios:",
+      options: listProfileOptions(),
+      system_pick: ctx.domain || "general_policy",
+      system_pick_label_en:
+        listProfileOptions().find((p) => p.value === ctx.domain)?.label_en || "Public policy (generic)",
+      status: resolved ? "resolved" : "open",
+      resolved_value: resolved ? ctx.forcedDomainProfile : undefined,
+    });
+  }
+
+  return points;
+}
+
+function sourceClassLabelEn(c: string): string {
+  switch (c) {
+    case "official_or_wire":
+      return "Official / wire";
+    case "policy_instrument":
+      return "Policy instrument file";
+    case "press_commentary":
+      return "Press commentary";
+    case "social_commentary":
+      return "Social commentary / self-media";
+    default:
+      return "Unclassified public text";
+  }
+}
+
+function intakeLabelEn(l: IntakeLabel): string {
+  switch (l) {
+    case "admit":
+      return "Admit";
+    case "defer":
+      return "Defer — watch queue";
+    case "reject_thin":
+      return "Reject — no usable detail";
+    default:
+      return l;
+  }
 }
 
 /** Name the content facts a rejected paste would need, in reader terms. */

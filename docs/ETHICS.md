@@ -17,6 +17,7 @@
 7. 语境卡是 **Civic Ontology Lite**（`docs/ONTOLOGY-LITE.md`）：`background` / `hypothesis` 背景层，**不是** OWL/知识图谱，不得冒充已证实的机密事实。  
 8. `info_triage` 只做公开源**信息种类 + 研究优先级（P1–P4）**；禁止输出任何保密密级标记（TOP SECRET / 密级：绝密 等）。  
 9. **自动采集**仅限 `config/sources.whitelist.json` 中的公开源；禁止登录墙绕过、大规模社媒抓取、针对个人。订阅投递（RSS/webhook/outbox）内容仍为**人审草稿**。
+10. **Human-in-the-loop 覆盖**（`human_review[]`／`forcedIntakeLabel`／`forcedDomainProfile`）只解决三处规则引擎的猜测（source class 无词典命中、intake 灰区、领域画像默认），**不绕过**任何硬门禁：quote 子串、伦理词、密级禁词仍在 `gate.ts` 全量跑；`intake_gray → admit` 这一覆盖会同时写入 `adoption.human_override=true`，留痕可审计，不是静默改判。
 
 ## 申请与社交
 
