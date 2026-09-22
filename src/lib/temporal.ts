@@ -12,7 +12,7 @@
 
 export type TemporalPrecision = "day" | "month" | "year" | "relative" | "none";
 
-export type FreshnessBand = "fresh" | "recent" | "aging" | "stale" | "unknown";
+export type FreshnessBand = "fresh" | "recent" | "aging" | "stale" | "weak" | "unknown";
 
 export type TemporalCut = {
   framing: "civilian-temporal-freshness";
@@ -163,9 +163,9 @@ function bandFromAge(days: number | undefined, precision: TemporalPrecision): {
   }
   if (precision === "relative") {
     return {
-      band: "unknown",
+      band: "weak",
       label_en: "Freshness weak (relative cue only)",
-      basis_en: `Only a relative time cue was found; treated as weak. Assumed offset ≈${days} day(s) for ordering only — not a verified publication date.`,
+      basis_en: `Only a relative time cue was found; treated as weak, not fully unknown — it still rules out "no idea when this is from". Assumed offset ≈${days} day(s) for ordering only — not a verified publication date.`,
       age_days: days,
     };
   }

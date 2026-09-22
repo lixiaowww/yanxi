@@ -97,8 +97,11 @@ complete research brief?** It is still not P(event).
 | partial | adopted but missing second source and/or as-of |
 | rejected | not adopted (no hard detail) / intake defer path |
 
-Freshness also **caps Outlook likelihoods** (`unknown` → low；`aging`/`stale` → medium). Scenarios
-should carry `alternative` and `falsifier` (offline fills them；gate warns soft if LLM omits).
+Freshness also **caps Outlook likelihoods** (`unknown` → low; `weak` — a relative cue like "近日"
+with no real date — → medium; `aging`/`stale` → medium). Scenarios are sorted by their pre-cap
+likelihood before the cap is applied, so relative signal between scenarios survives even when the
+cap collapses several of them to the same displayed word. Scenarios also carry `alternative` and
+`falsifier` (offline fills them；gate warns soft if LLM omits).
 
 UI chip: Complete brief / Partial brief. Markdown header mirrors `brief_quality.level` + `missing[]`.
 

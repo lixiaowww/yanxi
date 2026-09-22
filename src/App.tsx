@@ -709,7 +709,7 @@ export function App() {
                       className={`chip ${
                         b.temporal.freshness.band === "fresh" || b.temporal.freshness.band === "recent"
                           ? "chip-ok"
-                          : b.temporal.freshness.band === "unknown"
+                          : b.temporal.freshness.band === "unknown" || b.temporal.freshness.band === "weak"
                             ? "chip-warn"
                             : "chip-bad"
                       }`}

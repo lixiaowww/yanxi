@@ -68,11 +68,15 @@ export function outlookLikelihoodCap(
 ): "low" | "medium" | "high" {
   const band = temporal.freshness.band;
   if (band === "unknown") return "low";
-  if (band === "aging" || band === "stale") return "medium";
+  // A relative cue ("近日"/"最近") is weaker than a real date, but it is not
+  // nothing — it rules out "no idea when this is from". Treat it like a
+  // stale/aging date rather than lumping it in with no date at all.
+  if (band === "weak" || band === "aging" || band === "stale") return "medium";
   return "high";
 }
 
-const RANK = { low: 0, medium: 1, high: 2 } as const;
+export const LIKELIHOOD_RANK = { low: 0, medium: 1, high: 2 } as const;
+const RANK = LIKELIHOOD_RANK;
 
 export function clampLikelihood(
   likelihood: "low" | "medium" | "high",

@@ -48,6 +48,7 @@
 - [x] F15 加拿大关联度升级为核心排序参数（importance 加权 + related-briefs/outbox 排序）；UI 移除无价值的 Force offline 开关 · `npm run test:canada-priority`  
 - [x] F16 第二 LLM 供应商兜底（Groq 429 时自动切换）· `npm run test:llm-fallback-provider`  
 - [x] F17 情景四件套扩展到全部 10 个领域画像，不再依赖 LLM 增强就能去模板化 · `npm run test:scenario-diversity`  
+- [x] F18 Outlook 时效降权区分"相对时间词"与"完全无日期"，封顶前保留情景相对排序 · `npm run test:outlook-differentiation`  
 
 ## Next（产品）
 

@@ -28,6 +28,7 @@ import { enrichScenarioAlternatives } from "./scenario-enrich.js";
 import {
   clampLikelihood,
   evaluateBriefQuality,
+  LIKELIHOOD_RANK,
   outlookLikelihoodCap,
 } from "./brief-quality.js";
 
@@ -617,11 +618,13 @@ function applyDeterministicLayers(
     const freshnessWatch =
       temporal.freshness.band === "unknown"
         ? ["Confirm publication or meeting date — paste has no dated dateline"]
-        : temporal.freshness.band === "stale" || temporal.freshness.band === "aging"
-          ? [
-              `Re-check for a newer public text (source as-of ${temporal.source_as_of || "?"} looks ${temporal.freshness.band})`,
-            ]
-          : [];
+        : temporal.freshness.band === "weak"
+          ? ["Only a relative time cue (\"近日\"-style) was found — confirm the exact publication date"]
+          : temporal.freshness.band === "stale" || temporal.freshness.band === "aging"
+            ? [
+                `Re-check for a newer public text (source as-of ${temporal.source_as_of || "?"} looks ${temporal.freshness.band})`,
+              ]
+            : [];
     next.policy_outlook = {
       ...next.policy_outlook,
       watchpoints: [
@@ -646,28 +649,40 @@ function applyDeterministicLayers(
 
   if (adoption.adopted && next.policy_outlook?.scenarios?.length) {
     const cap = outlookLikelihoodCap(temporal);
+    // A tight cap (e.g. "low" for an undated single-source paste) legally
+    // collapses several scenarios to the same displayed word — that's the
+    // honest label. But it shouldn't also destroy the reader's ability to
+    // tell which scenario the rule engine actually thought was more likely
+    // BEFORE capping: sort by the pre-clamp rank first, so scenario order
+    // still carries that signal even when every likelihood chip reads the
+    // same. clampLikelihood's semantics are unchanged.
     const clampScenarios = <
       T extends { likelihood?: string; alternative?: string; falsifier?: string; trigger?: string },
     >(
       scenarios: T[]
-    ): T[] =>
-      scenarios.map((s) => {
-        const lik = (s.likelihood || "low").toLowerCase();
-        const base =
-          lik === "high" || lik === "medium" || lik === "low" ? lik : ("low" as const);
-        return {
-          ...s,
-          likelihood: clampLikelihood(base, cap),
-          alternative:
-            s.alternative ||
-            "Competing reading: the excerpt is signalling without near-term delivery (hypothesis).",
-          falsifier:
-            s.falsifier ||
-            (s.trigger
-              ? `Public observation opposite to the trigger: ${s.trigger}`
-              : "A clear public text on the same subject that contradicts this outcome."),
-        };
-      });
+    ): T[] => {
+      const normalized = (lik: string | undefined): "low" | "medium" | "high" => {
+        const v = (lik || "low").toLowerCase();
+        return v === "high" || v === "medium" || v === "low" ? v : "low";
+      };
+      return [...scenarios]
+        .sort((a, b) => LIKELIHOOD_RANK[normalized(b.likelihood)] - LIKELIHOOD_RANK[normalized(a.likelihood)])
+        .map((s) => {
+          const base = normalized(s.likelihood);
+          return {
+            ...s,
+            likelihood: clampLikelihood(base, cap),
+            alternative:
+              s.alternative ||
+              "Competing reading: the excerpt is signalling without near-term delivery (hypothesis).",
+            falsifier:
+              s.falsifier ||
+              (s.trigger
+                ? `Public observation opposite to the trigger: ${s.trigger}`
+                : "A clear public text on the same subject that contradicts this outcome."),
+          };
+        });
+    };
     next.policy_outlook = {
       ...next.policy_outlook,
       scenarios: clampScenarios(next.policy_outlook.scenarios),

@@ -215,6 +215,20 @@ ForecastScenario {
 
 **验证：** `npm run test:scenario-diversity`——对 10 个画像各跑一次 `buildContentAnalysis(..., forcedProfileId)`，断言同一画像内所有情景的 `alternative`/`falsifier` 互不相同，且都不等于 `ensureFourPiece()` 的原始兜底句。
 
+### 4.9 Outlook 时效降权：区分"无日期线索"与"只有相对时间词"（2026-09-22）
+
+**问题**：`temporal.ts` 把"文中完全没有时间线索"和"文中有'近日'这类相对时间词但没写死日期"归成同一个 `band: "unknown"`，而 `outlookLikelihoodCap` 对 `unknown` 统一封顶 `low`。公开中文政策类摘录极少自带精确到日的日期，"近日"却很常见——结果是绝大多数真实粘贴场景里，Outlook 三个情景会被压成完全相同的 `[low]`，F13 情景四件套辛苦写的差异化内容在 likelihood 这一栏完全体现不出来。
+
+**方案（两处，独立生效）**：
+1. 新增 `FreshnessBand = "weak"`，专门给"只有相对时间词"的情况用（`temporal.ts`）；`outlookLikelihoodCap` 里 `weak` 封顶 `medium`，`unknown`（真的一点线索都没有）仍然封顶 `low`——两者不再共用同一个最严格的档位。`brief_quality` 判断"是否有日期"的逻辑不变（`relative` 精度仍然不算 dated，仍需要真实日期才能 complete），这条改动只影响 Outlook 显示，不放松完整简报门禁。
+2. `pipeline.ts` 的 `clampScenarios` 在封顶前先按封顶前的 likelihood 排序，再统一夹到 cap——同一批情景哪怕封顶后显示的字都一样，**排序仍然保留封顶前的相对高低**，读者仍能从顺序里看出"哪条规则引擎本来判断更可能"。`clampLikelihood` 本身语义不变。
+
+**效果**（真实 fixture `macro-instrument`，单源、"近日"相对时间词、未写死日期）：
+- 改动前：三个情景全部 `[low]`。
+- 改动后：`freshness.band = "weak"` → cap 变成 `medium`，三个情景显示为 `[medium]` `[low]` `[low]`——不再是复读机。
+
+**验证：** `npm run test:outlook-differentiation`（weak 与 unknown 两档 cap 数值断言；封顶前后排序保持不变的断言）。
+
 ---
 
 ## 5. 风险与伦理

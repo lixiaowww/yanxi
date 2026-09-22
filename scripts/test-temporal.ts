@@ -29,7 +29,7 @@ const briefed = new Date("2026-09-21T15:00:00Z");
     briefedAt: briefed,
   });
   assert(t.source_as_of_precision === "relative", "relative cue");
-  assert(t.freshness.band === "unknown", "relative → unknown/weak");
+  assert(t.freshness.band === "weak", "relative cue → weak (distinct from no date at all)");
   assert(t.source_as_of_evidence === "近日", "evidence 近日");
 }
 
