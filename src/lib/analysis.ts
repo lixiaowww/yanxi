@@ -275,6 +275,10 @@ const PROFILES: Profile[] = [
         basis: `A funded pilot needs allocation rules before money can move, so the administrative text normally precedes disbursement (hypothesis).`,
         trigger:
           "A named implementing body, a draft measure for comment, or a published list of pilot provinces and approved organisers.",
+        alternative:
+          "The commitment stays declaratory and no measure is drafted, with cross-Strait messaging continuing to substitute for an administrative document (hypothesis).",
+        falsifier:
+          "No draft measure, comment period, or named implementing office appears within the stated window, and existing exchange programmes continue unchanged.",
         tag: "hypothesis",
       },
       {
@@ -284,6 +288,10 @@ const PROFILES: Profile[] = [
         basis: `Pilot framing and a floor-style funding figure both leave room to scale if early cohorts are judged administratively and politically manageable (hypothesis).`,
         trigger:
           "First-round funding awards, published participant quotas, or a second pilot batch naming additional provinces.",
+        alternative:
+          "The pilot stays capped at its original scope, with no expansion signal even after the first cohorts complete (hypothesis).",
+        falsifier:
+          "No second batch, quota increase, or additional pilot province is announced within 24 months of the first cohort's completion.",
         tag: "hypothesis",
       },
       {
@@ -293,6 +301,10 @@ const PROFILES: Profile[] = [
         basis: `Exchange programmes are sensitive to the wider cross-Strait climate, and with no named implementing body a quiet narrowing carries little institutional cost (hypothesis).`,
         trigger:
           "Sharper official cross-Strait rhetoric, suspension of existing exchange programmes, or no implementing body named before the stated deadline.",
+        alternative:
+          "The programme launches at its stated scope on schedule, with a named implementing body and published eligibility criteria (hypothesis).",
+        falsifier:
+          "A named implementing body and eligibility criteria are published before the stated deadline, and first-round participants are announced on schedule.",
         tag: "hypothesis",
       },
     ],
@@ -348,6 +360,10 @@ const PROFILES: Profile[] = [
         basis: `Administrative control of a midstream chokepoint historically prompts buyers to fund alternative refining and substitution rather than absorb licensing risk (hypothesis).`,
         trigger:
           "Offtake agreements with non-Chinese refiners, government stockpile announcements, or substitution results published by major downstream users.",
+        alternative:
+          "Buyers absorb the licensing delay without funding alternative supply, judging the control temporary or narrow enough to wait out (hypothesis).",
+        falsifier:
+          "No offtake agreement, stockpile announcement, or substitution result is disclosed by major downstream buyers within 24 months.",
         tag: "hypothesis",
       },
       {
@@ -356,6 +372,10 @@ const PROFILES: Profile[] = [
         horizon: "6-18 months",
         basis: `Mineral supply measures have repeatedly drawn reciprocal control or consultation steps from affected economies (hypothesis).`,
         trigger: "A WTO consultation request, a reciprocal control list, or a coordinated partner statement naming the same materials.",
+        alternative:
+          "Partner governments respond through diplomatic consultation rather than formal trade-remedy action, judging the measure within existing WTO commitments (hypothesis).",
+        falsifier:
+          "No WTO consultation request, reciprocal control list, or coordinated partner statement naming the same materials appears within 18 months.",
         tag: "hypothesis",
       },
     ],
@@ -404,6 +424,10 @@ const PROFILES: Profile[] = [
         horizon: "12-24 months",
         basis: `Funding aimed at supply-chain breadth transmits fastest to mature-node capacity and tool qualification, where technology barriers are lowest (hypothesis).`,
         trigger: "Award lists, new fab or packaging-line announcements, or domestic tool qualification disclosures.",
+        alternative:
+          "Funding is absorbed into existing operating budgets without new capacity or qualification announcements, and no award list is published (hypothesis).",
+        falsifier:
+          "No award list, new fab or packaging-line announcement, or domestic tool qualification disclosure appears within 24 months.",
         tag: "hypothesis",
       },
       {
@@ -412,6 +436,10 @@ const PROFILES: Profile[] = [
         horizon: "18-36 months",
         basis: `Capital does not substitute for lithography and EDA access, so a funded programme can still stall at the advanced-node frontier (hypothesis).`,
         trigger: "Absence of leading-edge yield disclosures, or later measures re-weighting toward advanced packaging and materials.",
+        alternative:
+          "Advanced-node yield improves faster than expected despite the funding gap, narrowing rather than widening the gap with leading-edge competitors (hypothesis).",
+        falsifier:
+          "Leading-edge yield disclosures or advanced-node capacity announcements appear within 36 months, with no re-weighting toward packaging and materials.",
         tag: "hypothesis",
       },
     ],
@@ -463,6 +491,10 @@ const PROFILES: Profile[] = [
         horizon: v.deadlineEn ?? undefined,
         basis: `A filing requirement cannot operate without published scope and review procedure, and the excerpt already commits to the document (hypothesis).`,
         trigger: "A draft measure for public comment, a named review body, or the first published filing decisions.",
+        alternative:
+          "Filing stays an internal administrative practice with no published scope or review timeline, and enforcement remains discretionary case-by-case (hypothesis).",
+        falsifier:
+          "No draft measure, named review body, or published filing decision appears within the stated window.",
         tag: "hypothesis",
       },
       {
@@ -471,6 +503,10 @@ const PROFILES: Profile[] = [
         horizon: v.deadlineEn ? `within 12 months of ${v.deadlineEn.replace(/^by /, "")}` : "12 months",
         basis: `Hub-scale funding follows existing power, land and network endowments, which are concentrated in a small number of provinces (hypothesis).`,
         trigger: "Award lists, provincial matching funds, or disclosed hub capacity and utilisation figures.",
+        alternative:
+          "Compute support is spread thinly across many provinces for political balance rather than concentrated where infrastructure already exists (hypothesis).",
+        falsifier:
+          "No award list, provincial matching fund, or disclosed hub capacity figure appears within 12 months of the stated deadline.",
         tag: "hypothesis",
       },
       {
@@ -480,6 +516,10 @@ const PROFILES: Profile[] = [
         basis: `Funding addresses capacity, not approval throughput or chip access, so either can bind first and neither is resolved by this text (hypothesis).`,
         trigger:
           "Lengthening approval queues, hub utilisation shortfalls, or tighter external controls on high-end accelerators.",
+        alternative:
+          "Filing throughput and accelerator supply both keep pace with funded capacity, and commercial launches proceed on the stated timeline (hypothesis).",
+        falsifier:
+          "Approval queues and hub utilisation stay stable and export-control conditions on high-end accelerators do not tighten within 24 months.",
         tag: "hypothesis",
       },
     ],
@@ -530,6 +570,10 @@ const PROFILES: Profile[] = [
         horizon: v.deadlineEn ? `12-18 months after ${v.deadlineEn.replace(/^by /, "")}` : "12-18 months",
         basis: `Infrastructure and cell support transmits to announced capacity faster than to end-demand, and provincial matching funds usually follow central pilot designation (hypothesis).`,
         trigger: "Award lists, provincial matching funds, new plant or charging-network targets.",
+        alternative:
+          "Funded capacity sits idle or under-utilised, with no matching export or utilisation announcements even after the pilot is designated (hypothesis).",
+        falsifier:
+          "No award list, provincial matching fund, or new plant/charging-network target is announced within 18 months of the stated deadline.",
         tag: "hypothesis",
       },
       {
@@ -539,6 +583,10 @@ const PROFILES: Profile[] = [
         basis: `Documented public support for the EV chain is the evidentiary basis anti-subsidy investigations rely on, and the named funding is publicly stated (hypothesis).`,
         trigger:
           "New anti-subsidy or countervailing filings citing Chinese EV-chain support, or tariff decisions in the EU or other major markets.",
+        alternative:
+          "Export markets treat the funding as consistent with existing trade commitments and take no new action, judging it below the threshold that triggers a case (hypothesis).",
+        falsifier:
+          "No new anti-subsidy filing, countervailing case, or tariff decision citing Chinese EV-chain support appears within 18 months.",
         tag: "hypothesis",
       },
     ],
@@ -587,6 +635,10 @@ const PROFILES: Profile[] = [
         horizon: "3-12 months",
         basis: `The excerpt leads with dialogue and consultation and names products without a remedy step, which is the pattern that normally precedes a scheduled bilateral channel (hypothesis).`,
         trigger: "An announced bilateral meeting or joint economic commission date, or a technical delegation visit.",
+        alternative:
+          "No bilateral channel is scheduled and the named products stay a recurring rhetorical point rather than the basis for a meeting (hypothesis).",
+        falsifier:
+          "No announced bilateral meeting, joint economic commission date, or technical delegation visit appears within 12 months.",
         tag: "hypothesis",
       },
       {
@@ -595,6 +647,10 @@ const PROFILES: Profile[] = [
         horizon: "6-18 months",
         basis: `Naming specific products in an official statement establishes the public record that a subsequent anti-dumping, countervailing or WTO step would cite (hypothesis).`,
         trigger: "A ministry case notice with a docket number, a WTO consultation request, or a customs clearance change on those product lines.",
+        alternative:
+          "Both sides prefer to keep the issue at the consultation level indefinitely, judging a formal case too costly to the broader relationship (hypothesis).",
+        falsifier:
+          "No ministry case notice, WTO consultation request, or customs clearance change on the named product lines appears within 18 months.",
         tag: "hypothesis",
       },
       {
@@ -603,6 +659,10 @@ const PROFILES: Profile[] = [
         horizon: "6-12 months",
         basis: `Consultation formulations frequently recur without an instrument attached, particularly where domestic buyers of the same inputs would absorb the cost of restriction (hypothesis).`,
         trigger: "Repeat statements with no case number, and stable customs clearance and shipment volumes.",
+        alternative:
+          "A procedural step follows relatively quickly, driven by domestic pressure from an affected industry rather than by the diplomatic cycle (hypothesis).",
+        falsifier:
+          "A case number, WTO filing, or customs clearance change appears within 12 months, or shipment volumes on the named products drop sharply.",
         tag: "hypothesis",
       },
     ],
@@ -660,6 +720,10 @@ const PROFILES: Profile[] = [
         horizon: "6-18 months",
         basis: `Where the excerpt names no central transfer mechanism, delivery historically depends on local fiscal capacity, which widens regional divergence (hypothesis).`,
         trigger: "Provincial bond issuance volumes, quota allocations, or published project lists skewed by region.",
+        alternative:
+          "A central transfer mechanism is named later, reducing regional divergence rather than leaving delivery to local fiscal capacity alone (hypothesis).",
+        falsifier:
+          "A named central transfer channel is published, or provincial bond issuance and project lists show even distribution rather than concentration in fiscally stronger provinces.",
         tag: "hypothesis",
       },
       {
@@ -668,6 +732,10 @@ const PROFILES: Profile[] = [
         horizon: "6-12 months",
         basis: `Direction-level commitments in this area repeatedly recur before an operative vehicle appears, and transmission requires the vehicle rather than the statement (hypothesis).`,
         trigger: "Repeat statements with no bond quota, refinancing programme or allocation rule attached.",
+        alternative:
+          "An implementation vehicle is published promptly, converting the commitment into an operative programme within a near-term window (hypothesis).",
+        falsifier:
+          "A bond quota, refinancing programme, or allocation rule is published within 12 months of this excerpt.",
         tag: "hypothesis",
       },
     ],
@@ -711,6 +779,10 @@ const PROFILES: Profile[] = [
         horizon: v.deadlineEn ?? "12-24 months",
         basis: `Industrial-base language in public defense discourse is typically followed by open procurement or localisation programmes rather than by operational disclosure (hypothesis).`,
         trigger: "Published procurement catalogues, localisation targets, or named civil-military technology programmes.",
+        alternative:
+          "Industrial-base language stays at the posture level with no procurement catalogue or localisation programme published, consistent with how such formulations often recur without administrative follow-through (hypothesis).",
+        falsifier:
+          "No published procurement catalogue, localisation target, or named civil-military technology programme appears within the stated horizon.",
         tag: "hypothesis",
       },
       {
@@ -719,6 +791,10 @@ const PROFILES: Profile[] = [
         horizon: "6-18 months",
         basis: `Cooperation formulations in public statements sometimes precede announced exchanges, though the link is weak and frequently unrealised (hypothesis).`,
         trigger: "Announced bilateral defence dialogues, port visits, or joint exercise notifications in official releases.",
+        alternative:
+          "Cooperation language stays rhetorical, with no bilateral dialogue, visit, or exercise notification scheduled (hypothesis).",
+        falsifier:
+          "No announced bilateral defence dialogue, port visit, or joint exercise notification appears within 18 months.",
         tag: "hypothesis",
       },
       {
@@ -727,6 +803,10 @@ const PROFILES: Profile[] = [
         horizon: "12 months",
         basis: `Public defense discourse is designed for continuity, so the absence of follow-through is the common outcome (hypothesis).`,
         trigger: "Repeat press-conference formulations without new procurement, localisation or exchange announcements.",
+        alternative:
+          "A concrete industrial or exchange announcement follows relatively quickly, breaking from the usual pattern of continuity-only public defense discourse (hypothesis).",
+        falsifier:
+          "A new procurement, localisation, or exchange announcement appears within 12 months that goes beyond repeat press-conference formulations.",
         tag: "hypothesis",
       },
     ],
@@ -772,6 +852,10 @@ const PROFILES: Profile[] = [
         horizon: v.deadlineEn ?? "6-18 months",
         basis: `Governance directions change behaviour only when they enter cadre performance assessment or local budgets, which is the usual next step (hypothesis).`,
         trigger: "Published local implementation rules, staffing allocations, or assessment criteria naming these priorities.",
+        alternative:
+          "The direction is absorbed into existing local work plans without a distinct staffing, budget, or assessment change, consistent with how governance language often recurs without administrative follow-through (hypothesis).",
+        falsifier:
+          "No published local implementation rule, staffing allocation, or assessment criterion naming these priorities appears within a near-term window.",
         tag: "hypothesis",
       },
       {
@@ -780,6 +864,10 @@ const PROFILES: Profile[] = [
         horizon: "12 months",
         basis: `Grassroots delivery depends on county fiscal capacity, which varies widely and is not addressed in this text (hypothesis).`,
         trigger: "Divergent district-level service statistics, or complaint and mediation caseload data.",
+        alternative:
+          "Delivery is more even than fiscal capacity would predict, because central transfers or provincial equalisation funding offset the county-level gap (hypothesis).",
+        falsifier:
+          "District-level service and mediation statistics show comparable delivery across better- and worse-resourced counties within 12 months.",
         tag: "hypothesis",
       },
       {
@@ -788,6 +876,10 @@ const PROFILES: Profile[] = [
         horizon: "12-24 months",
         basis: `The same personnel carry both functions, so a tightening of public-opinion priorities reallocates capacity away from services (hypothesis).`,
         trigger: "Local reporting that reweights toward public-opinion tasks, or reduced mediation and service throughput.",
+        alternative:
+          "Livelihood service delivery holds steady even as stability-management demands rise, because the two functions draw on separate budget lines or personnel (hypothesis).",
+        falsifier:
+          "Local reporting and service throughput show no reallocation toward public-opinion tasks within 12-24 months.",
         tag: "hypothesis",
       },
     ],
@@ -838,6 +930,10 @@ const GENERIC: Profile = {
       horizon: v.deadlineEn ? `12 months after ${v.deadlineEn.replace(/^by /, "")}` : "12 months",
       basis: `Delivery of a commitment with no named implementing body follows existing administrative capacity rather than stated intent (hypothesis).`,
       trigger: "Award or project lists showing regional concentration, or provincial matching commitments.",
+      alternative:
+        "Implementation is spread deliberately across weaker-capacity regions as a matter of equity policy, rather than following existing administrative strength (hypothesis).",
+      falsifier:
+        "Award or project lists show even geographic distribution rather than concentration in higher-capacity regions.",
       tag: "hypothesis",
     },
     slippageScenario(v, "a narrower version of the stated commitment"),

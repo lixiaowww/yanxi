@@ -195,6 +195,26 @@ ForecastScenario {
 
 **验证：** `npm run test:canada-priority`（bump 数值 + 同主题候选按 canada_nexus 重排）。
 
+### 4.7 第二 LLM 供应商兜底（2026-09-22）
+
+**问题**：连续两份线上真实简报（EV、Taiwan Strait）都是 `mode: offline`，排查发现根因是 Groq 免费/on-demand 档 `openai/gpt-oss-20b` 的每分钟 token 限额被打满（`HTTP 429`），不是代码 bug，是账号档位的真实瓶颈——公开站只要有正常访问量就会频繁撞到。
+
+**方案**：`src/lib/llm.ts` 新增 `callLlmJsonWithFallback()`——主供应商（`LLM_*`）失败时（任何错误，不只 429），自动重试一个可选的第二供应商（`LLM_FALLBACK_*`）。两者都失败才真正掉回 offline 模板；成功时 `BriefResponse.llmProvider` 标注 `"primary"|"fallback"` 便于审计。`enrichScenarioAlternatives()`（§4.3a）仍只用主供应商，不做兜底——它本身已是软失败设计，且只在主简报调用成功后才触发。
+
+**不做**：不做超过两级的供应商链；不重试同一供应商（避免在真正的 429 窗口内加重限流，参考 §4.3a 的冷却设计）；兜底供应商的 key 只进本地 `.env` / Render 环境变量，不进代码或文档。
+
+**代码：** `src/lib/llm.ts`（`callLlmJsonWithFallback`）；`src/lib/pipeline.ts`（主调用改用兜底版本 + `llmProvider` 字段）；`.env.example`（`LLM_FALLBACK_*` 说明）。
+
+**验证：** `npm run test:llm-fallback-provider`（mock fetch：主成功不碰兜底 / 主失败切兜底 / 两者皆败抛主错误 / `callLlmJson` 单供应商不变）。已用真实 DeepSeek key 在本地验证：强制主供应商失败、以及命中真实 Groq 429 时，均正确切到兜底并返回 `mode: "llm"`。
+
+### 4.8 情景四件套去模板化：扩展到全部 10 个领域画像（2026-09-22）
+
+**问题**：§4.3a 只解决了 `macro_finance`/`general_policy` 用到的两个共用工厂函数（`publicationScenario`/`slippageScenario`），其余 8 个领域画像（`taiwan_strait`/`critical_minerals`/`semiconductors`/`china_ai`/`electric_vehicles`/`canada_trade`/`defense_public`/`social_governance`）的手写 scenario 对象根本没填 `alternative`/`falsifier`，全部落到 `ensureFourPiece()` 的同一句兜底文案——从两份真实线上简报（EV 2/3 重复、Taiwan Strait **3/3 全部重复**）确认这是最常见的真实体验，不是边缘情况。
+
+**方案**：给全部 10 个领域画像的每一个手写 scenario 补上贴合该情景具体推理的 `alternative`/`falsifier`（不是套模板——每条都对应该情景自己的 basis/trigger 写一条独立的竞争性解读和独立的反证条件）。不依赖 LLM 增强（§4.3a）——即使线上一直走 offline（见 §4.7 之前的情况），情景四件套现在也不再是复读机。
+
+**验证：** `npm run test:scenario-diversity`——对 10 个画像各跑一次 `buildContentAnalysis(..., forcedProfileId)`，断言同一画像内所有情景的 `alternative`/`falsifier` 互不相同，且都不等于 `ensureFourPiece()` 的原始兜底句。
+
 ---
 
 ## 5. 风险与伦理

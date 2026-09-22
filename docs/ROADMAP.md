@@ -46,6 +46,8 @@
 - [x] F13 alternative/falsifier 去模板化：可选 LLM 同批重写（ACH 对比），软失败回退规则引擎 · `npm run test:scenario-enrich`  
 - [x] F14 Human-in-the-loop 明确 intake：source_class / intake 灰区 / 领域画像三点非阻塞覆盖 · `npm run test:human-review`  
 - [x] F15 加拿大关联度升级为核心排序参数（importance 加权 + related-briefs/outbox 排序）；UI 移除无价值的 Force offline 开关 · `npm run test:canada-priority`  
+- [x] F16 第二 LLM 供应商兜底（Groq 429 时自动切换）· `npm run test:llm-fallback-provider`  
+- [x] F17 情景四件套扩展到全部 10 个领域画像，不再依赖 LLM 增强就能去模板化 · `npm run test:scenario-diversity`  
 
 ## Next（产品）
 

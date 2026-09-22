@@ -34,6 +34,7 @@ Paste save ──► outbox markdown (reader spine)
 | `src/lib/brief-quality.ts` | complete \| partial \| rejected；likelihood cap |
 | `src/lib/facts.ts` / `analysis.ts` | 内容事实抽取与分领域 so_what / 情景四件套（规则引擎，兜底 alternative/falsifier） |
 | `src/lib/scenario-enrich.ts` | 可选：LLM 一次性重写全部情景的 alternative/falsifier（ACH 同批对比），拒绝雷同/字段缺失则整批放弃，保留规则引擎文案 |
+| `src/lib/llm.ts`（`callLlmJsonWithFallback`） | 主 LLM 供应商失败时自动切换可选的 `LLM_FALLBACK_*` 供应商；两者皆败才交给调用方回退 offline |
 | `src/lib/pipeline.ts`（`buildHumanReviewPoints`） | Human-in-the-loop：`human_review[]` 列出 source_class / intake 灰区 / 领域画像三处猜测点；`BriefRequest.forcedIntakeLabel` / `forcedDomainProfile` 非阻塞覆盖重跑 |
 | `src/lib/confidence.ts` | 印证分 + 因子化置信度 |
 | `src/lib/gate.ts` | L1 claim/ethics |

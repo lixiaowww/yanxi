@@ -1,6 +1,6 @@
 import { composeBriefingSystemPrompt } from "./skills.js";
 import { runClaimGate, gatePassed, type BriefingJson } from "./gate.js";
-import { callLlmJson, llmConfigured } from "./llm.js";
+import { callLlmJsonWithFallback, llmConfigured } from "./llm.js";
 import { offlineBriefing } from "./offline.js";
 import { buildSignalingScorecard, valvesFromScorecard } from "./media-heuristics.js";
 import { buildInfoTriage } from "./info-triage.js";
@@ -64,6 +64,8 @@ export type BriefResponse = {
   /** Why offline, or empty when LLM succeeded. */
   offlineReason?: string;
   llmConfigured: boolean;
+  /** Which provider actually answered, when mode is "llm" — transparency, not a claim of quality difference. */
+  llmProvider?: "primary" | "fallback";
   /** Research draft usefulness hint (not event probability). */
   infoValue: {
     level: "low" | "medium" | "high";
@@ -219,6 +221,7 @@ export async function runBriefingPipeline(req: BriefRequest): Promise<BriefRespo
   let briefing: BriefingJson;
   let mode: "llm" | "offline" = "offline";
   let offlineReason: string | undefined;
+  let llmProvider: "primary" | "fallback" | undefined;
 
   if (req.forceOffline) {
     briefing = offlineBriefing(joined, matchedCards, sources[0].label, sources);
@@ -232,8 +235,10 @@ export async function runBriefingPipeline(req: BriefRequest): Promise<BriefRespo
     offlineReason = `intake_${intake.label}: skipped LLM — ${intake.reason_en}`;
   } else if (allowLlm) {
     try {
-      briefing = await callLlmJson(prompt, userMessage(sources));
+      const called = await callLlmJsonWithFallback(prompt, userMessage(sources));
+      briefing = called.data;
       mode = "llm";
+      llmProvider = called.provider;
       offlineReason = undefined;
     } catch (e) {
       briefing = offlineBriefing(joined, matchedCards, sources[0].label, sources);
@@ -314,6 +319,7 @@ export async function runBriefingPipeline(req: BriefRequest): Promise<BriefRespo
     mode,
     offlineReason,
     llmConfigured: configured,
+    llmProvider,
     infoValue,
     matchedCards: finalCards,
     briefing,

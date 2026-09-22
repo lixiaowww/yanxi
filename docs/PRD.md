@@ -111,6 +111,8 @@
 | F13 | 预测四件套：label / basis / trigger / alternative / falsifier（缺字段 soft） | P0 | 已交付 |
 | F14 | Human-in-the-loop 明确 intake：`human_review[]` 列出 source_class / intake 灰区 / 领域画像三处仍是猜测的点，非阻塞，操作者选完覆盖字段重跑即解决 | P1 | 已交付 |
 | F15 | 加拿大关联度作为核心排序参数：importance 加权、outbox/related-briefs 排序均以 canada_nexus 为一等信号（非装饰徽章） | P1 | 已交付 |
+| F16 | 第二 LLM 供应商兜底：主供应商（Groq）失败/限流时自动切换到可选的 `LLM_FALLBACK_*`，两者皆败才落回离线模板 | P0 | 已交付 |
+| F17 | 情景四件套（alternative/falsifier）扩展到全部 10 个领域画像的手写场景，离线模式下也不再共享同一句兜底文案 | P0 | 已交付 |
 
 详细设计见 [DP-brief-quality.md](./DP-brief-quality.md)。读者交付物字段与流水线见 [DP.md](./DP.md)、[ARCHITECTURE.md](./ARCHITECTURE.md)。
 
