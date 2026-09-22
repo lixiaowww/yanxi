@@ -348,13 +348,35 @@ async function main() {
     res.send(body);
   });
 
+  // Frozen portfolio showcase pair (npm run showcase) — read-only, no secrets.
+  app.get("/examples/showcase/:file", (req, res) => {
+    const name = path.basename(req.params.file);
+    if (!/^[\w.-]+\.(json|md)$/.test(name)) {
+      res.status(400).send("bad filename");
+      return;
+    }
+    const body = readFileInsideDir(path.join(process.cwd(), "examples", "showcase"), name);
+    if (body === null) {
+      res.status(404).send("not found — run npm run showcase first");
+      return;
+    }
+    if (name.endsWith(".json")) res.type("application/json");
+    else res.type("text/markdown; charset=utf-8");
+    res.send(body);
+  });
+
   const isProd = process.env.NODE_ENV === "production";
 
   if (isProd) {
     const dist = path.join(process.cwd(), "dist");
     app.use(express.static(dist, { index: false }));
     app.get("*", (req, res, next) => {
-      if (req.path.startsWith("/api/") || req.path.startsWith("/feeds/") || req.path.startsWith("/outbox/")) {
+      if (
+        req.path.startsWith("/api/") ||
+        req.path.startsWith("/feeds/") ||
+        req.path.startsWith("/outbox/") ||
+        req.path.startsWith("/examples/")
+      ) {
         next();
         return;
       }

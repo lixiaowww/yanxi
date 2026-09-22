@@ -7,6 +7,8 @@ description: Enumerated public PRC media heuristics with weights — civilian re
 tag: hypothesis
 updated: 2026-09-20
 sources: Observable public PRC media/reporting conventions (open press patterns)
+reviewed_by: Sean Li (native Mandarin speaker, author)
+review_date: 2026-09-22
 ---
 
 # Context card: 公开报道启发式清单（先枚举，再加权）

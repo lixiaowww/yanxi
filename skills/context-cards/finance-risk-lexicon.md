@@ -7,6 +7,8 @@ description: Background gloss for public finance / property / systemic-risk voca
 tag: background
 updated: 2026-09-20
 sources: Public finance/property/systemic-risk vocabulary in open PRC reporting
+reviewed_by: Sean Li (native Mandarin speaker, author)
+review_date: 2026-09-22
 ---
 
 # Context card: Finance & risk lexicon (background)

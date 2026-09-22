@@ -7,6 +7,8 @@ description: Cultural and discourse semantics that affect tone and audience read
 tag: background
 updated: 2026-09-20
 sources: Public cultural/discourse terms appearing in open Mandarin media
+reviewed_by: Sean Li (native Mandarin speaker, author)
+review_date: 2026-09-22
 ---
 
 # Context card: Cultural / discourse semantics (background)

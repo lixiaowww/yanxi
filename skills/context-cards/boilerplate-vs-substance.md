@@ -7,6 +7,8 @@ description: How to strip formulaic party-speak and keep verifiable substance cu
 tag: hypothesis
 updated: 2026-09-20
 sources: Civilian reading method for formulaic PRC public prose; not a claim about intent
+reviewed_by: Sean Li (native Mandarin speaker, author)
+review_date: 2026-09-22
 ---
 
 # Context card: 党八股剥离 → 干货清单

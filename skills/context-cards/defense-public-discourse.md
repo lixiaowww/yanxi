@@ -7,6 +7,8 @@ description: Public defense/military discourse vocabulary — civilian reading o
 tag: background
 updated: 2026-09-20
 sources: Public MND press-conference / defense white-paper style vocabulary only
+reviewed_by: Sean Li (native Mandarin speaker, author)
+review_date: 2026-09-22
 ---
 
 # Context card: 国防公开表述

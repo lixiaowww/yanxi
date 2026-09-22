@@ -365,16 +365,48 @@ export function App() {
     setReviewChoices({});
   }
 
+  /**
+   * Guided starting points instead of a blank textarea — one input that
+   * reaches brief_quality=complete, one that correctly defers. Both are the
+   * product working as designed (see docs/PRD.md §2), not a coin flip on
+   * whatever a first-time visitor happens to paste.
+   */
+  async function loadGuidedExample(kind: "complete" | "defer") {
+    setDomainId("");
+    setActiveQuote(null);
+    setResult(null);
+    setReviewChoices({});
+    if (kind === "defer") {
+      setSourceText(
+        "有关会议强调，要统筹发展和安全，稳妥化解地方债与隐性债务风险，持续做好保交楼工作，促进房地产市场平稳健康发展，坚决守住不发生系统性金融风险的底线，同时防止资本无序扩张。"
+      );
+      setLabel("single-source-finance-risk");
+      setSource2Text("");
+      setSourcePublishedAt("");
+      return;
+    }
+    const [meeting, notice] = await Promise.all([
+      fetch("/api/domains/macro-cewc").then((r) => r.json()),
+      fetch("/api/domains/macro-instrument").then((r) => r.json()),
+    ]);
+    setSourceText(meeting.sourceText);
+    setLabel("Xinhua — Central Economic Work Conference");
+    setSource2Text(notice.sourceText);
+    setSource2Label("State Council General Office — implementing notice");
+    setSourcePublishedAt("2026-09-15");
+  }
+
   useEffect(() => {
     refreshSubs().catch(() => undefined);
   }, []);
 
-  async function run() {
+  async function run(opts?: { second?: { text: string; label: string } }) {
     setLoading(true);
     setError("");
     setActiveQuote(null);
     try {
-      const second = source2Text.trim();
+      const second = (opts?.second?.text ?? source2Text).trim();
+      const secondLabel = opts?.second?.label ?? source2Label;
       // Human review overrides — only sent once the operator has actually
       // picked an answer for that point (see the "Needs your call" panel).
       const overrides = {
@@ -387,7 +419,7 @@ export function App() {
           ? {
               sources: [
                 { label, text: sourceText },
-                { label: source2Label || "second-public-source", text: second },
+                { label: secondLabel || "second-public-source", text: second },
               ],
               sourcePublishedAt: sourcePublishedAt.trim() || undefined,
               ...overrides,
@@ -432,7 +464,10 @@ export function App() {
     }
   }
 
-  async function useRelatedAsSecondSource(jsonFile: string) {
+  /** Fetch a related outbox brief's source text/label; returns null on failure (sets error). */
+  async function fetchRelatedSource(
+    jsonFile: string
+  ): Promise<{ text: string; label: string } | null> {
     try {
       const res = await fetch(`/outbox/briefs/${jsonFile}`);
       if (!res.ok) throw new Error(`Could not load ${jsonFile}`);
@@ -440,12 +475,30 @@ export function App() {
       const text = String(rec?.source?.sourceText || "");
       const lab = String(rec?.source?.label || rec?.id || "related-source");
       if (text.length < 20) throw new Error("Related brief has no usable source text");
-      setSource2Text(text);
-      setSource2Label(lab);
-      setError("");
+      return { text, label: lab };
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
+      return null;
     }
+  }
+
+  async function useRelatedAsSecondSource(jsonFile: string) {
+    const hit = await fetchRelatedSource(jsonFile);
+    if (!hit) return;
+    setSource2Text(hit.text);
+    setSource2Label(hit.label);
+    setError("");
+  }
+
+  /** Top-banner one-click action for a Partial brief: merge the strongest
+   * related outbox brief as the second source and re-run immediately,
+   * instead of load-then-scroll-up-then-click-Generate. */
+  async function mergeRelatedAndRun(jsonFile: string) {
+    const hit = await fetchRelatedSource(jsonFile);
+    if (!hit) return;
+    setSource2Text(hit.text);
+    setSource2Label(hit.label);
+    await run({ second: hit });
   }
 
   async function saveBrief() {
@@ -571,6 +624,29 @@ export function App() {
               Hot topics desk and show theme chips on the brief.
             </p>
           ) : null}
+          <div className="guided-examples">
+            <p className="meta">New here? Load a guided example instead of pasting blind:</p>
+            <div className="row" style={{ gap: "0.5rem", flexWrap: "wrap" }}>
+              <button
+                type="button"
+                className="secondary"
+                onClick={() => loadGuidedExample("complete").catch((err) => setError(String(err)))}
+              >
+                Try a complete example
+              </button>
+              <span className="meta">two sources, dated → reaches brief_quality=complete</span>
+            </div>
+            <div className="row" style={{ gap: "0.5rem", flexWrap: "wrap", marginTop: "0.3rem" }}>
+              <button
+                type="button"
+                className="secondary"
+                onClick={() => loadGuidedExample("defer").catch((err) => setError(String(err)))}
+              >
+                Try a deferred example
+              </button>
+              <span className="meta">single source, no date, no named body → correctly declined</span>
+            </div>
+          </div>
           <label htmlFor="src" style={{ marginTop: "0.75rem" }}>
             Public Mandarin source (paste)
           </label>
@@ -626,7 +702,7 @@ export function App() {
               />
               Mark as social commentary (down-weight)
             </label>
-            <button type="button" onClick={run} disabled={loading}>
+            <button type="button" onClick={() => run()} disabled={loading}>
               {loading ? "Running…" : "Generate briefing"}
             </button>
             <button
@@ -653,6 +729,45 @@ export function App() {
           ) : (
             <article className="brief-reader">
               <header className="brief-status">
+                <p
+                  className={`verdict-line ${
+                    b.intake?.label === "defer" || b.adoption?.adopted === false ? "warn" : "ok"
+                  }`}
+                >
+                  {b.intake?.label === "defer"
+                    ? "Deferred — watch queue (no actionable hard detail yet)."
+                    : b.adoption?.adopted === false
+                      ? "Not adopted — no verifiable detail in this excerpt."
+                      : `Adopted${
+                          b.brief_quality?.label_en ? ` · ${b.brief_quality.label_en}` : ""
+                        }${
+                          b.temporal?.freshness?.label_en
+                            ? ` · ${b.temporal.freshness.label_en}`
+                            : ""
+                        }${
+                          b.confidence_factors?.level
+                            ? ` · confidence ${b.confidence_factors.level}`
+                            : ""
+                        }.`}
+                </p>
+                {b.brief_quality?.level === "partial" && result.relatedBriefs?.[0] ? (
+                  <p className="merge-cta">
+                    <button
+                      type="button"
+                      className="secondary"
+                      onClick={() => mergeRelatedAndRun(result.relatedBriefs![0].jsonFile)}
+                      disabled={loading}
+                    >
+                      Merge related brief &amp; re-run
+                    </button>{" "}
+                    <span className="meta">
+                      Uses "{result.relatedBriefs[0].label}" as a second source to test for
+                      complete.
+                    </span>
+                  </p>
+                ) : null}
+                <details className="qa-details">
+                  <summary>Analysis details (mode, gate, chips)</summary>
                 <div className="status-chips">
                   <span
                     className={`chip ${
@@ -785,6 +900,7 @@ export function App() {
                     Domain: {b.content_analysis.domain_label_en}
                   </p>
                 ) : null}
+                </details>
               </header>
 
               {(b.human_review || []).some((p) => p.status === "open") ? (
@@ -815,7 +931,7 @@ export function App() {
                         </select>
                       </div>
                     ))}
-                  <button type="button" className="secondary" onClick={run} disabled={loading}>
+                  <button type="button" className="secondary" onClick={() => run()} disabled={loading}>
                     Apply &amp; re-run
                   </button>
                 </section>

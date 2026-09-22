@@ -37,8 +37,9 @@ Script: `scripts/cursor-harness-brief.ts`
 
 | Var | Purpose |
 |-----|---------|
-| _(none)_ | Offline briefing demo |
-| `LLM_API_KEY` | Optional OpenAI-compatible chat for `/api/brief` |
+| _(none)_ | Offline briefing demo — final fallback only; not the standing config (see below) |
+| `LLM_API_KEY` / `LLM_BASE_URL` / `LLM_MODEL` | Primary LLM (Groq) for `/api/brief` — configured in both local `.env` and Render (F19) |
+| `LLM_FALLBACK_API_KEY` / `LLM_FALLBACK_BASE_URL` / `LLM_FALLBACK_MODEL` | Fallback LLM (DeepSeek), used on primary failure/429 (F16) — configured in both local `.env` and Render (F19) |
 | `CURSOR_API_KEY` | Optional Cursor SDK harness script |
 | `TYPESAFE_API_KEY` | Optional Jev Choice for intake second cut only |
 

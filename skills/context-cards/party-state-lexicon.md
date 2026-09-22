@@ -7,6 +7,8 @@ description: Lexicon for common PRC political terms — background only.
 tag: background
 updated: 2026-09-20
 sources: Common open PRC Party–state institutional terms
+reviewed_by: Sean Li (native Mandarin speaker, author)
+review_date: 2026-09-22
 ---
 
 # Context card: Party–state lexicon (background)

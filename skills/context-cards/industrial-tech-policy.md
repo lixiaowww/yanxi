@@ -7,6 +7,8 @@ description: Background glosses for industrial and tech-policy vocabulary in pub
 tag: background
 updated: 2026-09-20
 sources: Public industrial/tech-policy vocabulary (MIIT-style open statements)
+reviewed_by: Sean Li (native Mandarin speaker, author)
+review_date: 2026-09-22
 ---
 
 # Context card: Industrial & tech policy (background)

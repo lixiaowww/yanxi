@@ -49,14 +49,20 @@
 - [x] F16 第二 LLM 供应商兜底（Groq 429 时自动切换）· `npm run test:llm-fallback-provider`  
 - [x] F17 情景四件套扩展到全部 10 个领域画像，不再依赖 LLM 增强就能去模板化 · `npm run test:scenario-diversity`  
 - [x] F18 Outlook 时效降权区分"相对时间词"与"完全无日期"，封顶前保留情景相对排序 · `npm run test:outlook-differentiation`  
+- [x] F19 运行事实确认：本地 `.env` + Render 均配置双 LLM（Groq 主 + DeepSeek 备），offline 模板降级为最终兜底，非默认路径 — 见 `docs/DP.md` §7
 
 ## Next（产品）
 
-| 项 | 说明 |
-|----|------|
-| 操作引导 | Partial 顶栏 → 「Use related as second source」一键合并再跑（UX 加固） |
-| 金标扩样 | 为 complete/partial 增少量固定 fixtures（演示稳定） |
-| F9 | 作者自定义 context card 向导（可选） |
+| 项 | 优先级 | 说明 |
+|----|--------|------|
+| P0 · Showcase 样例 | P0（已交付） | `npm run showcase` 生成 `examples/showcase/{complete-macro-instrument,deferred-finance-risk}.{md,json}`（真实 LLM 调用，complete 用例 `llmProvider=fallback`/DeepSeek）；Portfolio 页新增 "Showcase" 板块直接展示两篇固化产出 + 完整简报链接，`build-portfolio.ts` 只读文件、不重新调用 LLM |
+| P1 · 结果页拆分 | P1（已交付） | 结果页顶部新增一行 plain-English `verdict-line`（Adopted/Deferred/Not adopted + brief quality + freshness + confidence）始终可见；原有 chip 行 + gate/mode/temporal 细节折进 `<details>`「Analysis details」，默认收起 |
+| P1 · 首页引导样例 | P1（已交付） | 粘贴框上方新增两个按钮：「Try a complete example」（macro-cewc + macro-instrument 双源+日期 → complete）与「Try a deferred example」（本轮对话验证过的 finance-risk 单源无日期 → defer），各配一句结果预告 |
+| P2 · 冻结新门禁层 | P2 | F19 之后不再新增 pipeline 诚实机制层，精力转向呈现/叙事 |
+| 操作引导 | P2（已交付） | Partial 顶栏新增「Merge related brief & re-run」一键按钮（`mergeRelatedAndRun`，`src/App.tsx`），复用既有 `relatedBriefs` 排序取第一条，拉取源文合并后立即重跑，不必再手动滚到底部三步操作 |
+| ~~已知缺口~~ 已修复 | — | `findRelatedBriefs` 排序曾把早期 `job-fit-domain-battery`（14 域合并的测试产物）排在单一主题匹配之前——不仅靠关键词重叠数占便宜，还会因为混入的加拿大相关句子意外触发 `canada_nexus=direct`，拿到本不该有的加权。改为按候选自身 topic 指纹的命中占比折算 concrete/nexus 权重（`src/lib/related-briefs.ts`），干净单主题匹配现在排第一。回归测试 `npm run test:related-specificity`（已进 `npm test`），且用真实 outbox 数据验证过：同一条 SAMPLE 查询现在排第一的是 `domain-tech-chips`，不再是合并大杂烩 |
+| 金标扩样 | P2（已被 Showcase 覆盖） | `examples/showcase/` 的 complete + deferred 固化样例已满足"演示稳定"的诉求，不再单独扩样 |
+| F9 | P2（暂缓） | 作者自定义 context card 向导——新功能而非整改，与"冻结新门禁层"的纪律冲突，暂不做 |
 
 ## Later
 

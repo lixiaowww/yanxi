@@ -38,7 +38,67 @@ type DeskItem = {
   outlook: { label?: string; likelihood?: string }[];
 };
 
+type ShowcaseCard = {
+  id: string;
+  title: string;
+  mode: string;
+  llmProvider?: string;
+  briefQuality?: string;
+  briefQualityLabel?: string;
+  deskLabel?: string;
+  sourceLabels: string[];
+  what?: string;
+  context?: string;
+  soWhat?: string;
+  scenarios: { label?: string; likelihood?: string; alternative?: string; falsifier?: string }[];
+  markdownUrl: string;
+};
+
+/**
+ * Read the frozen showcase pair (`npm run showcase`) rather than calling an
+ * LLM on every portfolio build — build:deploy runs on every Render deploy,
+ * and this must stay free/deterministic. Missing files degrade to an empty
+ * array (fresh clone before `npm run showcase` has been run once) instead
+ * of failing the whole portfolio build.
+ */
+function loadShowcase(root: string): ShowcaseCard[] {
+  const dir = path.join(root, "examples", "showcase");
+  const files: { file: string; title: string }[] = [
+    { file: "complete-macro-instrument.json", title: "Complete brief — two sources, dated" },
+    { file: "deferred-finance-risk.json", title: "Deferred — single source, no date, no named body" },
+  ];
+  const cards: ShowcaseCard[] = [];
+  for (const { file, title } of files) {
+    const full = path.join(dir, file);
+    if (!fs.existsSync(full)) continue;
+    const r = JSON.parse(fs.readFileSync(full, "utf8"));
+    const b = r.briefing || {};
+    cards.push({
+      id: file.replace(/\.json$/, ""),
+      title,
+      mode: r.mode,
+      llmProvider: r.llmProvider,
+      briefQuality: b.brief_quality?.level,
+      briefQualityLabel: b.brief_quality?.label_en,
+      deskLabel: b.desk_section?.label_en,
+      sourceLabels: (b.briefing_en?.sources_used as string[]) || [],
+      what: b.briefing_en?.what,
+      context: b.briefing_en?.context,
+      soWhat: b.briefing_en?.so_what,
+      scenarios: (b.policy_outlook?.scenarios || []).map((s: Record<string, string>) => ({
+        label: s.label,
+        likelihood: s.likelihood,
+        alternative: s.alternative,
+        falsifier: s.falsifier,
+      })),
+      markdownUrl: `/examples/showcase/${file.replace(/\.json$/, ".md")}`,
+    });
+  }
+  return cards;
+}
+
 const root = process.cwd();
+const showcase = loadShowcase(root);
 const fixtures = listDomainFixtures(root);
 const bySection = new Map<DeskSectionId, DeskItem[]>();
 const texts = new Map<string, string>();
@@ -178,6 +238,7 @@ const portfolio = {
     ontology_en: "Civic Ontology Lite: desk-first context cards ≤8; not OWL / intel ontology",
   },
   heuristic_basis_note: HEURISTIC_BASIS_NOTE,
+  showcase,
   columns,
   hot_theme_catalog: HOT_THEME_CATALOG.map((t) => ({
     id: t.id,
@@ -193,6 +254,8 @@ const portfolio = {
     description: c.description,
     updated: c.updated,
     sources: c.sources,
+    reviewedBy: c.reviewedBy,
+    reviewDate: c.reviewDate,
   })),
   ethics: [
     "Quotes must be substrings of the paste (claim gate)",
@@ -227,9 +290,30 @@ const md = [
   `- ${portfolio.method.canada_en}`,
   `- ${portfolio.method.ontology_en}`,
   "",
-  "## Desk columns",
-  "",
 ];
+if (showcase.length) {
+  md.push("## Showcase — what a run actually produces", "");
+  md.push(
+    "Two frozen examples: what the pipeline outputs when a paste has real detail and " +
+      "corroboration, and what it outputs when it correctly declines a thin, undated, " +
+      "unnamed-source paste. Both are the product working as designed."
+  );
+  md.push("");
+  for (const s of showcase) {
+    md.push(`### ${s.title}`);
+    md.push("");
+    md.push(
+      `mode=${s.mode}${s.llmProvider ? `/${s.llmProvider}` : ""}` +
+        (s.briefQualityLabel ? ` · ${s.briefQualityLabel}` : "") +
+        (s.deskLabel ? ` · ${s.deskLabel}` : "")
+    );
+    if (s.sourceLabels.length) md.push(`Sources: ${s.sourceLabels.join(" + ")}`);
+    md.push("");
+    if (s.what) md.push(s.what, "");
+    md.push(`[Full brief →](${s.markdownUrl})`, "");
+  }
+}
+md.push("## Desk columns", "");
 md.push(`_${HEURISTIC_BASIS_NOTE}_`);
 md.push("");
 for (const col of columns) {

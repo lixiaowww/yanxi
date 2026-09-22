@@ -14,6 +14,28 @@
 - Canada nexus + public policy/law URL overlay (not legal advice)
 - Civic Ontology Lite: desk-first context cards ≤8; not OWL / intel ontology
 
+## Showcase — what a run actually produces
+
+Two frozen examples: what the pipeline outputs when a paste has real detail and corroboration, and what it outputs when it correctly declines a thin, undated, unnamed-source paste. Both are the product working as designed.
+
+### Complete brief — two sources, dated
+
+mode=llm/fallback · Complete brief (multi-source + dated) · Economy & investment
+Sources: Xinhua — Central Economic Work Conference + State Council General Office — implementing notice
+
+Two public texts describe a policy sequence: a Central Economic Work Conference stressing high-quality development, 'new quality productive forces' adapted to local conditions, continued reform and opening, livelihood protection and social stability; and a State Council General Office notice directing relevant departments to draft implementation plans, run pilots on new quality productive forces adapted to local conditions, do policy interpretation, and issue supporting measures in due course. The conference text also restates the standard fiscal/monetary stance (proactive fiscal, prudent monetary), domestic-demand expansion and growth stabilization.
+
+[Full brief →](/examples/showcase/complete-macro-instrument.md)
+
+### Deferred — single source, no date, no named body
+
+mode=offline · Rejected / not a full brief · Economy & investment
+Sources: single-source-finance-risk
+
+Not adopted — this excerpt carries no verifiable detail. Named in the paste: acting party (an unnamed meeting) and subject (local-government debt, hidden local debt and housing-delivery guarantees). Missing: a named instrument, a funding line, a deadline or time marker, a quantified target and a pilot or scope boundary.
+
+[Full brief →](/examples/showcase/deferred-finance-risk.md)
+
 ## Desk columns
 
 _Bands come from hand-set rule cues, not a calibrated model — they order and flag, they do not measure._
@@ -23,9 +45,9 @@ _Bands come from hand-set rule cues, not a calibrated model — they order and f
 Aggregated public hot themes: Taiwan Strait, EVs, China AI, semiconductors, critical minerals — still adoption-gated on hard detail · items 4 · strongest corroboration minimal
 
 - `hot-china-ai` · implementing_instrument/P3 · corroboration minimal · confidence low · verifiable detail dense (numbers, deadlines, named instruments and funding lines detected)
-  - the Ministry of Science and Technology official statement; large models filing supporting measures to be issued by end-2…
+  - The Ministry of Science and Technology official statement; large models filing supporting measures to be issued by end-2…
 - `hot-electric-vehicles` · implementing_instrument/P3 · corroboration minimal · confidence low · verifiable detail dense (numbers, deadlines, named instruments and funding lines detected)
-  - the Ministry of Industry and Information Technology official statement; supporting measures to be issued by end-2026; no…
+  - The Ministry of Industry and Information Technology official statement; supporting measures to be issued by end-2026; no…
 
 ### Economy & investment
 
@@ -33,15 +55,15 @@ Fiscal/monetary, industrial investment, special funds, local debt/property, meet
 
 - `dual-circulation` · dual_circulation/P3 · corroboration minimal · confidence low · verifiable detail thin (no numbers, deadlines, named notices or responsible bodies detected)
   - Not adopted — this excerpt carries no verifiable detail. Named in the paste: subject (dual circulation and the unified n…
-- `finance-risk` · finance_risk/P3 · corroboration minimal · confidence low · verifiable detail mixed (cue words matched, but no hard detail survived the adoption filter)
+- `finance-risk` · finance_risk/P3 · corroboration minimal · confidence low · verifiable detail mixed (bans or red lines and named sectors detected)
   - Not adopted — this excerpt carries no verifiable detail. Named in the paste: acting party (an unnamed meeting) and subje…
 
 ### Foreign affairs
 
 Diplomatic discourse, bilateral ties, Belt and Road, sanctions/cooperation in open text · items 2 · strongest corroboration minimal
 
-- `canada-nexus` · foreign_affairs/P3 · corroboration minimal · confidence low · verifiable detail mixed (responsible bodies and named sectors detected)
-  - the Ministry of Commerce official and the Ministry of Foreign Affairs spokesperson statement; named subjects: China-Cana…
+- `canada-nexus` · foreign_affairs/P2 · corroboration minimal · confidence low · verifiable detail mixed (responsible bodies and named sectors detected)
+  - Not adopted — this excerpt carries no verifiable detail. Named in the paste: acting party (the Ministry of Commerce offi…
 - `foreign-affairs` · foreign_affairs/P3 · corroboration minimal · confidence low · verifiable detail thin (no numbers, deadlines, named notices or responsible bodies detected)
   - Not adopted — this excerpt carries no verifiable detail. Named in the paste: acting party (the Ministry of Foreign Affai…
 

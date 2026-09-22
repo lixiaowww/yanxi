@@ -7,6 +7,8 @@ description: Background on PRC macro policy-cycle vocabulary and cautious outloo
 tag: background
 updated: 2026-09-20
 sources: Public CEWC / work-report vocabulary conventions
+reviewed_by: Sean Li (native Mandarin speaker, author)
+review_date: 2026-09-22
 ---
 
 # Context card: Macro policy cycle (background)

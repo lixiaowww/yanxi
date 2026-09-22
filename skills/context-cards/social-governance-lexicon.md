@@ -7,6 +7,8 @@ description: Background glosses for social governance and livelihood policy voca
 tag: background
 updated: 2026-09-20
 sources: Public social-governance / livelihood vocabulary
+reviewed_by: Sean Li (native Mandarin speaker, author)
+review_date: 2026-09-22
 ---
 
 # Context card: Social governance lexicon (background)

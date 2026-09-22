@@ -21,6 +21,61 @@
     "ontology_en": "Civic Ontology Lite: desk-first context cards ≤8; not OWL / intel ontology"
   },
   "heuristic_basis_note": "Bands come from hand-set rule cues, not a calibrated model — they order and flag, they do not measure.",
+  "showcase": [
+    {
+      "id": "complete-macro-instrument",
+      "title": "Complete brief — two sources, dated",
+      "mode": "llm",
+      "llmProvider": "fallback",
+      "briefQuality": "complete",
+      "briefQualityLabel": "Complete brief (multi-source + dated)",
+      "deskLabel": "Economy & investment",
+      "sourceLabels": [
+        "Xinhua — Central Economic Work Conference",
+        "State Council General Office — implementing notice"
+      ],
+      "what": "Two public texts describe a policy sequence: a Central Economic Work Conference stressing high-quality development, 'new quality productive forces' adapted to local conditions, continued reform and opening, livelihood protection and social stability; and a State Council General Office notice directing relevant departments to draft implementation plans, run pilots on new quality productive forces adapted to local conditions, do policy interpretation, and issue supporting measures in due course. The conference text also restates the standard fiscal/monetary stance (proactive fiscal, prudent monetary), domestic-demand expansion and growth stabilization.",
+      "context": "The vocabulary is standard annual economic-work-meeting language: 高质量发展, 新质生产力, 稳增长, 扩大内需, 积极的财政政策/稳健的货币政策. The second text is the administrative follow-through layer — a State Council General Office notice asking departments to produce 实施方案 and 配套办法. Both are summary-level public texts; no numeric targets, deadlines, funding figures, or named sectors appear in the pasted excerpts.",
+      "soWhat": "The substantive nuggets are procedural rather than quantitative: a named instrument (国办通知), a named follow-on instrument (实施方案/配套办法), a pilot-scope cue (因地制宜推进试点), and an identifiable issuing body. That combination suggests the policy chain has moved from meeting framing to drafting stage, but the pasted text does not show what will actually be piloted, where, at what scale, or by when. Treat the slogans as agenda-ordering cues, not operational facts; the next verifiable step is the publication of the referenced implementation plans and supporting measures.",
+      "scenarios": [
+        {
+          "label": "Drafting-stage follow-through",
+          "likelihood": "medium",
+          "alternative": "The notice may merely reiterate the meeting’s broad goals without mandating concrete implementation documents, suggesting the next steps are still open-ended.",
+          "falsifier": "No public budget line item or funding allocation for the new quality productivity pilot appears in the next fiscal budget."
+        },
+        {
+          "label": "Pilot scope stays vague",
+          "likelihood": "medium",
+          "alternative": "The phrase '因地制宜' could be understood as referencing a pre‑identified set of regions or sectors already earmarked by higher authorities, implying a defined pilot scope.",
+          "falsifier": "A public announcement lists a specific region or industry as a pilot, and related investment projects are disclosed within a month."
+        },
+        {
+          "label": "Priority continuity without new numbers",
+          "likelihood": "medium",
+          "alternative": "The wording around '扩大内需' and '稳增长' may conceal a new quantitative target for domestic demand expansion or a revised GDP growth goal.",
+          "falsifier": "The next economic bulletin includes a revised GDP growth forecast or introduces a new quantitative indicator, indicating a change in priorities."
+        }
+      ],
+      "markdownUrl": "/examples/showcase/complete-macro-instrument.md"
+    },
+    {
+      "id": "deferred-finance-risk",
+      "title": "Deferred — single source, no date, no named body",
+      "mode": "offline",
+      "briefQuality": "rejected",
+      "briefQualityLabel": "Rejected / not a full brief",
+      "deskLabel": "Economy & investment",
+      "sourceLabels": [
+        "single-source-finance-risk"
+      ],
+      "what": "Not adopted — this excerpt carries no verifiable detail. Named in the paste: acting party (an unnamed meeting) and subject (local-government debt, hidden local debt and housing-delivery guarantees). Missing: a named instrument, a funding line, a deadline or time marker, a quantified target and a pilot or scope boundary.",
+      "context": "Deferred to the watch queue: thematic or institutional cues without an actionable instrument yet.",
+      "soWhat": "Watch for a later public notice, funded line, or deadline-tied instrument. Local gray heuristic: watch-worthy without actionable hard detail — defer. In this excerpt no document or measure is named, no amount or funding channel appears, no date is given, no pilot or geographic scope is set.",
+      "scenarios": [],
+      "markdownUrl": "/examples/showcase/deferred-finance-risk.md"
+    }
+  ],
   "columns": [
     {
       "id": "hot_topics",
@@ -39,22 +94,22 @@
           "corrBand": "minimal",
           "corr": 0,
           "conf": "low",
-          "what": "the Ministry of Science and Technology official statement; large models filing supporting measures to be issued by end-2026; no less than RMB 2 billion in special funds for a computing-power hubs pilot. The excerpt also expressly prohibits improper cross-border data transfers. Not stated in the excerpt: a quantified target.",
-          "soWhat": "A named instrument (large models filing supporting measures), a date (by end-2026) and an amount (no less than RMB 2 billion in special funds) sit in one excerpt, so this is checkable against the issuing body's own public text rather than read as meeting rhetoric. The amount is s",
+          "what": "The Ministry of Science and Technology official statement; large models filing supporting measures to be issued by end-2026; no less than RMB 2 billion in special funds for a computing-power hubs pilot. The text also expressly prohibits improper cross-border data transfers. Not specified in the excerpt: a quantified target.",
+          "soWhat": "Pairing a model-filing measure with compute funding ties market access to registration: the governance track — who may deploy a model — and the capacity track — who gets compute — would move together, so approval throughput becomes as commercially decisive as hardware. Directing ",
           "canada": "none",
           "canadaPolicy": "none",
           "outlook": [
             {
-              "label": "Instrument vocabulary continues to operationalize the same priorities",
-              "likelihood": "medium"
-            },
-            {
-              "label": "Instrument is procedural/empty of timelines or responsible units",
+              "label": "Filing rules for large models are published with defined scope, review timelines and operator obligations",
               "likelihood": "low"
             },
             {
-              "label": "Subsequent instruments cite the same measures with measurable targets",
-              "likelihood": "medium"
+              "label": "Compute-hub awards concentrate in a few provinces with existing data-centre clusters, with published capacity or utilisation targets",
+              "likelihood": "low"
+            },
+            {
+              "label": "Filing review or accelerator supply becomes the binding constraint, slowing commercial launches despite available funding",
+              "likelihood": "low"
             }
           ]
         },
@@ -67,22 +122,22 @@
           "corrBand": "minimal",
           "corr": 0,
           "conf": "low",
-          "what": "the Ministry of Industry and Information Technology official statement; supporting measures to be issued by end-2026; no less than RMB 3 billion in special funds for a power batteries and charging piles pilot. The excerpt also expressly prohibits subsidy fraud. Not stated in the excerpt: a quantified target.",
-          "soWhat": "A named instrument (supporting measures), a date (by end-2026) and an amount (no less than RMB 3 billion in special funds) sit in one excerpt, so this is checkable against the issuing body's own public text rather than read as meeting rhetoric. The amount is stated as a floor rat",
+          "what": "The Ministry of Industry and Information Technology official statement; supporting measures to be issued by end-2026; no less than RMB 3 billion in special funds for a power batteries and charging piles pilot. The text also expressly prohibits subsidy fraud. Not specified in the excerpt: a quantified target.",
+          "soWhat": "Directing no less than RMB 3 billion at a power batteries and charging piles pilot keeps support in the battery and charging layer rather than in vehicle purchase incentives, which points to a shift from demand stimulus toward infrastructure and supply-chain build-out. Incumbent ",
           "canada": "none",
           "canadaPolicy": "none",
           "outlook": [
             {
-              "label": "Instrument vocabulary continues to operationalize the same priorities",
-              "likelihood": "medium"
-            },
-            {
-              "label": "Instrument is procedural/empty of timelines or responsible units",
+              "label": "Supporting measures are published setting technical and eligibility conditions for battery and charging pilot funding",
               "likelihood": "low"
             },
             {
-              "label": "Subsequent instruments cite the same measures with measurable targets",
-              "likelihood": "medium"
+              "label": "Pilot funding is followed by capacity, utilisation or export announcements in the battery and charging segment",
+              "likelihood": "low"
+            },
+            {
+              "label": "Additional state support draws fresh trade-remedy action or tariff escalation in export markets",
+              "likelihood": "low"
             }
           ]
         },
@@ -91,26 +146,26 @@
           "kind": "implementing_instrument",
           "importance": "P3",
           "substance": "dense",
-          "substanceBasis": "numbers, deadlines, named instruments and funding lines detected",
+          "substanceBasis": "numbers, deadlines and funding lines detected",
           "corrBand": "minimal",
           "corr": 0,
           "conf": "low",
-          "what": "the Taiwan Affairs Office spokesperson statement; supporting publicity and exchange management measures to be issued by end-2026; no less than RMB 200 million in special funds for a cross-Strait youth exchange pilot. Not stated in the excerpt: a quantified target.",
-          "soWhat": "A named instrument (supporting publicity and exchange management measures), a date (by end-2026) and an amount (no less than RMB 200 million in special funds) sit in one excerpt, so this is checkable against the issuing body's own public text rather than read as meeting rhetoric.",
+          "what": "The Taiwan Affairs Office spokesperson statement; supporting publicity and exchange management measures to be issued by end-2026; no less than RMB 200 million in special funds for a cross-Strait youth exchange pilot. Not specified in the excerpt: a quantified target.",
+          "soWhat": "This would move cross-Strait policy from general messaging toward a funded, administratively managed exchange programme: the money makes delivery credible while supporting publicity and exchange management measures implies eligibility rules, approved organisers and bounded conten",
           "canada": "none",
           "canadaPolicy": "none",
           "outlook": [
             {
-              "label": "Public messaging continues to repeat the same priorities",
-              "likelihood": "medium"
-            },
-            {
-              "label": "Implementation stays thin until a named measure or implementing rule appears",
+              "label": "A measure defines eligible organisers, funding channels and pilot locations for cross-Strait youth exchanges",
               "likelihood": "low"
             },
             {
-              "label": "A later public instrument reinforces the same vocabulary",
-              "likelihood": "medium"
+              "label": "The programme narrows to symbolic showcase events, or the measure is delayed",
+              "likelihood": "low"
+            },
+            {
+              "label": "Pilot exchanges widen to further provinces or participant categories after the first cohorts run",
+              "likelihood": "low"
             }
           ]
         },
@@ -123,24 +178,11 @@
           "corrBand": "minimal",
           "corr": 0,
           "conf": "low",
-          "what": "the Ministry of Industry and Information Technology official statement; named subjects: chips, semiconductors, specialised SMEs and artificial intelligence. Not stated in the excerpt: a named instrument, a funding line, a deadline or time marker, a quantified target and a pilot or scope boundary.",
-          "soWhat": "No instrument, amount, or date appears here, so the excerpt reads as direction language rather than delivery detail. Single excerpt only — corroborate against a second public source before raising confidence. Draft for human review. Industrial/tech vocabulary signals priority dom",
+          "what": "Not adopted — this excerpt carries no verifiable detail. Named in the paste: acting party (the Ministry of Industry and Information Technology official) and subject (chips, semiconductors and specialised SMEs). Missing: a named instrument, a funding line, a deadline or time marker, a quantified target and a pilot or scope boundary.",
+          "soWhat": "Watch for a later public notice, funded line, or deadline-tied instrument. Local gray heuristic: watch-worthy without actionable hard detail — defer. In this excerpt no document or measure is named, no amount or funding channel appears, no date is given, no pilot or geographic sc",
           "canada": "none",
           "canadaPolicy": "none",
-          "outlook": [
-            {
-              "label": "Tech-industry priority language persists in subsequent public guidance",
-              "likelihood": "medium"
-            },
-            {
-              "label": "Rhetoric outpaces named instruments or funding vehicles in open corpus",
-              "likelihood": "medium"
-            },
-            {
-              "label": "Sector notices name chips/AI/supply-chain measures with concrete tools",
-              "likelihood": "low"
-            }
-          ]
+          "outlook": []
         }
       ],
       "next_steps_zh": [
@@ -166,7 +208,7 @@
           "corr": 0,
           "conf": "low",
           "what": "Not adopted — this excerpt carries no verifiable detail. Named in the paste: subject (dual circulation and the unified national market). Missing: a named instrument, a funding line, a deadline or time marker, a quantified target and a pilot or scope boundary.",
-          "soWhat": "Direction-only / formula language is filtered out. Paste an implementing notice or an excerpt with concrete data, then re-run.",
+          "soWhat": "Analysis needs at least one of: the document to be issued and by whom, the amount and funding channel, the deadline, the pilot or geographic scope, or a quantified target. In this excerpt no document or measure is named, no amount or funding channel appears, no date is given, no ",
           "canada": "none",
           "canadaPolicy": "none",
           "outlook": []
@@ -176,12 +218,12 @@
           "kind": "finance_risk",
           "importance": "P3",
           "substance": "mixed",
-          "substanceBasis": "cue words matched, but no hard detail survived the adoption filter",
+          "substanceBasis": "bans or red lines and named sectors detected",
           "corrBand": "minimal",
           "corr": 0,
           "conf": "low",
           "what": "Not adopted — this excerpt carries no verifiable detail. Named in the paste: acting party (an unnamed meeting) and subject (local-government debt, hidden local debt and housing-delivery guarantees). Missing: a named instrument, a funding line, a deadline or time marker, a quantified target and a pilot or scope boundary.",
-          "soWhat": "Direction-only / formula language is filtered out. Paste an implementing notice or an excerpt with concrete data, then re-run.",
+          "soWhat": "Watch for a later public notice, funded line, or deadline-tied instrument. Local gray heuristic: watch-worthy without actionable hard detail — defer. In this excerpt no document or measure is named, no amount or funding channel appears, no date is given, no pilot or geographic sc",
           "canada": "none",
           "canadaPolicy": "none",
           "outlook": []
@@ -196,7 +238,7 @@
           "corr": 1,
           "conf": "low",
           "what": "Not adopted — this excerpt carries no verifiable detail. Named in the paste: acting party (the Central Economic Work Conference). Missing: a named instrument, a funding line, a deadline or time marker, a quantified target and a pilot or scope boundary.",
-          "soWhat": "Direction-only / formula language is filtered out. Paste an implementing notice or an excerpt with concrete data, then re-run.",
+          "soWhat": "Analysis needs at least one of: the document to be issued and by whom, the amount and funding channel, the deadline, the pilot or geographic scope, or a quantified target. In this excerpt no document or measure is named, no amount or funding channel appears, no date is given, no ",
           "canada": "none",
           "canadaPolicy": "none",
           "outlook": []
@@ -206,26 +248,26 @@
           "kind": "implementing_instrument",
           "importance": "P1",
           "substance": "dense",
-          "substanceBasis": "named instruments detected",
+          "substanceBasis": "named instruments and responsible bodies detected",
           "corrBand": "minimal",
           "corr": 0,
           "conf": "low",
-          "what": "the Central Economic Work Conference readout and the State Council General Office; a notice issued; delivery bounded to a new quality productive forces related pilot. Not stated in the excerpt: a funding line, a deadline or time marker and a quantified target.",
-          "soWhat": "An instrument (notice) is named without a date, so timing is open-ended. Scope is bounded to a new quality productive forces related pilot, so read any amount against pilot size rather than national spend. Delivery is delegated to unnamed “relevant departments”, so the named spea",
+          "what": "The Central Economic Work Conference readout and the State Council General Office; a notice issued; delivery bounded to a new quality productive forces related pilot. Not specified in the excerpt: a funding line, a deadline or time marker and a quantified target.",
+          "soWhat": "Without a named vehicle or allocation, the burden question stays open: central transfer, local bond quota and bank credit distribute the same nominal support very differently. Recipients gain a funded channel while the financing side absorbs the residual risk, so the distribution",
           "canada": "none",
           "canadaPolicy": "none",
           "outlook": [
             {
-              "label": "Instrument vocabulary continues to operationalize the same priorities",
+              "label": "Support is routed through local budgets and bond quotas, concentrating delivery in fiscally stronger provinces",
               "likelihood": "medium"
             },
             {
-              "label": "Instrument is procedural/empty of timelines or responsible units",
+              "label": "Notice is published naming the transmission vehicle, quota allocation and eligibility",
               "likelihood": "low"
             },
             {
-              "label": "Subsequent instruments cite the same measures with measurable targets",
-              "likelihood": "medium"
+              "label": "Headline commitments are restated without a matching implementation vehicle, and transmission stays limited",
+              "likelihood": "low"
             }
           ]
         }
@@ -247,30 +289,17 @@
         {
           "fixtureId": "canada-nexus",
           "kind": "foreign_affairs",
-          "importance": "P3",
+          "importance": "P2",
           "substance": "mixed",
           "substanceBasis": "responsible bodies and named sectors detected",
           "corrBand": "minimal",
           "corr": 0,
           "conf": "low",
-          "what": "the Ministry of Commerce official and the Ministry of Foreign Affairs spokesperson statement; named subjects: China-Canada, canola oil and softwood. Not stated in the excerpt: a named instrument, a funding line, a deadline or time marker, a quantified target and a pilot or scope boundary.",
-          "soWhat": "No instrument, amount, or date appears here, so the excerpt reads as direction language rather than delivery detail. Single excerpt only — corroborate against a second public source before raising confidence. Draft for human review. Map diplomatic framing terms carefully; disting",
+          "what": "Not adopted — this excerpt carries no verifiable detail. Named in the paste: acting party (the Ministry of Commerce official) and subject (China-Canada, canola oil and softwood). Missing: a named instrument, a funding line, a deadline or time marker, a quantified target and a pilot or scope boundary.",
+          "soWhat": "Watch for a later public notice, funded line, or deadline-tied instrument. Local gray heuristic: watch-worthy without actionable hard detail — defer. In this excerpt no document or measure is named, no amount or funding channel appears, no date is given, no pilot or geographic sc",
           "canada": "direct",
           "canadaPolicy": "topical",
-          "outlook": [
-            {
-              "label": "Diplomatic framing vocabulary remains stable in public statements",
-              "likelihood": "medium"
-            },
-            {
-              "label": "Tone hardens or partners named differently without matching deeds in open sources",
-              "likelihood": "medium"
-            },
-            {
-              "label": "Follow-on public MOUs/projects echo the same framing",
-              "likelihood": "low"
-            }
-          ]
+          "outlook": []
         },
         {
           "fixtureId": "foreign-affairs",
@@ -282,7 +311,7 @@
           "corr": 0,
           "conf": "low",
           "what": "Not adopted — this excerpt carries no verifiable detail. Named in the paste: acting party (the Ministry of Foreign Affairs spokesperson) and subject (the Belt and Road Initiative). Missing: a named instrument, a funding line, a deadline or time marker, a quantified target and a pilot or scope boundary.",
-          "soWhat": "Direction-only / formula language is filtered out. Paste an implementing notice or an excerpt with concrete data, then re-run.",
+          "soWhat": "Analysis needs at least one of: the document to be issued and by whom, the amount and funding channel, the deadline, the pilot or geographic scope, or a quantified target. In this excerpt no document or measure is named, no amount or funding channel appears, no date is given, no ",
           "canada": "none",
           "canadaPolicy": "topical",
           "outlook": []
@@ -311,7 +340,7 @@
           "corr": 0,
           "conf": "low",
           "what": "Not adopted — this excerpt carries no verifiable detail. Named in the paste: acting party (the Ministry of National Defense regular press conference) and subject (national defence and the defence industry). Missing: a named instrument, a funding line, a deadline or time marker, a quantified target and a pilot or scope boundary.",
-          "soWhat": "Direction-only / formula language is filtered out. Paste an implementing notice or an excerpt with concrete data, then re-run.",
+          "soWhat": "Analysis needs at least one of: the document to be issued and by whom, the amount and funding channel, the deadline, the pilot or geographic scope, or a quantified target. In this excerpt no document or measure is named, no amount or funding channel appears, no date is given, no ",
           "canada": "none",
           "canadaPolicy": "none",
           "outlook": []
@@ -340,7 +369,7 @@
           "corr": 0,
           "conf": "low",
           "what": "Not adopted — this excerpt carries no verifiable detail. Named in the paste: acting party (unnamed local authorities and departments). Missing: a named instrument, a funding line, a deadline or time marker, a quantified target and a pilot or scope boundary.",
-          "soWhat": "Direction-only / formula language is filtered out. Paste an implementing notice or an excerpt with concrete data, then re-run.",
+          "soWhat": "Analysis needs at least one of: the document to be issued and by whom, the amount and funding channel, the deadline, the pilot or geographic scope, or a quantified target. In this excerpt no document or measure is named, no amount or funding channel appears, no date is given, no ",
           "canada": "none",
           "canadaPolicy": "none",
           "outlook": []
@@ -355,7 +384,7 @@
           "corr": 0,
           "conf": "low",
           "what": "Not adopted — this excerpt carries no verifiable detail. Named in the paste: acting party (the Ministry of Agriculture and Rural Affairs) and subject (rural revitalisation, arable land and food security). Missing: a named instrument, a funding line, a deadline or time marker, a quantified target and a pilot or scope boundary.",
-          "soWhat": "Direction-only / formula language is filtered out. Paste an implementing notice or an excerpt with concrete data, then re-run.",
+          "soWhat": "Analysis needs at least one of: the document to be issued and by whom, the amount and funding channel, the deadline, the pilot or geographic scope, or a quantified target. In this excerpt no document or measure is named, no amount or funding channel appears, no date is given, no ",
           "canada": "none",
           "canadaPolicy": "none",
           "outlook": []
@@ -370,7 +399,7 @@
           "corr": 0,
           "conf": "low",
           "what": "Not adopted — this excerpt carries no verifiable detail. Named in the paste: acting party (an unnamed local meeting) and subject (social governance, public-opinion management and common prosperity). Missing: a named instrument, a funding line, a deadline or time marker, a quantified target and a pilot or scope boundary.",
-          "soWhat": "Direction-only / formula language is filtered out. Paste an implementing notice or an excerpt with concrete data, then re-run.",
+          "soWhat": "Analysis needs at least one of: the document to be issued and by whom, the amount and funding channel, the deadline, the pilot or geographic scope, or a quantified target. In this excerpt no document or measure is named, no amount or funding channel appears, no date is given, no ",
           "canada": "none",
           "canadaPolicy": "none",
           "outlook": []
@@ -410,7 +439,7 @@
     "cases": 8,
     "stages": 11,
     "failed": 0,
-    "stamp": "2026-09-21-14-58-25",
+    "stamp": "2026-09-22-13-27-47",
     "highlights": [
       "会议单独 → 弱印证；会议+细则 → 印证上升",
       "八股+干货 → substance 升档",
@@ -562,7 +591,9 @@
       "tag": "background",
       "description": "Background intl_compare for public trade-friction vocabulary (PRC wording vs open multilateral/partner frames).",
       "updated": "2026-09-20",
-      "sources": "Open trade-policy vocabulary in PRC MOFCOM/MFA-style texts and public WTO/partner discourse labels"
+      "sources": "Open trade-policy vocabulary in PRC MOFCOM/MFA-style texts and public WTO/partner discourse labels",
+      "reviewedBy": "Sean Li (native Mandarin speaker, author)",
+      "reviewDate": "2026-09-22"
     },
     {
       "id": "boilerplate-vs-substance",
@@ -573,7 +604,9 @@
       "tag": "hypothesis",
       "description": "How to strip formulaic party-speak and keep verifiable substance cues (civilian).",
       "updated": "2026-09-20",
-      "sources": "Civilian reading method for formulaic PRC public prose; not a claim about intent"
+      "sources": "Civilian reading method for formulaic PRC public prose; not a claim about intent",
+      "reviewedBy": "Sean Li (native Mandarin speaker, author)",
+      "reviewDate": "2026-09-22"
     },
     {
       "id": "china-canada-public-discourse",
@@ -585,7 +618,9 @@
       "tag": "background",
       "description": "Background compare frame for public PRC wording on China–Canada ties (trade/diplomacy) — not targeting.",
       "updated": "2026-09-20",
-      "sources": "Public MFA/MOFCOM-style bilateral phrasing vs open Canadian policy themes (reader-side compare only)"
+      "sources": "Public MFA/MOFCOM-style bilateral phrasing vs open Canadian policy themes (reader-side compare only)",
+      "reviewedBy": "Sean Li (native Mandarin speaker, author)",
+      "reviewDate": "2026-09-22"
     },
     {
       "id": "cultural-semantics",
@@ -596,7 +631,9 @@
       "tag": "background",
       "description": "Cultural and discourse semantics that affect tone and audience reading.",
       "updated": "2026-09-20",
-      "sources": "Public cultural/discourse terms appearing in open Mandarin media"
+      "sources": "Public cultural/discourse terms appearing in open Mandarin media",
+      "reviewedBy": "Sean Li (native Mandarin speaker, author)",
+      "reviewDate": "2026-09-22"
     },
     {
       "id": "defense-public-discourse",
@@ -607,7 +644,9 @@
       "tag": "background",
       "description": "Public defense/military discourse vocabulary — civilian reading only.",
       "updated": "2026-09-20",
-      "sources": "Public MND press-conference / defense white-paper style vocabulary only"
+      "sources": "Public MND press-conference / defense white-paper style vocabulary only",
+      "reviewedBy": "Sean Li (native Mandarin speaker, author)",
+      "reviewDate": "2026-09-22"
     },
     {
       "id": "dual-circulation-lexicon",
@@ -618,7 +657,9 @@
       "tag": "background",
       "description": "Background gloss for dual circulation / supply-chain security public vocabulary.",
       "updated": "2026-09-20",
-      "sources": "Public dual-circulation / supply-chain vocabulary since ~2020"
+      "sources": "Public dual-circulation / supply-chain vocabulary since ~2020",
+      "reviewedBy": "Sean Li (native Mandarin speaker, author)",
+      "reviewDate": "2026-09-22"
     },
     {
       "id": "finance-risk-lexicon",
@@ -629,7 +670,9 @@
       "tag": "background",
       "description": "Background gloss for public finance / property / systemic-risk vocabulary.",
       "updated": "2026-09-20",
-      "sources": "Public finance/property/systemic-risk vocabulary in open PRC reporting"
+      "sources": "Public finance/property/systemic-risk vocabulary in open PRC reporting",
+      "reviewedBy": "Sean Li (native Mandarin speaker, author)",
+      "reviewDate": "2026-09-22"
     },
     {
       "id": "five-year-plan-lexicon",
@@ -640,7 +683,9 @@
       "tag": "background",
       "description": "Background gloss for five-year plan / long-horizon planning vocabulary.",
       "updated": "2026-09-20",
-      "sources": "Public five-year plan / 远景目标 vocabulary in open planning documents"
+      "sources": "Public five-year plan / 远景目标 vocabulary in open planning documents",
+      "reviewedBy": "Sean Li (native Mandarin speaker, author)",
+      "reviewDate": "2026-09-22"
     },
     {
       "id": "foreign-policy-discourse",
@@ -651,7 +696,9 @@
       "tag": "background",
       "description": "Background on public PRC foreign-policy discourse terms — not classified analysis.",
       "updated": "2026-09-20",
-      "sources": "Public MFA-style diplomatic framing vocabulary"
+      "sources": "Public MFA-style diplomatic framing vocabulary",
+      "reviewedBy": "Sean Li (native Mandarin speaker, author)",
+      "reviewDate": "2026-09-22"
     },
     {
       "id": "historical-analogy-discipline",
@@ -662,7 +709,9 @@
       "tag": "hypothesis",
       "description": "How to use historical analogies without overclaiming.",
       "updated": "2026-09-20",
-      "sources": "Open historical frames commonly used in public PRC economic narratives (1978–)"
+      "sources": "Open historical frames commonly used in public PRC economic narratives (1978–)",
+      "reviewedBy": "Sean Li (native Mandarin speaker, author)",
+      "reviewDate": "2026-09-22"
     },
     {
       "id": "ideology-education-lexicon",
@@ -673,7 +722,9 @@
       "tag": "background",
       "description": "Background gloss for ideology / Party education / discipline vocabulary in public texts.",
       "updated": "2026-09-20",
-      "sources": "Public ideology/Party-education vocabulary in open campaigns"
+      "sources": "Public ideology/Party-education vocabulary in open campaigns",
+      "reviewedBy": "Sean Li (native Mandarin speaker, author)",
+      "reviewDate": "2026-09-22"
     },
     {
       "id": "industrial-tech-policy",
@@ -685,7 +736,9 @@
       "tag": "background",
       "description": "Background glosses for industrial and tech-policy vocabulary in public PRC sources.",
       "updated": "2026-09-20",
-      "sources": "Public industrial/tech-policy vocabulary (MIIT-style open statements)"
+      "sources": "Public industrial/tech-policy vocabulary (MIIT-style open statements)",
+      "reviewedBy": "Sean Li (native Mandarin speaker, author)",
+      "reviewDate": "2026-09-22"
     },
     {
       "id": "macro-policy-cycle",
@@ -696,7 +749,9 @@
       "tag": "background",
       "description": "Background on PRC macro policy-cycle vocabulary and cautious outlook discipline.",
       "updated": "2026-09-20",
-      "sources": "Public CEWC / work-report vocabulary conventions"
+      "sources": "Public CEWC / work-report vocabulary conventions",
+      "reviewedBy": "Sean Li (native Mandarin speaker, author)",
+      "reviewDate": "2026-09-22"
     },
     {
       "id": "party-state-lexicon",
@@ -707,7 +762,9 @@
       "tag": "background",
       "description": "Lexicon for common PRC political terms — background only.",
       "updated": "2026-09-20",
-      "sources": "Common open PRC Party–state institutional terms"
+      "sources": "Common open PRC Party–state institutional terms",
+      "reviewedBy": "Sean Li (native Mandarin speaker, author)",
+      "reviewDate": "2026-09-22"
     },
     {
       "id": "policy-signaling-valves",
@@ -718,7 +775,9 @@
       "tag": "hypothesis",
       "description": "Enumerated public PRC media heuristics with weights — civilian research calibrators (not secrets).",
       "updated": "2026-09-20",
-      "sources": "Observable public PRC media/reporting conventions (open press patterns)"
+      "sources": "Observable public PRC media/reporting conventions (open press patterns)",
+      "reviewedBy": "Sean Li (native Mandarin speaker, author)",
+      "reviewDate": "2026-09-22"
     },
     {
       "id": "rural-revitalization-lexicon",
@@ -730,7 +789,9 @@
       "tag": "background",
       "description": "Background gloss for rural revitalization and food-security public vocabulary.",
       "updated": "2026-09-20",
-      "sources": "Public rural revitalization / food-security vocabulary"
+      "sources": "Public rural revitalization / food-security vocabulary",
+      "reviewedBy": "Sean Li (native Mandarin speaker, author)",
+      "reviewDate": "2026-09-22"
     },
     {
       "id": "social-governance-lexicon",
@@ -741,7 +802,9 @@
       "tag": "background",
       "description": "Background glosses for social governance and livelihood policy vocabulary.",
       "updated": "2026-09-20",
-      "sources": "Public social-governance / livelihood vocabulary"
+      "sources": "Public social-governance / livelihood vocabulary",
+      "reviewedBy": "Sean Li (native Mandarin speaker, author)",
+      "reviewDate": "2026-09-22"
     }
   ],
   "ethics": [
@@ -751,5 +814,5 @@
     "UI is English; Chinese appears only in source paste and quoted excerpts",
     "Substance / corroboration / confidence / source tier are hand-set rule heuristics shown as bands — no labelled corpus, no validation set, so no scores are reported"
   ],
-  "generatedAt": "2026-09-21T14:58:26.285Z"
+  "generatedAt": "2026-09-22T13:33:57.161Z"
 }

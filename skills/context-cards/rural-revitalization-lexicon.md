@@ -7,6 +7,8 @@ description: Background gloss for rural revitalization and food-security public 
 tag: background
 updated: 2026-09-20
 sources: Public rural revitalization / food-security vocabulary
+reviewed_by: Sean Li (native Mandarin speaker, author)
+review_date: 2026-09-22
 ---
 
 # Context card: Rural revitalization lexicon (background)

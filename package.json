@@ -28,8 +28,10 @@
     "test:llm-fallback-provider": "tsx scripts/test-llm-fallback-provider.ts",
     "test:scenario-diversity": "tsx scripts/test-scenario-diversity.ts",
     "test:outlook-differentiation": "tsx scripts/test-outlook-differentiation.ts",
+    "test:related-specificity": "tsx scripts/test-related-specificity.ts",
     "portfolio": "tsx scripts/build-portfolio.ts",
-    "test": "npm run lint && npm run demo && npm run test:domains && npm run test:desk && npm run test:regress && npm run test:intake && npm run test:temporal && npm run test:multi && npm run test:brief-quality && npm run test:scenario-enrich && npm run test:human-review && npm run test:llm-fallback && npm run test:canada-priority && npm run test:llm-fallback-provider && npm run test:scenario-diversity && npm run test:outlook-differentiation",
+    "showcase": "tsx scripts/build-showcase.ts",
+    "test": "npm run lint && npm run demo && npm run test:domains && npm run test:desk && npm run test:regress && npm run test:intake && npm run test:temporal && npm run test:multi && npm run test:brief-quality && npm run test:scenario-enrich && npm run test:human-review && npm run test:llm-fallback && npm run test:canada-priority && npm run test:llm-fallback-provider && npm run test:scenario-diversity && npm run test:outlook-differentiation && npm run test:related-specificity",
     "collect": "tsx scripts/collect-and-brief.ts",
     "collect:daemon": "tsx scripts/collect-daemon.ts",
     "harness:brief": "tsx scripts/cursor-harness-brief.ts"

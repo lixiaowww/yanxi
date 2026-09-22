@@ -7,6 +7,8 @@ description: Background gloss for five-year plan / long-horizon planning vocabul
 tag: background
 updated: 2026-09-20
 sources: Public five-year plan / 远景目标 vocabulary in open planning documents
+reviewed_by: Sean Li (native Mandarin speaker, author)
+review_date: 2026-09-22
 ---
 
 # Context card: Five-year plan lexicon (background)

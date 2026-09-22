@@ -7,6 +7,8 @@ description: Background compare frame for public PRC wording on China–Canada t
 tag: background
 updated: 2026-09-20
 sources: Public MFA/MOFCOM-style bilateral phrasing vs open Canadian policy themes (reader-side compare only)
+reviewed_by: Sean Li (native Mandarin speaker, author)
+review_date: 2026-09-22
 ---
 
 # Context card: China–Canada public discourse (intl_compare)

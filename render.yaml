@@ -33,5 +33,16 @@ services:
         value: "1"
       - key: LLM_API_KEY
         sync: false
+      - key: LLM_BASE_URL
+        sync: false
+      - key: LLM_MODEL
+        sync: false
+      # F16 fallback provider — used only when the primary Groq call fails/429s.
+      - key: LLM_FALLBACK_API_KEY
+        sync: false
+      - key: LLM_FALLBACK_BASE_URL
+        sync: false
+      - key: LLM_FALLBACK_MODEL
+        sync: false
       - key: YANXI_AUDIT
         value: "0"

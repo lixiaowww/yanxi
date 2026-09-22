@@ -4,7 +4,7 @@
 |------|------|
 | 产品 | 研析 Yanxi |
 | 版本 | 0.3 |
-| 日期 | 2026-09-21 |
+| 日期 | 2026-09-22 |
 | 对应 PRD | [PRD.md](./PRD.md) |
 | 质量加固 DP | [DP-brief-quality.md](./DP-brief-quality.md)（F11–F13，已执行） |
 
@@ -103,5 +103,18 @@ Markdown frontmatter（type / desk / tag / updated / sources / match）；作者
 
 ## 7. 技术
 
-Node / Express / Vite / React；默认 offline。公开部署见 `DEPLOY.md`。  
+Node / Express / Vite / React。公开部署见 `DEPLOY.md`。  
 验证：`npm test`。Agent 约定：`AGENTS.md` · `HARNESS.md`。
+
+### 7.1 LLM 供应商（运行事实，F19）
+
+本地开发与 Render 生产环境**均已配置双 OpenAI-compatible 供应商**，不是"可选未开"的状态：
+
+| 角色 | 供应商 | 环境变量 |
+|------|--------|----------|
+| 主 | Groq (`gpt-oss-20b`) | `LLM_API_KEY` / `LLM_BASE_URL` / `LLM_MODEL` |
+| 备（429/失败时自动切换，F16） | DeepSeek (`deepseek-chat`) | `LLM_FALLBACK_API_KEY` / `LLM_FALLBACK_BASE_URL` / `LLM_FALLBACK_MODEL` |
+
+因此**实际默认路径是 LLM**（`BriefResponse.llmProvider` 标注 `primary`/`fallback`），offline 规则模板只在两个供应商都失败时才触发（`src/lib/llm.ts`）。文档、UI 文案、demo 脚本不应再默认假设"无 key 走 offline"——那是最终兜底，不是标准演示状态。`outbox/briefs/` 里当前留存的样例大多来自早期 `forceOffline: true` 的测试脚本（`npm run demo` 等确定性场景），不代表当前 LLM 路径的产出质量；见整改意见 P0-2（`docs/ROADMAP.md` Next）。
+
+`npm run showcase`（`scripts/build-showcase.ts`）用真实 LLM 调用固化 `examples/showcase/` 下的 complete + deferred 两个参照样例，供 Portfolio 静态展示。**不进 `npm test`**——会打真实 Groq/DeepSeek 网络请求、消耗额度、输出非确定性，与其余确定性回归套件性质不同，同 `npm run collect` / `npm run harness:brief` 一样是可选的实况脚本。

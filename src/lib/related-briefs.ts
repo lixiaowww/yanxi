@@ -92,7 +92,20 @@ export function findRelatedBriefs(opts: {
     // reader. Sized to actually move the ranking (concrete match = 2).
     const nexusLevel = rec.result?.briefing?.canada_nexus?.level;
     const nexusBonus = nexusLevel === "direct" ? 3 : nexusLevel === "possible" ? 1 : 0;
-    const score = concrete.length * 2 + (soft ? 1 : 0) + nexusBonus;
+    // Precision over recall: a candidate that jams many unrelated subjects
+    // together (e.g. a merged multi-domain test batch) can rack up the same
+    // topical overlap AND accidentally trip canada_nexus off a bolted-on,
+    // unrelated sentence — outscoring a clean single-topic match on both
+    // terms even though neither signal is really "about" the query subject.
+    // When there IS concrete overlap, discount it (and any nexus bonus)
+    // by how much of the candidate's own topic fingerprint that overlap
+    // actually covers, so a tight single-topic brief outranks a
+    // kitchen-sink one at the same absolute overlap or nexus hit. A
+    // genuinely Canada-focused single-topic candidate (small `theirs`)
+    // keeps nearly all of its nexusBonus — see test:canada-priority.
+    // Soft-only matches (no concrete overlap) are left undiluted.
+    const specificity = concrete.length > 0 && theirs.length ? concrete.length / theirs.length : 1;
+    const score = (concrete.length * 2 + nexusBonus) * specificity + (soft ? 1 : 0);
     scored.push({
       score,
       hit: {

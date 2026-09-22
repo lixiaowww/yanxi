@@ -26,6 +26,21 @@ type Column = {
   next_steps_zh: string[];
   next_steps_en?: string[];
 };
+type ShowcaseCard = {
+  id: string;
+  title: string;
+  mode: string;
+  llmProvider?: string;
+  briefQuality?: string;
+  briefQualityLabel?: string;
+  deskLabel?: string;
+  sourceLabels: string[];
+  what?: string;
+  context?: string;
+  soWhat?: string;
+  scenarios: { label?: string; likelihood?: string; alternative?: string; falsifier?: string }[];
+  markdownUrl: string;
+};
 type PortfolioData = {
   title: string;
   tagline_zh: string;
@@ -34,6 +49,7 @@ type PortfolioData = {
   not_en?: string;
   method: Record<string, string>;
   heuristic_basis_note?: string;
+  showcase?: ShowcaseCard[];
   columns: Column[];
   hot_theme_catalog?: { id: string; label_en: string }[];
   regress: {
@@ -58,6 +74,8 @@ type PortfolioData = {
     description: string;
     updated: string;
     sources: string;
+    reviewedBy?: string;
+    reviewDate?: string;
   }[];
   ethics: string[];
   generatedAt?: string;
@@ -130,6 +148,58 @@ export function Portfolio() {
         </ul>
       </section>
 
+      {data.showcase?.length ? (
+        <section className="portfolio-section">
+          <h2>Showcase — what a run actually produces</h2>
+          <p className="meta">
+            Two frozen examples: a real, corroborated brief and a correctly-declined thin one.
+            Both are the product working as designed, not a live paste that happened to land well.
+          </p>
+          <div className="portfolio-showcase-grid">
+            {data.showcase.map((s) => (
+              <article
+                key={s.id}
+                className={`portfolio-showcase-card ${
+                  s.briefQuality === "complete" ? "ok" : "warn"
+                }`}
+              >
+                <h3>{s.title}</h3>
+                <p className="meta">
+                  mode={s.mode}
+                  {s.llmProvider ? `/${s.llmProvider}` : ""}
+                  {s.briefQualityLabel ? ` · ${s.briefQualityLabel}` : ""}
+                  {s.deskLabel ? ` · ${s.deskLabel}` : ""}
+                </p>
+                {s.sourceLabels.length ? (
+                  <p className="meta">Sources: {s.sourceLabels.join(" + ")}</p>
+                ) : null}
+                {s.what ? <p className="prose">{s.what}</p> : null}
+                {s.scenarios.length ? (
+                  <details>
+                    <summary>Outlook ({s.scenarios.length} scenarios)</summary>
+                    <ul className="plain-list">
+                      {s.scenarios.map((sc, i) => (
+                        <li key={i}>
+                          <strong>[{sc.likelihood}]</strong> {sc.label}
+                          {sc.falsifier ? (
+                            <div className="meta">Falsifier: {sc.falsifier}</div>
+                          ) : null}
+                        </li>
+                      ))}
+                    </ul>
+                  </details>
+                ) : null}
+                <p>
+                  <a href={s.markdownUrl} target="_blank" rel="noreferrer">
+                    Full brief →
+                  </a>
+                </p>
+              </article>
+            ))}
+          </div>
+        </section>
+      ) : null}
+
       <section className="portfolio-section">
         <h2>Desk columns</h2>
         <p className="meta">
@@ -200,6 +270,12 @@ export function Portfolio() {
             <li key={c.id}>
               <code>{c.id}</code> · {c.type}/{c.tag} · desk={(c.desk || []).join("|")}
               <div className="meta">{c.description}</div>
+              {c.reviewedBy ? (
+                <div className="meta">
+                  Reviewed by {c.reviewedBy}
+                  {c.reviewDate ? ` · ${c.reviewDate}` : ""}
+                </div>
+              ) : null}
             </li>
           ))}
         </ul>

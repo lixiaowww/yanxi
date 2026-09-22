@@ -4,7 +4,7 @@
 |------|------|
 | 产品 | 研析 Yanxi |
 | 版本 | 0.3 |
-| 日期 | 2026-09-21 |
+| 日期 | 2026-09-22 |
 | 作者 | Sean Li |
 | 状态 | Active |
 | 伦理 | [ETHICS.md](./ETHICS.md) |
@@ -112,6 +112,7 @@
 | F14 | Human-in-the-loop 明确 intake：`human_review[]` 列出 source_class / intake 灰区 / 领域画像三处仍是猜测的点，非阻塞，操作者选完覆盖字段重跑即解决 | P1 | 已交付 |
 | F15 | 加拿大关联度作为核心排序参数：importance 加权、outbox/related-briefs 排序均以 canada_nexus 为一等信号（非装饰徽章） | P1 | 已交付 |
 | F16 | 第二 LLM 供应商兜底：主供应商（Groq）失败/限流时自动切换到可选的 `LLM_FALLBACK_*`，两者皆败才落回离线模板 | P0 | 已交付 |
+| F19 | 运行事实：本地 `.env` 与 Render 生产环境均已配置双 LLM 供应商（主 Groq + 备 DeepSeek），offline 模板不再是常态默认路径，而是双供应商皆失败时的最终兜底 | P0 | 已交付（配置确认） |
 | F17 | 情景四件套（alternative/falsifier）扩展到全部 10 个领域画像的手写场景，离线模式下也不再共享同一句兜底文案 | P0 | 已交付 |
 | F18 | Outlook 时效降权拆分"相对时间词"（weak→medium）与"完全无日期"（unknown→low）；封顶前保留情景相对排序，避免全部情景显示同一个 likelihood | P1 | 已交付 |
 
@@ -140,9 +141,10 @@
 - 可选借鉴：Nexus_Crime 的 provenance / 置信表达（不迁犯罪域）  
 - 文档根：`docs/`；范围受 `JOB-FIT.md` 民用映射约束  
 - 验证：`npm test`（含 `test:brief-quality` / `test:temporal` / `test:intake` 等）
+- **LLM 供应商（运行事实，F19）**：本地与 Render 均已配置 `LLM_API_KEY`（Groq，主）+ `LLM_FALLBACK_API_KEY`（DeepSeek，备），见 `docs/DP.md` §7。UI/文案不得暗示"默认离线"——离线模板是双供应商失败后的最终兜底，不是常态路径
 
 ## 10. 开放问题
 
-1. 语境卡是否需要中英双语正式审定流程？  
-2. Portfolio 对外页与本仓 `/portfolio` 的长期挂载关系？  
-3. Later：听力 / PDF / SMTP 是否进入下一 DP？  
+1. ~~语境卡是否需要中英双语正式审定流程？~~ **已定**：不设第三方审定，作者自审（`reviewed_by`/`review_date` frontmatter，17 张卡已完成一轮）。见 `docs/ONTOLOGY-LITE.md` §审定。
+2. Portfolio 对外页与本仓 `/portfolio` 的长期挂载关系？**已定**：`sean-portfolio-plum.vercel.app` 的 Projects 卡片外链到本仓 Render 部署的 `/portfolio`；不重复建站，本仓 `/portfolio` 是外部卡片指向的「详情页」。
+3. ~~Later：听力 / PDF / SMTP 是否进入下一 DP？~~ **已定：不做**。作者母语普通话，听力不构成能力缺口；PDF/SMTP 无当前需求驱动。  

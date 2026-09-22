@@ -7,6 +7,8 @@ description: Background gloss for ideology / Party education / discipline vocabu
 tag: background
 updated: 2026-09-20
 sources: Public ideology/Party-education vocabulary in open campaigns
+reviewed_by: Sean Li (native Mandarin speaker, author)
+review_date: 2026-09-22
 ---
 
 # Context card: Ideology & Party education lexicon (background)

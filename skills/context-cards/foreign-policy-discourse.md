@@ -7,6 +7,8 @@ description: Background on public PRC foreign-policy discourse terms — not cla
 tag: background
 updated: 2026-09-20
 sources: Public MFA-style diplomatic framing vocabulary
+reviewed_by: Sean Li (native Mandarin speaker, author)
+review_date: 2026-09-22
 ---
 
 # Context card: Foreign-policy discourse (background)

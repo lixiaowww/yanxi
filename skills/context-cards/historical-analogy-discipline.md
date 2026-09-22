@@ -7,6 +7,8 @@ description: How to use historical analogies without overclaiming.
 tag: hypothesis
 updated: 2026-09-20
 sources: Open historical frames commonly used in public PRC economic narratives (1978–)
+reviewed_by: Sean Li (native Mandarin speaker, author)
+review_date: 2026-09-22
 ---
 
 # Context card: Historical analogy discipline (hypothesis only)

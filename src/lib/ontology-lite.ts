@@ -28,6 +28,9 @@ export type OntologyCard = {
   tag: "background" | "hypothesis";
   updated: string;
   sources: string;
+  /** Self-certification (docs/ONTOLOGY-LITE.md §Frontmatter) — not a third-party audit. */
+  reviewedBy?: string;
+  reviewDate?: string;
   body: string;
   file: string;
 };
@@ -115,6 +118,8 @@ export function loadOntologyCards(root = process.cwd()): OntologyCard[] {
       tag: fm.tag === "hypothesis" ? "hypothesis" : "background",
       updated: fm.updated || "unknown",
       sources: fm.sources || "Public open-source conventions (unspecified)",
+      reviewedBy: fm.reviewed_by || undefined,
+      reviewDate: fm.review_date || undefined,
       body,
       file: `skills/context-cards/${f}`,
     });

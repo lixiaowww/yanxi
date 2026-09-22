@@ -7,6 +7,8 @@ description: Background gloss for dual circulation / supply-chain security publi
 tag: background
 updated: 2026-09-20
 sources: Public dual-circulation / supply-chain vocabulary since ~2020
+reviewed_by: Sean Li (native Mandarin speaker, author)
+review_date: 2026-09-22
 ---
 
 # Context card: Dual circulation & supply-chain lexicon (background)

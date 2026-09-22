@@ -7,6 +7,8 @@ description: Background intl_compare for public trade-friction vocabulary (PRC w
 tag: background
 updated: 2026-09-20
 sources: Open trade-policy vocabulary in PRC MOFCOM/MFA-style texts and public WTO/partner discourse labels
+reviewed_by: Sean Li (native Mandarin speaker, author)
+review_date: 2026-09-22
 ---
 
 # Context card: Bilateral trade-friction compare (intl_compare)
