@@ -27,6 +27,18 @@ export function likelihoodWord(l?: string): string {
   return l === "high" ? "likely" : l === "medium" ? "roughly even odds" : "unlikely";
 }
 
+/**
+ * Reader-only simplification (2026-09-23, user request): the Reader's
+ * Forecast section shows just two likelihood words, not the full ICD 203
+ * three-band scheme above — "high likelihood" / "moderate likelihood".
+ * `/compose`'s BriefingNote keeps using likelihoodWord() unchanged; this is
+ * Reader-specific, same pattern as ReaderBrief already narrowing the full
+ * spine down for readers (docs/DP-V2.md §1 2026-09-22/23 revisions).
+ */
+export function readerLikelihoodWord(l?: string): string {
+  return l === "high" ? "high likelihood" : "moderate likelihood";
+}
+
 const CORROBORATION_DRIVER_EN: Record<string, string> = {
   multi_source_merge: "two or more public sources",
   cross_source_subject_match: "two sources naming the same subject",

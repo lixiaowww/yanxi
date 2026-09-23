@@ -99,13 +99,13 @@ Return ONLY valid JSON with this shape:
         "basis": "...",
         "trigger": "observable confirmation...",
         "alternative": "competing reading...",
-        "falsifier": "public observation that kills this path...",
+        "falsifier": "public observation that kills this path — if it needs a fact this excerpt/outbox doesn't have (a historical baseline, a prior edition, an official figure), say what to search for, not just 'unclear'...",
         "tag": "hypothesis"
       }
     ],
     "watchpoints": ["observable public signal..."]
   },
-  "open_questions": ["..."]
+  "open_questions": ["a background-knowledge gap the excerpt can't resolve, phrased as an actionable search step: what to search for or what document type to find — not just 'this needs verification'"]
 }
 
 Rules:
