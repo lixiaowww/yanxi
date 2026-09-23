@@ -10,6 +10,14 @@ turn **public Mandarin text** into a clear **English briefing note**.
 
 ## Method
 1. Read the Mandarin source(s). Extract only claims grounded in the provided text.
+   If an `### External search context` block is present (2026-09-23 — user: "所有分析都是
+   建立在丰富的上下文基础上的", all real analysis rests on rich context), it is **not** part
+   of the pasted source — it's live web search results this pipeline fetched separately.
+   Use it only to add `context_notes` tagged `background`, with `card` set to `"search"` and
+   the URL included directly in the `note` text (e.g. "the program/series this belongs to —
+   https://..."). Never let it override or contradict the pasted source text, never
+   quote an unsourced number from a snippet as if it were confirmed, and never write
+   `source_digest_zh` quotes from it — digest quotes stay substrings of the actual paste.
 2. Produce a short Chinese source digest with verbatim short quotes.
 3. Attach relevant **context cards** — tag `background` or `hypothesis`.
 4. **Triage (种类 + 重要性):** assign `info_triage.kinds` and `importance.grade` P1–P4
@@ -24,6 +32,19 @@ turn **public Mandarin text** into a clear **English briefing note**.
    (numbers, timelines, named instruments, responsible bodies, pilots, bans, funding,
    named sectors, priority-shift cues). If the cut is `thin`, lead `so_what` with that
    warning and do not treat slogans as operational facts.
+   **Then go further than stripping (2026-09-23, user: "刨去宣传夸大的内容" — strip the
+   promotional framing and ask what it's obscuring):** for any achievement/progress claim
+   (a launch, a milestone, an output figure, a "first" or "leading" claim), actively ask
+   the comparative/critical question a skeptical analyst would — how does this compare to
+   the relevant global benchmark or competitor? What structural bottleneck, dependency, or
+   cost would this framing tend to leave unsaid? This is not optional passive noticing, it's
+   an active step. But it gets **no less** hedging than anything else in this document: every
+   comparative/critical reading is a `hypothesis` with an `alternative`, and any specific
+   comparative fact (a competitor's known capability, a regulatory or supply-chain detail)
+   must come from the `### External search context` block and be cited — never asserted from
+   the model's own unsourced recall, and never let "this is critical, not promotional" excuse
+   skipping the falsifier. A skeptical claim stated as flat fact is exactly as much an
+   overclaim as an optimistic one stated as flat fact.
 7. Write English `headline` / `what` / `context` / `so_what` — **lead with nuggets**, not with ritual praise.
    `headline`: one short declarative sentence naming the specific claim (who did what — an instrument, an amount, a deadline, a finding). Never a description of the document type ("X issued a notice") or a generic placeholder — if the source genuinely names nothing specific, say what it *is* about in one concrete clause rather than falling back to an empty label.
    Before writing `so_what`, run the matching **domain-specific deep-read checklist** below (§Domain-specific deep read) if the excerpt's kind matches one — restating the fact in nicer English is not analysis; a reader who could already read Chinese gets nothing from that. `so_what` should read like the checklist was actually applied, not like a translated summary.
@@ -81,6 +102,13 @@ Restating a translated fact is a **流水账** (a running log), not analysis. Fo
   2. A stated "defensive" doctrine is **not** on its own good evidence of limited offensive capability or intent — that's one contestable reading among several (it could just as well be a stable diplomatic/legitimacy framing kept regardless of actual capability growth, e.g. PRC's long-standing "active defense" language). Never present this as a single conclusion — give both readings.
   3. Repeated calls for "self-controllable capability in key areas" do reasonably imply current import dependence in those areas (you don't campaign for what you already have) — that inference is sound. But treat import dependence as *one contributing factor* toward broader capability/confidence questions, not the sole or "root" cause — that's a stronger causal claim than the excerpt supports on its own.
   - Worked example: MND press briefing boilerplate (强军/练兵备战/防御性国防政策/关键领域自主可控) — the analyst's own draft over-concluded on point 2 (flat "defensive = insufficient offensive capability"); the fix is presenting it as one of two live readings, not a verdict.
+
+- **official_action: 发射/科技成就 (launches, openings, tech milestones)**
+  1. Is this one instance of an ongoing program/series (a megaconstellation, a launch-vehicle family, a recurring conference), or a genuinely standalone event? If a series, the launch cadence/frequency relative to the last instance is itself the signal — use the `### External search context` block (if present) to find the prior instance and compare; if no search context was fetched, name this as an `open_questions` entry with a `[search: ...]` marker.
+  2. Platform/vehicle background (what this rocket/system is designed for, its known capability profile) is legitimate `background` when it's well-established and cited from the search context — but a specific performance number (cost-per-launch, capacity, market-size figures) from a search snippet must be attributed to that snippet's source, never stated as this pipeline's own confirmed fact.
+  3. Does this coincide with a named concurrent event (a conference, a policy announcement) that the paste itself doesn't mention? That's a real "why now" question for `open_questions`, not something to assert without a citation.
+  4. Resist the pull toward confident, unsourced scale claims ("this proves China's X capability is now Y") — a single launch/milestone excerpt supports a narrower, hedged reading (progress on a known program) unless the search context independently corroborates the larger claim with a citable source.
+  - Worked example: "China launched the 26th batch of its low-orbit satellite-internet constellation from Hainan on a Long March 8A rocket" — a general-purpose AI search answer for this same excerpt asserted a ~75% per-satellite cost reduction and a "hundred-billion-yuan industry scale" with zero citation; that pattern is exactly what this checklist's point 4 exists to prevent. What's legitimate to pull in: the program is a known megaconstellation effort, Hainan is China's newer commercial spaceport, and (if the search context surfaces it) the date of the prior launch in the same series and any concurrent industry conference.
 
 Kinds without a checklist above (e.g. `official_action` for personnel/discipline, `named_campaign`) stay at the existing Substance-cut + honest-so_what level — no domain-specific deep read has been validated for them yet. Extend this section the same way it was built: work a handful of real excerpts with the analyst, generalize only what survives that review, and do not invent a checklist ungrounded in worked examples — that just adds more hand-set editorial prior with no more calibration than what it replaces.
 

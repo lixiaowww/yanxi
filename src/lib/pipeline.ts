@@ -15,6 +15,7 @@ import { CHANNEL_TIER_IDS, resolveChannelTier, type ChannelTierId } from "./sour
 import { detectAbsenceSignal } from "./absence-signal.js";
 import { evaluateAdoption, filterDigestByHardNuggets } from "./adoption.js";
 import { appendGateAudit } from "./audit-log.js";
+import { searchConfigured, buildSearchQuery, fetchSearchContext, formatSearchContextBlock } from "./search-context.js";
 import {
   composeDigestRows,
   composeHeadlineEn,
@@ -293,8 +294,24 @@ export async function runBriefingPipeline(req: BriefRequest): Promise<BriefRespo
     briefing = offlineBriefing(joined, matchedCards, sources[0].label, sources);
     offlineReason = `intake_${intake.label}: skipped LLM — ${intake.reason_en}`;
   } else if (allowLlm) {
+    // Optional live-search enrichment (src/lib/search-context.ts) — only
+    // spent on excerpts that are actually reaching the LLM (post-intake),
+    // never on content that's about to be rejected/deferred. A fixed,
+    // code-driven query derived from the excerpt's own extracted facts,
+    // not agentic tool-use — see that file's docstring for why.
+    let searchBlock: string | undefined;
+    if (searchConfigured()) {
+      try {
+        const earlyFacts = extractFacts(joined);
+        const query = buildSearchQuery(joined, earlyFacts);
+        const hits = await fetchSearchContext(query);
+        if (hits) searchBlock = formatSearchContextBlock(query, hits);
+      } catch {
+        /* fail-open — no search context this round */
+      }
+    }
     try {
-      const called = await callLlmJsonWithFallback(prompt, userMessage(sources));
+      const called = await callLlmJsonWithFallback(prompt, userMessage(sources, searchBlock));
       briefing = sanitizePasteholders(called.data, sources);
       mode = "llm";
       llmProvider = called.provider;
@@ -958,7 +975,7 @@ function digestFallback(
   }));
 }
 
-function userMessage(sources: SourceInput[]): string {
+function userMessage(sources: SourceInput[], searchContextBlock?: string): string {
   const blocks = sources.map((s, i) => `### Source ${i + 1}: ${s.label}\n${s.text}`);
   return [
     `Source count: ${sources.length}`,
@@ -970,5 +987,6 @@ function userMessage(sources: SourceInput[]): string {
     "Factorize confidence; social commentary cannot alone corroborate or reach high confidence.",
     "-----",
     ...blocks,
+    ...(searchContextBlock ? ["-----", searchContextBlock] : []),
   ].join("\n\n");
 }
