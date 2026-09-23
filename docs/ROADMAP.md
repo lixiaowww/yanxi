@@ -51,6 +51,7 @@
 - [x] F18 Outlook 时效降权区分"相对时间词"与"完全无日期"，封顶前保留情景相对排序 · `npm run test:outlook-differentiation`  
 - [x] F19 运行事实确认：本地 `.env` + Render 均配置双 LLM（Groq 主 + DeepSeek 备），offline 模板降级为最终兜底，非默认路径 — 见 `docs/DP.md` §7
 - [x] F20 Reader 页（类别 → 列表 → 详情的阅读产品，`docs/DP-V3.md` 收尾）：`/` 改为 Reader（按 desk 分类浏览 outbox，默认隐藏分析细节，`⚙ Settings` 可选展开 `AnalystAppendix`），粘贴玩法移到 `/compose`；`/api/outbox?desk=` 新增按 importance/日期排序；新组件 `src/Reader.tsx`、`src/lib/reader-settings.ts`（per-viewer localStorage，不是共享状态）
+- [x] F28 "细节"定义扩大 + 优先级排序纠正（`docs/DP-V2.md` §1 2026-09-23 修订）：采纳门禁新增 `official_action`/`named_campaign`，`public-live-collect` 采纳率 1/15→8-9/15；外交侨务/一带一路 > 外贸投资 > 台海 加权，省市级人事任免降权；修正"政协"误判央级会议 bug；标题生成器扩展；`/api/outbox` 默认隐藏 not-adopted
 
 ## Next（产品）
 

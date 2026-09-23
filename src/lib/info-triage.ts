@@ -55,7 +55,11 @@ export type InfoTriage = {
 const KIND_META: Record<InfoKind, { label_zh: string; rx: RegExp; weight: number }> = {
   leadership_meeting: {
     label_zh: "Leadership / central work meeting",
-    rx: /中央经济工作会议|中央政治局|中央全会|两会|全国人大|政协|总书记/,
+    // Bare 政协/人大 match any local official's *title* ("...政协副主席...",
+    // "...人大常委会副主任...") as if it were a central-leadership-meeting
+    // reference — a false positive unrelated to actual importance. Require
+    // 全国 to scope it to the national body, same as 全国人大 already does.
+    rx: /中央经济工作会议|中央政治局|中央全会|两会|全国人大|全国政协|总书记/,
     weight: 1,
   },
   macro_policy: {
@@ -220,6 +224,35 @@ export function buildInfoTriage(
   if (kinds.some((k) => k.kind === "foreign_affairs" || k.kind === "finance_risk" || k.kind === "industrial_tech_policy" || k.kind === "defense_public")) {
     score += 0.06;
     drivers.push("high_salience_domain");
+  }
+  // User priority (2026-09-23, docs/DP-V2.md "detail redefinition"): foreign
+  // affairs incl. diaspora/BRI, then trade & investment, then Taiwan Strait
+  // defense matter most to this reader — on top of the generic
+  // high_salience_domain bump above, not instead of it.
+  if (/华人|华侨|海外同胞|侨务|一带一路|人类命运共同体/.test(text)) {
+    score += 0.08;
+    drivers.push("diaspora_or_bri_priority");
+  }
+  if (/外贸|进出口|外商投资|外资准入|贸易顺差|贸易逆差|关税|出口管制|双边投资协定|FDI/.test(text)) {
+    score += 0.08;
+    drivers.push("trade_investment_priority");
+  }
+  if (/台海|两岸|台湾问题|一个中国|反独促统|武统|环台|解放军.{0,6}台|台.{0,6}军演/.test(text)) {
+    score += 0.08;
+    drivers.push("taiwan_strait_priority");
+  }
+  // Sub-national (province/city-level) personnel appointments/discipline
+  // cases are real detail (admit-worthy — see adoption.ts official_action)
+  // but low editorial value on their own: no national-leadership, macro,
+  // instrument, or the priority domains above driving the score.
+  if (
+    /任命|免去.{0,6}职务|调任|挂职|接受.{0,4}审查调查|立案审查|立案侦查|双开|开除党籍|开除公职|留党察看|党内警告/.test(text) &&
+    !kinds.some((k) =>
+      ["leadership_meeting", "macro_policy", "implementing_instrument", "foreign_affairs", "defense_public", "finance_risk"].includes(k.kind)
+    )
+  ) {
+    score -= 0.1;
+    drivers.push("subnational_personnel_low_priority");
   }
   if (
     kinds.some((k) =>

@@ -124,8 +124,9 @@
 | F25 | Jev 快筛层：定时抓取候选先经 `JevGate`（in_scope / language_quality / priority_hint / `has_concrete_detail`）粗筛，值得的才进入全套分析；`has_concrete_detail=false`（纯党八股/无可核实细节）在 Stage 2 即被筛掉，不进 outbox；fail-open——未配置或调用失败一律直接放行，从不阻塞、从不越权门禁 | P1 | 已交付 |
 | F26 | 定时抓取管线串联：白名单分层 → 抓取 → Jev 粗筛 → 既有全套分析管线（`runSubscriptionCollect`/`collector.ts`），真实 `npm run collect` 验证过端到端行为不受影响 | P1 | 已交付 |
 | F27 | 缺席即信号：`absence_signal` 检测"长期沉默后简短通报"模式，基于历史 outbox 时间序列基线（`GAP_DAYS_THRESHOLD=14`，明确标注为未校准的手设编辑先验） | P2 | 已交付 |
+| F28 | "细节"定义扩大：采纳门禁不再只认政策工具（文件/资金/期限/量化目标），新增 `official_action`（人事/纪检/外交/发射/颁奖）与 `named_campaign`（具名宣教活动）两类硬细节；`public-live-collect` 实测采纳率从 1/15 升到 8-9/15。同步修正优先级排序（外交侨务/一带一路 > 外贸投资 > 台海 加权；省市级人事任免降权；`政协`/`人大` 误判中央会议的分类 bug）与标题生成器（认识新细节类型）；`/api/outbox` 默认不再展示 not-adopted 记录 | P0 | 已交付 |
 
-详细设计见 [DP-brief-quality.md](./DP-brief-quality.md)。读者交付物字段与流水线见 [DP.md](./DP.md)、[ARCHITECTURE.md](./ARCHITECTURE.md)。
+详细设计见 [DP-brief-quality.md](./DP-brief-quality.md)、[DP-V2.md](./DP-V2.md)（§1 2026-09-23 修订）。读者交付物字段与流水线见 [DP.md](./DP.md)、[ARCHITECTURE.md](./ARCHITECTURE.md)。
 
 ## 7. 非功能需求
 

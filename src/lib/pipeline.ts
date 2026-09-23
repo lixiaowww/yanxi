@@ -677,7 +677,7 @@ function applyDeterministicLayers(
       // instrument/amount/deadline/prohibition if the text states one in a
       // pattern it recognizes, and falls back to a near-empty generic line
       // otherwise. Offline mode (no LLM `base`) still needs the fallback.
-      headline: base?.headline || composeHeadlineEn(facts),
+      headline: base?.headline || composeHeadlineEn(facts, adoption.hard_nuggets),
       what:
         base?.what ||
         composeWhatEn(facts, { sourceCount: ctx.sourceCount, sourceLabels: ctx.sourceLabels }),

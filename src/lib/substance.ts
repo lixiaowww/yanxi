@@ -26,7 +26,9 @@ export type SubstanceKind =
   | "constraint_or_ban"
   | "resource_or_funding"
   | "named_sector_or_place"
-  | "delta_or_priority_shift";
+  | "delta_or_priority_shift"
+  | "official_action"
+  | "named_campaign";
 
 export type SubstanceNugget = {
   kind: SubstanceKind;
@@ -134,12 +136,43 @@ const SUBSTANCE: Detector[] = [
   {
     kind: "named_sector_or_place",
     label_zh: "Named sector / place",
-    rx: /芯片|半导体|人工智能|房地产|地方债|菜籽|稀土|粤港澳|长三角|京津冀|东北|新疆|西藏|台湾|南海/g,
+    // Curated hot-theme sectors, plus a general administrative-division
+    // catch-all (省/自治区/市/自治州/地区/县/区) so any China dateline or
+    // provincial/city mention counts as a named place — not just the
+    // hand-picked macro-policy sectors below. See docs/DP-V2.md (2026-09-23
+    // "detail redefinition"): objective, specific facts are not limited to
+    // policy-instrument vocabulary.
+    rx: /芯片|半导体|人工智能|房地产|地方债|菜籽|稀土|粤港澳|长三角|京津冀|东北|新疆|西藏|台湾|南海|[一-龥]{2,6}(省|自治区|自治州|市|地区|县|区)/g,
   },
   {
     kind: "delta_or_priority_shift",
     label_zh: "Priority / wording shift cue",
     rx: /首次|更加突出|把.+放在|优先|重中之重|从.+转向|不再|淡化|暂缓|加力|加码/g,
+  },
+  {
+    // Objective, specific, officially-reported occurrences that are not
+    // policy-instrument language: personnel appointments/dismissals,
+    // discipline/investigation actions, diplomatic meetings, launches and
+    // openings, awards/results. These are "detail" in the same sense a
+    // funding line is — a named subject did a specific, checkable thing —
+    // just not about a policy document. Deliberately excludes vague
+    // reporting verbs like 强调/指出/要求 (see BOILERPLATE above): those
+    // carry no checkable action on their own. docs/DP-V2.md (2026-09-23).
+    kind: "official_action",
+    label_zh: "Official action / appointment / discipline / diplomatic readout",
+    rx: /任命|免去.{0,6}职务|正式免职|调任|当选|连任|辞去.{0,6}职务|挂职|接受.{0,4}审查调查|立案审查|立案侦查|双开|开除党籍|开除公职|撤销.{0,6}职务|留党察看|党内警告|批准逮捕|提起公诉|一审判决|获刑|会见|会晤|正式访问|签署.{0,10}(协议|备忘录|合作)|成功发射|发射成功|发射升空|圆满成功|首飞|下水|交付使用|正式投产|正式开业|正式启用|揭牌|正式开工|竣工|启动仪式|论坛.{0,4}举办|颁奖仪式|颁授.{0,6}(奖章|证书|勋章)|授称|荣获|获得.{0,6}(冠军|奖|奖项)|夺得|摘得/g,
+  },
+  {
+    // Named, dated ideological/educational/awareness campaigns — distinct
+    // from official_action (a one-off transactional act): a sustained
+    // messaging activity with a specific name and target, e.g. a youth
+    // cybersecurity-literacy week. The campaign's existence and stated
+    // target audience are themselves checkable facts, same as any other
+    // detail — the interpretation of what the campaign signals belongs in
+    // analysis/forecast, not the intake gate. docs/DP-V2.md (2026-09-23).
+    kind: "named_campaign",
+    label_zh: "Named ideological/educational campaign or activity",
+    rx: /网络安全周|安全生产月|宪法宣传周|国家安全教育日|普法宣传周|主题教育活动|专项行动|巡回宣讲|进校园活动|进社区活动|进企业活动|进农村活动|培训班|学习班|观摩活动|文明实践.{0,6}活动|宣传月|宣传周/g,
   },
 ];
 
@@ -154,6 +187,8 @@ const CUE_FALLBACK_EN: Record<SubstanceKind, string> = {
   resource_or_funding: "a funding or resource line (see quoted excerpt)",
   named_sector_or_place: "a named sector or place (see quoted excerpt)",
   delta_or_priority_shift: "a priority or wording-shift cue (see quoted excerpt)",
+  official_action: "a named official action (see quoted excerpt)",
+  named_campaign: "a named campaign or activity (see quoted excerpt)",
 };
 
 /** Which extracted fact kinds can supply the value for a given cue kind. */
@@ -167,6 +202,8 @@ const FACT_KINDS_FOR_CUE: Record<SubstanceKind, FactKind[]> = {
   resource_or_funding: ["money"],
   named_sector_or_place: ["subject"],
   delta_or_priority_shift: [],
+  official_action: ["actor"],
+  named_campaign: [],
 };
 
 /**

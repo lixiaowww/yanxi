@@ -262,6 +262,84 @@ const GLOSS: Gloss[] = [
 
 const GLOSS_SORTED = [...GLOSS].sort((a, b) => b.zh.length - a.zh.length);
 
+/**
+ * English glosses for the official_action/named_campaign verb phrases in
+ * substance.ts's SUBSTANCE detectors (personnel/discipline/diplomatic/
+ * launch/award actions and named campaigns) — kept separate from GLOSS
+ * above since these are headline-specific action phrases, not general
+ * policy vocabulary. Only used by composeHeadlineEn's official_action
+ * fallback branch. docs/DP-V2.md (2026-09-23 detail redefinition).
+ */
+const ACTION_GLOSS: Gloss[] = [
+  { zh: "接受审查调查", en: "is placed under disciplinary investigation" },
+  { zh: "立案审查", en: "is placed under formal disciplinary review" },
+  { zh: "立案侦查", en: "is placed under criminal investigation" },
+  { zh: "双开", en: "is expelled from the Party and public office" },
+  { zh: "开除党籍", en: "is expelled from the Party" },
+  { zh: "开除公职", en: "is dismissed from public office" },
+  { zh: "留党察看", en: "is put on internal Party probation" },
+  { zh: "党内警告", en: "receives a Party warning" },
+  { zh: "撤销职务", en: "is removed from office" },
+  { zh: "免去职务", en: "is removed from office" },
+  { zh: "正式免职", en: "is formally dismissed" },
+  { zh: "调任", en: "is transferred to a new post" },
+  { zh: "连任", en: "is re-elected" },
+  { zh: "当选", en: "is elected" },
+  { zh: "辞去职务", en: "resigns from office" },
+  { zh: "挂职", en: "takes a temporary posting" },
+  { zh: "任命", en: "is appointed" },
+  { zh: "批准逮捕", en: "is formally arrested" },
+  { zh: "提起公诉", en: "is formally prosecuted" },
+  { zh: "一审判决", en: "receives a first-instance verdict" },
+  { zh: "获刑", en: "is sentenced" },
+  { zh: "会见", en: "meets with a foreign counterpart" },
+  { zh: "会晤", en: "holds talks with a foreign counterpart" },
+  { zh: "正式访问", en: "pays an official visit" },
+  { zh: "成功发射", en: "successfully launches" },
+  { zh: "发射成功", en: "is successfully launched" },
+  { zh: "发射升空", en: "lifts off" },
+  { zh: "圆满成功", en: "is declared a full success" },
+  { zh: "首飞", en: "makes its maiden flight" },
+  { zh: "下水", en: "is launched" },
+  { zh: "交付使用", en: "is delivered into service" },
+  { zh: "正式投产", en: "enters production" },
+  { zh: "正式开业", en: "formally opens" },
+  { zh: "正式启用", en: "is formally activated" },
+  { zh: "揭牌", en: "is formally inaugurated" },
+  { zh: "正式开工", en: "breaks ground" },
+  { zh: "竣工", en: "is completed" },
+  { zh: "启动仪式", en: "holds its launch ceremony" },
+  { zh: "颁奖仪式", en: "holds an awards ceremony" },
+  { zh: "颁授", en: "confers honors" },
+  { zh: "授称", en: "confers honorary titles" },
+  { zh: "荣获", en: "wins" },
+  { zh: "获得", en: "receives" },
+  { zh: "夺得", en: "wins" },
+  { zh: "摘得", en: "takes" },
+  { zh: "论坛", en: "holds a forum" },
+  // named_campaign
+  { zh: "网络安全周", en: "holds a Cybersecurity Week campaign" },
+  { zh: "安全生产月", en: "holds a Work Safety Month campaign" },
+  { zh: "宪法宣传周", en: "holds a Constitution Publicity Week campaign" },
+  { zh: "国家安全教育日", en: "marks National Security Education Day" },
+  { zh: "普法宣传周", en: "holds a Legal Awareness Week campaign" },
+  { zh: "主题教育活动", en: "runs a themed education campaign" },
+  { zh: "专项行动", en: "launches a targeted campaign" },
+  { zh: "巡回宣讲", en: "runs a touring outreach campaign" },
+  { zh: "培训班", en: "runs a training program" },
+  { zh: "学习班", en: "runs a study program" },
+  { zh: "宣传月", en: "holds a Publicity Month campaign" },
+  { zh: "宣传周", en: "holds a Publicity Week campaign" },
+];
+
+/** First known action phrase found anywhere in the clause, or "" if none. */
+function actionGloss(zh: string): string {
+  for (const g of ACTION_GLOSS) {
+    if (zh.includes(g.zh)) return g.en;
+  }
+  return "";
+}
+
 /** Longest-match glossary render. `covered` = share of chars translated. */
 export function glossPhrase(zh: string): { en: string; covered: number } {
   const parts: string[] = [];
@@ -1190,7 +1268,11 @@ export function composeWhatEn(
  * "Deferred — watch queue" / "Not adopted" heading, which already reads as
  * the headline for that case.
  */
-export function composeHeadlineEn(set: FactSet): string {
+export function composeHeadlineEn(
+  set: FactSet,
+  /** Adopted hard nuggets — only official_action/named_campaign are read here (adoption.ts's hard_nuggets). */
+  nuggets?: { kind: string; evidence: string }[]
+): string {
   const named = set.actor.filter((a) => a.actor_form !== "unnamed");
 
   // With merged multi-source text, "the first named actor overall" is
@@ -1231,6 +1313,22 @@ export function composeHeadlineEn(set: FactSet): string {
     return actorCap
       ? `${actorCap} Commits ${money.value_en}${forWhat ? ` for ${forWhat}` : ""}`
       : `${money.value_en} Committed${forWhat ? ` for ${forWhat}` : ""}`;
+  }
+  // Personnel/discipline/diplomatic/launch/campaign detail (adoption.ts's
+  // official_action/named_campaign) has no instrument/money to name, but is
+  // still a specific, checkable action — worth a real headline before
+  // falling through to the weaker deadline-only/generic branches below,
+  // which otherwise misfire on a bare year inside the action clause (e.g.
+  // "2026年...食品安全宣传周" read as a deadline). docs/DP-V2.md (2026-09-23).
+  const officialAction = (nuggets || []).find(
+    (n) => n.kind === "official_action" || n.kind === "named_campaign"
+  );
+  if (officialAction) {
+    const gloss = actionGloss(officialAction.evidence);
+    if (gloss) {
+      const actorCap = actorCapFor(named[0]);
+      return actorCap ? `${actorCap} ${gloss}` : sentenceCase(gloss);
+    }
   }
   if (deadline) {
     const actorCap = actorCapFor(nearestActor(deadline.index));

@@ -55,6 +55,16 @@ type ReaderBrief = {
   - 出处：`docs/ETHICS.md` 红线不变——引用的是**美国政府公开发布的分析写作标准**（民用文本写作方法论），不涉及情报采集/密级操作规程，符合"不做 SIGINT/密级分类框架"的边界。
 - `skills/briefing-writer/SKILL.md` 已同步补充这条可能性用词规则的引用来源。
 
+**2026-09-23 修订——"细节"定义扩大，采纳门禁不再只认政策工具**：实测线上 RSS 自动采集（`public-live-collect` 订阅）发现 `intake_reject_thin` 拒绝率极高（15 条里仅 1 条采纳）。用户复盘后给出明确纠正：
+
+1. **产品方向纠正**：自动搜集+分析+预测是主线，人工审核是最后一道关卡，不是退回人工粘贴为主（此前一版分析误判为应缩小自动化范围，已撤回）。
+2. **"细节"的精确定义**："官方公布的任免等客观信息，不需要证伪，主观性的评论，我们不需要采纳，所以不需要证伪。重点在于分析和预测。"——即：细节不限于政策工具类词汇（文件/资金/期限/量化目标），任何具名主体+具体可核查动作/数字/日期（人事任免、纪检通报、外交会见、发射/颁奖、具名宣教活动）都算细节；唯一真正该拒的是"党八股"式无具名主体的泛泛号召语言。用户原话确认三个样本判断正确后签字："这个定义正确"。
+3. **落地**（`src/lib/substance.ts` + `src/lib/adoption.ts`）：新增 `official_action`（人事/纪检/外交/发射/颁奖等具体官方动作）与 `named_campaign`（具名宣教/宣传活动，如"网络安全周"）两类 `SubstanceKind`，计入 `HARD_SUBSTANCE_KINDS`，`isActionableCore` 对二者的匹配无条件视为可采纳（动词表本身已是精选清单，构造上即具体可核查）。`named_sector_or_place` 从硬编码地名列表改为通用行政区划正则（`省/自治区/市/自治州/地区/县/区`），不再遗漏"广西"这类未入列的省份。效果：`public-live-collect` 实测采纳率从 1/15 升到 8-9/15。
+4. **优先级排序纠正**（`src/lib/info-triage.ts`）：用户指出"国家级以下（省市级别）人事任免意义不大；外交（包括华人，一带一路），经济（尤其是外贸和投资），国防（台海）可能更重要"——新增 `diaspora_or_bri_priority`/`trade_investment_priority`/`taiwan_strait_priority` 加权，以及 `subnational_personnel_low_priority` 降权。过程中顺带修了一个真实分类 bug：`leadership_meeting` 的正则里裸 `政协`/`人大` 会命中任何地方官员的头衔（如"...政协副主席..."），误判成中央级会议拿到 P2 高优先级；改为要求 `全国政协`/`全国人大` 才算数。
+5. **标题生成器同步扩展**（`src/lib/facts.ts` `composeHeadlineEn`）：新增 `ACTION_GLOSS` 词表 + `officialAction` 分支，让离线兜底路径也认识新细节类型，避免像此前那样把"2026年...食品安全宣传周"里的基准年误判成 deadline（"Deadline Set in 2026"）或退化成通用占位符标题。
+6. **Reader/`/compose` 呈现层**（`server.ts` `/api/outbox`）：新增默认过滤 `adopted === false` 的记录（与既有 `fixture_demo` 过滤同一模式），`?includeNotAdopted=true` 可选查看被拒内容用于调试/调优信源。用户明确要求："简报不应该是 rss 的罗列，而是有个过滤机制，符合我们这种分析预测能力和范围的才列出来"。
+7. 全程 `npm test`（21/21）与 `tsc --noEmit` 保持干净，未破坏既有 fixture 校准。
+
 ---
 
 ## 2. Outbox 记录标 provenance，把测试数据和真实数据分开

@@ -242,8 +242,8 @@
       "url": "https://www.ndrc.gov.cn/xxgk/zcfb/",
       "label": "ndrc.gov.cn-policy-release",
       "topics": ["macro_policy", "implementing_instrument"],
-      "enabled": true,
-      "note": "Tried live 2026-09-22: returns ~54 bytes (likely a JS-rendered shell or a soft block on this client) — fetchWhitelistedText's 20-char minimum drops it silently, no bad output, just nothing collected. Left enabled since it's harmless; revisit if a better subpage/approach is found.",
+      "enabled": false,
+      "note": "Tried live 2026-09-22: returns ~54 bytes (likely a JS-rendered shell or a soft block on this client) — fetchWhitelistedText's 20-char minimum drops it silently, no bad output, just nothing collected. Re-confirmed 2026-09-23 (still zero adopted briefs across two collect runs, just wasted quota slots): disabled in favor of the chinanews.com.cn RSS entries. Re-enable only if a better subpage/approach is found.",
       "tier": "ministry_official",
       "channel_type": "official_site",
       "authority_weight": 0.8
@@ -254,8 +254,8 @@
       "url": "https://jingji.cctv.com/",
       "label": "CCTV-2 finance channel (text)",
       "topics": ["macro_policy", "finance_risk", "industrial_tech_policy"],
-      "enabled": true,
-      "note": "Tried live 2026-09-22: fetches real content and is correctly deferred/rejected as thin by the pipeline (short consumer-lifestyle blurb, not policy substance) — honest behavior, left enabled. Text/article content only — broadcast video is out of scope (docs/DP-V3.md §2).",
+      "enabled": false,
+      "note": "Tried live 2026-09-22: fetches real content and is correctly deferred/rejected as thin by the pipeline (short consumer-lifestyle blurb, not policy substance) — honest behavior. Re-confirmed 2026-09-23: it's a channel homepage, not an article, so it structurally can never carry a named instrument/funding/deadline — same index-page problem as govcn-policy-index/mofcom-home above. Disabled; the chinanews.com.cn RSS entries are real single-article items instead. Text/article content only — broadcast video is out of scope (docs/DP-V3.md §2).",
       "tier": "specialized_channel",
       "channel_type": "tv",
       "authority_weight": 0.6
@@ -266,8 +266,8 @@
       "url": "https://tv.cctv.com/cctv7/",
       "label": "CCTV-7 defense/military channel (text)",
       "topics": ["defense_public"],
-      "enabled": true,
-      "note": "Tried live 2026-09-22: fetches real content and is correctly deferred/rejected as thin (channel-description boilerplate, no article substance) — honest behavior, left enabled. Text/article content only — broadcast video is out of scope (docs/DP-V3.md §2).",
+      "enabled": false,
+      "note": "Tried live 2026-09-22: fetches real content and is correctly deferred/rejected as thin (channel-description boilerplate, no article substance) — honest behavior. Re-confirmed 2026-09-23: same channel-homepage index-page problem as cctv-finance above, structurally never produces an adoptable article. Disabled. Text/article content only — broadcast video is out of scope (docs/DP-V3.md §2).",
       "tier": "specialized_channel",
       "channel_type": "tv",
       "authority_weight": 0.6
@@ -299,14 +299,26 @@
       "authority_weight": 0.5
     },
     {
+      "id": "chinanews-importnews-rss",
+      "type": "rss",
+      "url": "https://www.chinanews.com.cn/rss/importnews.xml",
+      "label": "China News Service — editors' headline digest RSS",
+      "topics": ["macro_policy", "foreign_affairs", "social_governance"],
+      "enabled": true,
+      "maxItems": 5,
+      "note": "Added 2026-09-23 in place of chinanews-scroll-rss: same wire, but this is the editors' curated headline pick (要闻导读) rather than the raw minute-by-minute firehose, so it's less saturated with sports/culture human-interest filler. Does not meaningfully raise the adoption rate on its own (this remains a general wire, not a policy-instrument publisher — see public-live-collect subscription note) but wastes fewer of the run's item budget on stories the intake gate was always going to reject. See chinanews-politics-rss for tier rationale.",
+      "tier": "unknown",
+      "channel_type": "wire",
+      "authority_weight": 0.5
+    },
+    {
       "id": "chinanews-scroll-rss",
       "type": "rss",
       "url": "https://www.chinanews.com.cn/rss/scroll-news.xml",
       "label": "China News Service — rolling news RSS",
       "topics": ["macro_policy", "social_governance", "foreign_affairs", "finance_risk"],
-      "enabled": true,
-      "maxItems": 8,
-      "note": "Verified live 2026-09-22 (items updating same-day, minutes apart) — highest-frequency of the three chinanews.com.cn feeds, mixed topics. See chinanews-politics-rss for tier rationale.",
+      "enabled": false,
+      "note": "Verified live 2026-09-22 (items updating same-day, minutes apart) — highest-frequency of the three chinanews.com.cn feeds, mixed topics. Disabled 2026-09-23: in a live test run this was mostly sports/culture/personnel-discipline items (moon cakes, Asian Games swim relay, corruption announcements), none adopted — swapped for chinanews-importnews-rss above. See chinanews-politics-rss for tier rationale.",
       "tier": "unknown",
       "channel_type": "wire",
       "authority_weight": 0.5

@@ -6,12 +6,21 @@
 
 import type { SubstanceCut, SubstanceKind, SubstanceNugget } from "./substance.js";
 
-/** Core hard detail: numbers / timelines / named instruments / funding. */
+/**
+ * Core hard detail: numbers / timelines / named instruments / funding —
+ * plus official_action (appointments, discipline, diplomatic readouts,
+ * launches, awards). "Detail" is not limited to policy-instrument
+ * vocabulary: an official, specific, checkable action is just as much a
+ * hard cue as a funding line. See docs/DP-V2.md (2026-09-23 detail
+ * redefinition).
+ */
 export const HARD_SUBSTANCE_KINDS: SubstanceKind[] = [
   "numeric_target",
   "timeline",
   "named_instrument",
   "resource_or_funding",
+  "official_action",
+  "named_campaign",
 ];
 
 const SUPPORT_BODY: SubstanceKind = "responsible_body";
@@ -46,6 +55,18 @@ export function isActionableCore(n: SubstanceNugget): boolean {
     case "timeline":
       // A date alone is weak; actionable when tied to an instrument/funding clause.
       return /出台|印发|实施|落地|安排|专项|试点|配套|办法|通知/.test(ev);
+    case "official_action":
+      // The detector's verb list is already curated to only match specific,
+      // checkable official actions (appointment/discipline/diplomatic/
+      // launch/award) — any match is actionable by construction, no extra
+      // qualifier needed, same as how a real funding figure needs no
+      // second gate once it's confirmed to be a number.
+      return true;
+    case "named_campaign":
+      // Same reasoning as official_action: the campaign-name list is
+      // already curated to specific, named activities, not generic
+      // mobilization vocabulary.
+      return true;
     default:
       return false;
   }

@@ -208,6 +208,7 @@ async function main() {
     const sub = req.query.subscriptionId ? String(req.query.subscriptionId) : undefined;
     const deskFilter = req.query.desk ? String(req.query.desk) : undefined;
     const includeFixtures = req.query.includeFixtures === "true";
+    const includeNotAdopted = req.query.includeNotAdopted === "true";
     let records = listOutboxBriefs(sub);
     // docs/DP-V2.md §2 (provenance) — the Reader is a reading product, not a
     // pipeline test harness; demo/fixture reruns (local_json sample text,
@@ -216,6 +217,15 @@ async function main() {
     // debugging/demoing the pipeline itself.
     if (!includeFixtures) {
       records = records.filter((r) => r.provenance !== "fixture_demo");
+    }
+    // Same reasoning applied to adoption: a "not adopted" record has no
+    // real content, just the gate's rejection reasoning standing in for a
+    // headline — the Reader (and /compose's "Recent outbox" list) is a
+    // reading surface, not a place to show intake-gate rejects as if they
+    // were briefs. Opt in with ?includeNotAdopted=true to audit what the
+    // gate is discarding (e.g. while tuning collect sources).
+    if (!includeNotAdopted) {
+      records = records.filter((r) => r.result.briefing.adoption?.adopted !== false);
     }
     if (deskFilter) {
       records = records.filter((r) => r.result.briefing.desk_section?.primary === deskFilter);

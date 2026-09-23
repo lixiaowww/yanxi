@@ -106,10 +106,10 @@
     },
     {
       "id": "public-live-collect",
-      "title": "Live public collect — CCTV / NDRC / China News Service RSS",
-      "description": "Real fetches from the enabled URL + RSS whitelist entries (docs/DP-V3.md §7 open question #2 starter set) — one brief per item, not merged. gov.cn/mofcom homepage entries dropped 2026-09-22 (index-page incoherence — see their whitelist notes); the 3 chinanews.com.cn RSS feeds are the real per-article source now.",
+      "title": "Live public collect — China News Service RSS",
+      "description": "Real fetches from the enabled RSS whitelist entries — one brief per item, not merged. gov.cn/mofcom/ndrc.gov.cn and the CCTV channel-homepage entries were all dropped by 2026-09-23 (each is an index/nav page, not a single article — see their whitelist notes); the 3 chinanews.com.cn RSS feeds (politics/finance/editors'-picks) are the real per-article source. Adoption rate from this general wire is inherently low (~1 in 10-12 items in live testing 2026-09-23) — most wire copy is human-interest/sports/personnel-discipline, not named-instrument policy content, so the intake gate correctly rejects most of it rather than fabricating analysis from a stub. Raising this further needs a genuine policy-document source, not another wire feed swap.",
       "keywords": [],
-      "sourceIds": ["ndrc-policy", "cctv-finance", "cctv-defense", "chinanews-politics-rss", "chinanews-finance-rss", "chinanews-scroll-rss"],
+      "sourceIds": ["chinanews-politics-rss", "chinanews-finance-rss", "chinanews-importnews-rss"],
       "scheduleCron": "0 7 * * 1-5",
       "scheduleHuman": "Weekdays 07:00 local",
       "delivery": ["outbox", "rss"],
