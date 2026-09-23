@@ -125,6 +125,8 @@
 | F26 | 定时抓取管线串联：白名单分层 → 抓取 → Jev 粗筛 → 既有全套分析管线（`runSubscriptionCollect`/`collector.ts`），真实 `npm run collect` 验证过端到端行为不受影响 | P1 | 已交付 |
 | F27 | 缺席即信号：`absence_signal` 检测"长期沉默后简短通报"模式，基于历史 outbox 时间序列基线（`GAP_DAYS_THRESHOLD=14`，明确标注为未校准的手设编辑先验） | P2 | 已交付 |
 | F28 | "细节"定义扩大：采纳门禁不再只认政策工具（文件/资金/期限/量化目标），新增 `official_action`（人事/纪检/外交/发射/颁奖）与 `named_campaign`（具名宣教活动）两类硬细节；`public-live-collect` 实测采纳率从 1/15 升到 8-9/15。同步修正优先级排序（外交侨务/一带一路 > 外贸投资 > 台海 加权；省市级人事任免降权；`政协`/`人大` 误判中央会议的分类 bug）与标题生成器（认识新细节类型）；`/api/outbox` 默认不再展示 not-adopted 记录 | P0 | 已交付 |
+| F29 | Reader 置信度显示简化 + skill 深度追问清单：Analysis 区块不再显示置信度标签（预测保留，收窄到 high/moderate likelihood 两档，`/compose` 完整三档不变）；`skills/briefing-writer/SKILL.md` 新增"Domain-specific deep read"——用真实样本（经济数据/外交会见/外交表态/政策工具/国防）归纳出各类别的标准追问清单，避免简报沦为翻译流水账；`falsifier`/`open_questions` 新增要求：需要背景知识核实时必须给出具体搜索关键词建议（不联网，只告诉人类去搜什么） | P0 | 已交付 |
+| F30 | Render 免费档磁盘不持久缓解：生产环境启动时检查 outbox 有无 `provenance=live` 记录，没有则后台自动触发一次采集（不阻塞启动），把"重启到有内容"的窗口从"等下次定时任务"缩短到"冷启动后约一分钟"；配合 `.github/workflows/collect-cron.yml` 的工作日定时采集使用，均不能让内容真正持久化（真正的修复是付费 Persistent Disk，未做） | P1 | 已交付 |
 
 详细设计见 [DP-brief-quality.md](./DP-brief-quality.md)、[DP-V2.md](./DP-V2.md)（§1 2026-09-23 修订）。读者交付物字段与流水线见 [DP.md](./DP.md)、[ARCHITECTURE.md](./ARCHITECTURE.md)。
 

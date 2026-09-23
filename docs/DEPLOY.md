@@ -8,6 +8,7 @@
 - 磁盘**不持久**：`outbox/briefs` 重启会丢（演示以粘贴简报 + 预生成 portfolio 为主）  
 - `POST /api/brief` 与 `POST /api/collect/run` 在公开演示上**开放**（靠 IP 限流，不要求 access token）
 - 服务本身**没有定时器**：`render.yaml` 只起 `npm start`（web 服务），不起 `collect:daemon`；`.github/workflows/collect-cron.yml` 用 GitHub Actions 按工作日定时 `POST /api/collect/run` 补上这一环——仍不解决磁盘不持久，只是让 Reader 在两次重启之间有内容，见 `docs/COLLECT.md` §生产触发
+- **冷启动自动补采集**（`server.ts`，2026-09-23）：生产环境启动时若 outbox 里没有任何 `provenance=live` 记录，会在后台自动触发一次 `public-live-collect` 采集（不阻塞 `app.listen()`/健康检查）。这把"重启到 Reader 有内容"的窗口从"等下一次 GitHub Actions 定时任务（最长一整天）"缩短到"冷启动后约一分钟"，跟上面的定时任务互补，**不是**持久化方案——真正让内容跨重启保留，需要升级到带 Persistent Disk 的付费档（Render Starter 及以上）
 
 ## 公开演示的访问模型
 

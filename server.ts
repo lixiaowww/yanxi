@@ -415,6 +415,31 @@ async function main() {
 
   const isProd = process.env.NODE_ENV === "production";
 
+  // Render's free tier has no persistent disk (docs/DEPLOY.md) -- every
+  // deploy/restart/sleep-wake starts with an empty outbox/, and the
+  // scheduled GitHub Actions collect (.github/workflows/collect-cron.yml)
+  // only fills it back in on its next scheduled run, which can leave the
+  // Reader empty for hours after a cold start. Kick off one background
+  // collect on boot -- fire-and-forget, does not block app.listen() or the
+  // health check -- so a fresh instance has real content within roughly a
+  // minute instead of waiting for the next cron tick. Skipped in dev (repeat
+  // reloads would otherwise refetch on every restart) and skipped if a live
+  // record already exists (a plain restart, not a cold start after sleep,
+  // shouldn't recollect -- this still doesn't survive restarts by itself,
+  // it just closes the gap between a restart and the next cron run).
+  if (isProd) {
+    const hasLive = listOutboxBriefs().some((r) => r.provenance === "live");
+    if (!hasLive) {
+      console.log("[boot-collect] no live outbox records found -- triggering one background collect run");
+      runAllActiveSubscriptions({ onlyId: "public-live-collect", publicBaseUrl: PUBLIC_BASE_URL })
+        .then((results) => {
+          const written = results.reduce((n, r) => n + r.written.length, 0);
+          console.log(`[boot-collect] done: collected ${written} item(s)`);
+        })
+        .catch((e) => console.error("[boot-collect] failed:", e));
+    }
+  }
+
   if (isProd) {
     const dist = path.join(process.cwd(), "dist");
     app.use(express.static(dist, { index: false }));

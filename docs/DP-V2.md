@@ -65,6 +65,15 @@ type ReaderBrief = {
 6. **Reader/`/compose` 呈现层**（`server.ts` `/api/outbox`）：新增默认过滤 `adopted === false` 的记录（与既有 `fixture_demo` 过滤同一模式），`?includeNotAdopted=true` 可选查看被拒内容用于调试/调优信源。用户明确要求："简报不应该是 rss 的罗列，而是有个过滤机制，符合我们这种分析预测能力和范围的才列出来"。
 7. 全程 `npm test`（21/21）与 `tsc --noEmit` 保持干净，未破坏既有 fixture 校准。
 
+**2026-09-23 续— Reader 置信度显示简化 + skill 深度追问清单**：同一天晚些时候，用户在实测上线后的简报时又给出两条纠正：
+
+8. **置信度只放在预测上**："把置信度只限于预测，分析不需要了，预测置信度只需要两个：高可能；一般可能"——`ReaderBrief.tsx` 的 Analysis 区块不再显示逐条 / masthead 置信度标签（`source_credibility`保留，它是信源可靠性，不是分析置信度，两个概念不同）；Forecast 的 likelihood 用词从 ICD 203 三档（likely / roughly even odds / unlikely）收窄到两档："high likelihood" / "moderate likelihood"（`src/lib/score-bands.ts` 新增 `readerLikelihoodWord()`，仅 Reader 用；`/compose` 的 `BriefingNote.tsx` 继续用完整三档 `likelihoodWord()`，两者分工不变）。
+9. **简报流水账问题 + skill 深度追问清单**：用户指出"很多简报都应该放在历史上去分析和预测，很多信息单独看是无法分析和预测的"，并用真实抓取的 5 个样本（西藏收入统计、李强会见吉尔吉斯斯坦总理、中国驻欧盟使团回应涉港澳报告、国务院办公厅新质生产力试点通知、国防部例行记者会通稿）亲自写分析和预测，由 Claude 归纳拓展进 `skills/briefing-writer/SKILL.md` 新增的"Domain-specific deep read"整节——经济数据（名义 vs 实际购买力、均值 vs 分布、真实驱动力）、外交会见/表态（回应格式即烈度、历史基线对比）、政策工具（本文件是否可执行、预测该指向后续配套文件）、国防（目标语言 vs 方法动作分开、"防御性"论述必须并列两种读法不能单一定论）。
+10. **历史序列对比 vs 联网搜索，分开处理**：用户进一步指出"数字贸易博览会"那条分析实际上是自己联网搜索了历届举办地/主宾国才写出来的——暴露出两层不同能力：(a) 查本系统 outbox 内部历史（`findRelatedBriefs` 目前在 LLM 调用**之后**才跑，没喂给模型，属于真实存在但**尚未动手**的管线顺序问题，留作后续单独评估）；(b) 真实联网搜索历史背景（新增依赖、新增成本、需要独立设计，本次明确**不做**）。折中方案：SKILL.md 新增指令——当 Forecast 的 `falsifier` 或 `open_questions` 需要本系统查不到的背景事实（历史基线、既往表态、官方统计口径）时，必须给出**具体建议搜索的关键词**，而不是含糊的"需要核实"；不联网，只告诉人类审阅者该去搜什么。`src/lib/skills.ts` 的输出 schema 提示同步更新。
+11. **Render 免费档磁盘不持久的缓解**（`server.ts`）：用户追问"如何让 outbox 保留内容（最好是最新的）"。真正的修复是升级到带 Persistent Disk 的付费档（未做，成本决策留给用户）；作为免费档下的折中，新增生产环境启动钩子——`app.listen()` 之前检查 outbox 里有没有 `provenance=live` 的记录，没有就后台触发一次 `public-live-collect` 采集（不阻塞启动/健康检查）。这不能让内容真正持久化（重启依然会清空），只是把"重启到下次有内容"的窗口从"等下一次 GitHub Actions 定时任务（最多一整天）"缩短到"冷启动后约一分钟内"，跟已有的 `.github/workflows/collect-cron.yml` 互补，不是替代。
+
+全程 `npm test`（21/21）与 `tsc --noEmit` 保持干净。
+
 ---
 
 ## 2. Outbox 记录标 provenance，把测试数据和真实数据分开

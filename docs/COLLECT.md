@@ -58,6 +58,13 @@ site's already-open `/api/collect/run` (`subscriptionId: "public-live-collect"`,
 a Render restart or sleep/wake still clears `outbox/briefs` — it only keeps the Reader populated
 between those resets. Trigger manually anytime via the workflow's "Run workflow" button.
 
+**Cold-start mitigation** (`server.ts`, 2026-09-23): in production, if the outbox has no
+`provenance: "live"` records at boot, the server fires one background `public-live-collect`
+run before it starts serving (doesn't block `app.listen()`/the health check). This shortens the
+"restart to Reader has content" gap from "wait for the next scheduled cron tick" to "roughly a
+minute after cold start" — it's a mitigation layered on top of the cron job above, not a
+replacement, and it still doesn't make `outbox/briefs` survive a restart by itself.
+
 While `npm run dev` is up:
 
 - `GET /api/subscriptions` — list + feed URLs  
