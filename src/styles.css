@@ -528,3 +528,334 @@ pre {
   font-size: 0.8rem;
 }
 
+/* ============================================================
+   Briefing note — v2 result view (docs/DP-V2.md §1)
+   The note itself reads as a document (paper tone, serif body);
+   the surrounding app chrome stays the dark tool UI. The Analyst
+   appendix is deliberately de-emphasized, never competing with
+   the note for attention.
+   ============================================================ */
+.briefing-note {
+  background: #f6f1e4;
+  color: #211d15;
+  border-radius: 10px;
+  padding: 1.75rem 2rem;
+  font-family: Georgia, "Iowan Old Style", "Palatino Linotype", serif;
+  line-height: 1.62;
+}
+@media (max-width: 640px) {
+  .briefing-note { padding: 1.25rem 1.1rem; }
+}
+.note-masthead {
+  border-bottom: 2px solid #211d15;
+  padding-bottom: 0.85rem;
+  margin-bottom: 1rem;
+}
+.note-headline {
+  font-family: Georgia, "Iowan Old Style", "Palatino Linotype", serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.25;
+  margin: 0 0 0.5rem;
+  color: #211d15;
+}
+.note-byline {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  align-items: center;
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #7a6f5c;
+  margin: 0 0 0.65rem;
+}
+.nexus-word { font-weight: 700; }
+.nexus-word.direct { color: #9a4a14; }
+.nexus-word.possible { color: #93781a; }
+.desk-tag {
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 0.05rem 0.35rem;
+}
+.reader-confidence-badges { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.5rem; }
+.confidence-badge {
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 0.7rem;
+  font-weight: 600;
+  border: 1px solid #ddd2b8;
+  border-radius: 3px;
+  padding: 0.15rem 0.5rem;
+  color: #7a6f5c;
+}
+.confidence-badge.confidence-high { color: #2f6f4e; border-color: #2f6f4e; }
+.confidence-badge.confidence-medium { color: #93781a; border-color: #93781a; }
+.confidence-badge.confidence-low { color: #9a4a14; border-color: #9a4a14; }
+.reader-more { margin-top: 2rem; border-top: 1px solid var(--border); padding-top: 1rem; }
+.reader-more .note-block h3 {
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #7a6f5c;
+  margin: 0 0 0.5rem;
+  border-bottom: 1px solid #ddd2b8;
+  padding-bottom: 0.3rem;
+}
+.bluf {
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.4;
+  margin: 0;
+  padding: 0.65rem 0.85rem;
+  border-left: 4px solid #211d15;
+  background: rgba(33, 29, 21, 0.045);
+  color: #211d15;
+}
+.bluf-ok { border-left-color: #2f6f4e; }
+.bluf-warn { border-left-color: #93781a; }
+.note-timestamp {
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 0.7rem;
+  color: #9a8f7a;
+  margin: 0.55rem 0 0;
+}
+.merge-cta { font-family: "IBM Plex Sans", sans-serif; }
+.merge-cta .note-sub { display: inline; }
+.note-block { margin: 1.35rem 0; }
+.note-block h2 {
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #7a6f5c;
+  margin: 0 0 0.5rem;
+  border-bottom: 1px solid #ddd2b8;
+  padding-bottom: 0.3rem;
+}
+.note-body { margin: 0 0 0.5rem; }
+.note-sub {
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 0.8rem;
+  color: #7a6f5c;
+  margin: 0.2rem 0;
+}
+.note-list { margin: 0.3rem 0 0 1.2rem; padding: 0; }
+.note-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin: 1rem 0;
+  font-family: "IBM Plex Sans", sans-serif;
+}
+.note-actions a { font-size: 0.85rem; align-self: center; }
+.reject-block h2,
+.review-block h2 {
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 1rem;
+  text-transform: none;
+  letter-spacing: 0;
+  border-bottom: none;
+  color: #211d15;
+}
+.review-point { margin: 0.5rem 0; font-family: "IBM Plex Sans", sans-serif; }
+.review-point label { color: #4a4234; }
+.review-point select { font-family: "IBM Plex Sans", sans-serif; }
+.review-resolved-note { font-family: "IBM Plex Sans", sans-serif; }
+
+button.ghost,
+.ghost {
+  background: transparent;
+  border: 1px solid #211d15;
+  color: #211d15;
+  font-family: "IBM Plex Sans", sans-serif;
+  font-weight: 600;
+  font-size: 0.8rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: 6px;
+  cursor: pointer;
+}
+button.ghost:hover { background: rgba(33, 29, 21, 0.06); }
+button.ghost:disabled { opacity: 0.55; cursor: default; }
+
+.appendix {
+  margin-top: 1.25rem;
+  padding: 1rem 1.1rem;
+  border: 1px dashed var(--border);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--panel) 92%, black);
+}
+.appendix-title {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin: 0 0 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.appendix-note { font-size: 0.78rem; color: var(--muted); margin: 0 0 0.75rem; }
+.appendix-list { display: grid; grid-template-columns: max-content 1fr; gap: 0.3rem 0.75rem; margin: 0 0 0.75rem; }
+.appendix-list dt { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap; }
+.appendix-list dd { margin: 0; font-size: 0.82rem; color: var(--text); }
+.appendix-sub { color: var(--muted); }
+.raw-json {
+  max-height: 320px;
+  overflow: auto;
+  font-size: 0.7rem;
+  background: #0c1117;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.75rem;
+  margin-top: 0.6rem;
+}
+
+/* Reused list/panel styles were tuned for the dark app chrome (--panel,
+   --border, --muted, dark chip backgrounds). Re-themed for the paper
+   background so they read as part of the document, not floating dark
+   boxes on cream. */
+.briefing-note .digest-btn {
+  background: #fbf8f0;
+  border-color: #ddd2b8;
+  color: #211d15;
+  font-family: "IBM Plex Sans", sans-serif;
+}
+.briefing-note .digest-btn.active { border-color: #2f6f4e; }
+.briefing-note .digest-btn.missing { border-color: #9a4a14; }
+.briefing-note .digest-point { color: #211d15; }
+.briefing-note .digest-quote { color: #7a6f5c; }
+.briefing-note .nugget-list li {
+  background: #fbf8f0;
+  border-color: #ddd2b8;
+}
+.briefing-note .nugget-kind { color: #6a5a1e; font-family: "IBM Plex Sans", sans-serif; }
+.briefing-note .nugget-ev { color: #211d15; }
+.briefing-note .scenario-list li { border-left-color: #ddd2b8; }
+.briefing-note .likelihood { border-color: #ddd2b8; font-family: "IBM Plex Sans", sans-serif; }
+.briefing-note .likelihood-high { color: #2f6f4e; }
+.briefing-note .likelihood-medium { color: #93781a; }
+.briefing-note .likelihood-low { color: #9a4a14; }
+.briefing-note .reject-block {
+  border: 1px solid #9a4a14;
+  background: rgba(154, 74, 20, 0.06);
+  border-radius: 8px;
+  padding: 0.85rem 1rem;
+}
+.briefing-note .review-block {
+  border: 1px solid #93781a;
+  background: rgba(147, 120, 26, 0.07);
+  border-radius: 8px;
+  padding: 0.85rem 1rem;
+}
+.briefing-note .ref-links a { color: #1a4d8a; }
+.digest-citation { margin: 0.25rem 0 0; }
+.digest-citation a { color: #1a4d8a; }
+.briefing-note select {
+  background: #fbf8f0;
+  color: #211d15;
+  border-color: #ddd2b8;
+  font-family: "IBM Plex Sans", sans-serif;
+}
+
+/* ============================================================
+   Reader — category-first reading view (docs/DP-V3.md follow-up)
+   Dark app chrome frames the nav/list; an opened brief still
+   renders inside .briefing-note's own paper tone, unchanged.
+   ============================================================ */
+.reader-wrap { max-width: 900px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+.reader-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+.reader-header h1 { font-size: 1.6rem; margin: 0; letter-spacing: -0.02em; }
+.reader-header-actions { display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap; }
+.reader-link {
+  color: var(--muted);
+  font-size: 0.85rem;
+  text-decoration: none;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.3rem 0.75rem;
+}
+.reader-link:hover { color: var(--text); border-color: var(--accent); }
+/* .ghost is themed for the paper-toned .briefing-note; the Reader shell
+   itself is dark chrome, so re-theme it here rather than change the shared
+   class (AnalystAppendix/BriefingNote still want the paper look). */
+.reader-wrap .ghost { border-color: var(--border); color: var(--text); background: transparent; }
+.reader-wrap .ghost:hover { background: color-mix(in srgb, var(--panel) 80%, white 4%); }
+.reader-settings {
+  background: color-mix(in srgb, var(--panel) 92%, black);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+}
+.reader-settings p { margin: 0.4rem 0 0; }
+.reader-nav { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.25rem; }
+.reader-nav-item {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  border-radius: 999px;
+  padding: 0.4rem 0.85rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.reader-nav-item:hover { color: var(--text); border-color: var(--accent); }
+.reader-nav-item.active { background: var(--accent); color: white; border-color: var(--accent); }
+.reader-nav-count {
+  font-size: 0.72rem;
+  opacity: 0.85;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  padding: 0.05rem 0.4rem;
+}
+.reader-nav-item.active .reader-nav-count { background: rgba(0, 0, 0, 0.2); }
+.reader-desk-blurb { margin-bottom: 1rem; }
+.reader-back { margin-bottom: 1rem; }
+.reader-main { min-height: 200px; }
+.reader-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.6rem; }
+.reader-list-item {
+  width: 100%;
+  text-align: left;
+  background: color-mix(in srgb, var(--panel) 92%, black);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.85rem 1rem;
+  cursor: pointer;
+  color: var(--text);
+  font: inherit;
+}
+.reader-list-item:hover { border-color: var(--accent); }
+.reader-list-top { display: flex; align-items: baseline; gap: 0.5rem; flex-wrap: wrap; }
+.reader-importance {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  color: var(--muted);
+}
+.reader-importance-P1 { color: var(--bad); border-color: color-mix(in srgb, var(--bad) 45%, var(--border)); }
+.reader-importance-P2 { color: #f0e2b8; border-color: color-mix(in srgb, #c4a35a 45%, var(--border)); }
+.reader-importance-P3 { color: var(--muted); }
+.reader-importance-P4 { color: var(--muted); opacity: 0.7; }
+.reader-list-headline { font-weight: 600; }
+.reader-list-sub { margin-top: 0.3rem; font-size: 0.8rem; color: var(--muted); }
+

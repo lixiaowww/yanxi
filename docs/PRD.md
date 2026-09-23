@@ -10,6 +10,7 @@
 | 伦理 | [ETHICS.md](./ETHICS.md) |
 | 质量 DP | [DP-brief-quality.md](./DP-brief-quality.md)（F11–F13） |
 | 总 DP | [DP.md](./DP.md) |
+| v3 DP | [DP-V3.md](./DP-V3.md)（F20–F27：Reader 页 + 定时抓取管线雏形） |
 
 ---
 
@@ -115,6 +116,14 @@
 | F19 | 运行事实：本地 `.env` 与 Render 生产环境均已配置双 LLM 供应商（主 Groq + 备 DeepSeek），offline 模板不再是常态默认路径，而是双供应商皆失败时的最终兜底 | P0 | 已交付（配置确认） |
 | F17 | 情景四件套（alternative/falsifier）扩展到全部 10 个领域画像的手写场景，离线模式下也不再共享同一句兜底文案 | P0 | 已交付 |
 | F18 | Outlook 时效降权拆分"相对时间词"（weak→medium）与"完全无日期"（unknown→low）；封顶前保留情景相对排序，避免全部情景显示同一个 likelihood | P1 | 已交付 |
+| F20 | Reader 页：`/` 改为按 desk 分类浏览的读者产品（类别→列表→详情），默认隐藏分析细节，`⚙ Settings` 可选展开 `AnalystAppendix`；粘贴玩法移到 `/compose` | P1 | 已交付 |
+| F21 | 信源分层白名单：`sources.whitelist.json` 加 `tier`/`channel_type`/`authority_weight`，供 F22 的 source_credibility 与 F24 的跨层级印证使用 | P1 | 已交付 |
+| F22 | 双轨置信度：`confidence_factors` 拆分为 `source_credibility`（信源可信度）与 `analysis_confidence`（分析置信度），各自独立 low/medium/high，不再合并成一个混合分（breaking change，客户端类型/markdown 导出/Portfolio 同步更新） | P0 | 已交付 |
+| F23 | 潜规则规则集加固：`signaling_scorecard` 新增笔名权威阶梯、外交措辞升级阶梯、弱化/强化措辞轴、"亲自"三件套等规则（17→23 条），每条新规则标注外部方法论出处（Hoover CLM / China Media Project / Asia Society 等） | P1 | 已交付 |
+| F24 | 跨信源层级印证：`corroboration` 新增 `channel_tier_spread` 维度，区分"跨层级一致"（如部委官网+省级党报同报一事）与"同层级重复" | P1 | 已交付 |
+| F25 | Jev 快筛层：定时抓取候选先经 `JevGate`（in_scope / language_quality / priority_hint / `has_concrete_detail`）粗筛，值得的才进入全套分析；`has_concrete_detail=false`（纯党八股/无可核实细节）在 Stage 2 即被筛掉，不进 outbox；fail-open——未配置或调用失败一律直接放行，从不阻塞、从不越权门禁 | P1 | 已交付 |
+| F26 | 定时抓取管线串联：白名单分层 → 抓取 → Jev 粗筛 → 既有全套分析管线（`runSubscriptionCollect`/`collector.ts`），真实 `npm run collect` 验证过端到端行为不受影响 | P1 | 已交付 |
+| F27 | 缺席即信号：`absence_signal` 检测"长期沉默后简短通报"模式，基于历史 outbox 时间序列基线（`GAP_DAYS_THRESHOLD=14`，明确标注为未校准的手设编辑先验） | P2 | 已交付 |
 
 详细设计见 [DP-brief-quality.md](./DP-brief-quality.md)。读者交付物字段与流水线见 [DP.md](./DP.md)、[ARCHITECTURE.md](./ARCHITECTURE.md)。
 
@@ -123,7 +132,7 @@
 - **可审计**：skills 与 cards 为 Markdown，git 可 diff；gate 可选 JSONL 审计  
 - **隐私**：默认本地；LLM 仅在配置 Key 后发送用户粘贴内容  
 - **安全叙事**：禁止产品文案使用间谍/机密能力声称  
-- **诚实标签**：`brief_quality` / confidence / corroboration **不是**事件概率  
+- **诚实标签**：`brief_quality` / `source_credibility` / `analysis_confidence` / corroboration **不是**事件概率  
 - **性能**：offline 路径 < 2s（本地）  
 - **UI 语言**：界面与分析员标签英文；中文仅出现在粘贴原文与摘录
 

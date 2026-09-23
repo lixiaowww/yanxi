@@ -15,7 +15,8 @@ export type HeuristicRuleDef = {
     | "attribution"
     | "concreteness"
     | "rollout_scope"
-    | "tone_framing";
+    | "tone_framing"
+    | "diplomatic_severity";
   label_zh: string;
   label_en: string;
   /** Relative importance among valves; should sum ≈ 1.0 across catalog. */
@@ -86,12 +87,24 @@ export const MEDIA_HEURISTICS: HeuristicRuleDef[] = [
       has(t, /会议|公报|纪要/) ? (has(t, /印发|出台|发布|通知|意见/) ? "hit" : "miss") : "unclear",
   },
   {
+    // Protocol precedence (docs/DP-V3.md §4, "协议排序"): names/titles in
+    // official PRC bulletins follow a fixed rank
+    // (总书记 > 国家主席 > 总理 > 常务副总理 > 人大委员长 > 政协主席 > 中纪委书记 > 书记处首位书记),
+    // not appearance order chosen by the writer. This rule only checks that
+    // ≥2 ranked titles co-occur (i.e. there's something to compare). It does
+    // NOT detect an actual order change — that needs a prior comparable
+    // bulletin to diff against, which requires collection history (see
+    // task #7, deferred until real collect runs exist). A human reviewer
+    // with two bulletins in hand should compare title order by eye.
     id: "seq-leader-title-order",
     category: "sequence",
-    label_zh: "领导人/机构称谓排序可观察",
-    label_en: "Observable leader/institution title ordering",
+    label_zh: "领导人/机构称谓排序可观察（协议序位；比较排序变化需要历史通稿，本轮暂不做）",
+    label_en: "Observable leader/institution title ordering (protocol precedence; order-CHANGE detection needs a prior bulletin, not implemented yet)",
     weight: 0.04,
-    detect: (t) => (has(t, /总书记|总理|主任|部长/) ? "hit" : "unclear"),
+    detect: (t) => {
+      const titles = t.match(/总书记|国家主席|总理|人大常委会委员长|政协主席|中央纪委书记|书记处书记|主任|部长/g) || [];
+      return titles.length >= 2 ? "hit" : titles.length === 1 ? "unclear" : "unclear";
+    },
   },
 
   // --- implementing detail / 细则 ---
@@ -156,7 +169,24 @@ export const MEDIA_HEURISTICS: HeuristicRuleDef[] = [
     label_zh: "社论/评论员文章文体",
     label_en: "Editorial / commentator genre",
     weight: 0.07,
-    detect: (t) => (has(t, /社论|评论员文章|仲音|任仲平/) ? "hit" : "unclear"),
+    detect: (t) => (has(t, /社论|评论员文章|仲音/) ? "hit" : "unclear"),
+  },
+  {
+    // Authority ladder of coded People's Daily/party-media bylines — each
+    // name is a homophone/pun marking a specific institutional level, not a
+    // real author. 任仲平="人民日报重要评论" (writing-group collective, major
+    // reform topics); 钟声="中国之声" (int'l affairs, critical of another
+    // state); 国纪平="国际重要评论" (central-consensus int'l commentary);
+    // 金观平="经济日报观察评论" (State-Council-affiliated economic consensus).
+    // "宣言" deliberately excluded — too common a word standalone to use as
+    // a substring cue without false positives. Sources: China Media Project
+    // ("Pen Names, Stern Warnings", 2025-03-25), 任仲平百度百科.
+    id: "press-authoritative-byline",
+    category: "press_placement",
+    label_zh: "党媒权威笔名（任仲平/钟声/国纪平/金观平）——高于普通署名的机构级信号",
+    label_en: "Coded party-media authority byline (任仲平/钟声/国纪平/金观平) — institutional-level signal, not an ordinary byline",
+    weight: 0.09,
+    detect: (t) => (has(t, /任仲平|钟声|国纪平|金观平|秋石/) ? "hit" : "unclear"),
   },
 
   // --- speech verbs ---
@@ -190,6 +220,21 @@ export const MEDIA_HEURISTICS: HeuristicRuleDef[] = [
     label_en: "Identifiable ministry as issuing body",
     weight: 0.04,
     detect: (t) => (has(t, /部昨日|部印发|总局|央行|发改委|工信部|财政部|商务部/) ? "hit" : "unclear"),
+  },
+  {
+    // "亲自X" personal-involvement framing was rare for post-Mao paramount
+    // leaders before Xi; CCP media have since used it to mark policies as
+    // personally directed by him, not collectively decided. Asia Society
+    // Policy Institute's "Xi's Personal Priorities" project used this exact
+    // phrase pattern (亲自谋划/亲自部署/亲自推动 and variants) to identify
+    // ~88 distinct policies. A hit here is a personalized-leadership signal,
+    // not evidence the policy is more or less likely to happen.
+    id: "attr-personal-leadership",
+    category: "attribution",
+    label_zh: "\"亲自\"个人化领导信号（亲自谋划/部署/推动/主持/出席）",
+    label_en: "\"亲自\" (personally) personalized-leadership framing",
+    weight: 0.05,
+    detect: (t) => (has(t, /亲自谋划|亲自部署|亲自推动|亲自主持|亲自出席|亲自指挥|亲自决策/) ? "hit" : "unclear"),
   },
 
   // --- concreteness ---
@@ -235,6 +280,56 @@ export const MEDIA_HEURISTICS: HeuristicRuleDef[] = [
       if (stab || grow) return "unclear";
       return "miss";
     },
+  },
+  {
+    // Minimization register: "个别/极少数/不代表整体" deliberately frames an
+    // event as non-systemic. Source: the supplied 潜规则 research doc
+    // (docs/DP-V3.md §4), synthesizing censorship/framing literature.
+    id: "tone-minimize-language",
+    category: "tone_framing",
+    label_zh: "弱化措辞（个别/极少数/不代表整体）— 刻意降低事件系统性",
+    label_en: "Minimization wording (个别/极少数/不代表整体) — frames an event as non-systemic",
+    weight: 0.04,
+    detect: (t) => (has(t, /个别|极少数|不代表整体|局部现象/) ? "hit" : "unclear"),
+  },
+  {
+    // Resolve register: "坚决维护/严厉打击/高度重视" demonstrates control and
+    // political will rather than describing a specific measure. Same source.
+    id: "tone-resolve-language",
+    category: "tone_framing",
+    label_zh: "强化措辞（坚决维护/严厉打击/高度重视）— 展示管控能力和政治决心",
+    label_en: "Resolve wording (坚决维护/严厉打击/高度重视) — demonstrates control/political will, not a specific measure",
+    weight: 0.04,
+    detect: (t) => (has(t, /坚决维护|严厉打击|高度重视|坚决防止|绝不允许/) ? "hit" : "unclear"),
+  },
+
+  // --- diplomatic severity / 外交措辞升级 ---
+  {
+    // Escalation ladder from lowest to highest severity: 关切 < 严重关切 <
+    // 谴责 < 强烈谴责 < 抗议 < 严重抗议 < 极大的愤慨. This rule only flags
+    // that SOME rung of the ladder is present — it does not itself rank
+    // which rung, that's for a human reading the matched evidence. Source:
+    // Gao Yang, "How to Understand Diplomacy Through PRC Diplomatic Jargon"
+    // (David Cowhig's Translation Blog, 2020/2025).
+    id: "diplo-severity-ladder",
+    category: "diplomatic_severity",
+    label_zh: "外交措辞升级阶梯命中（关切→严重关切→谴责→强烈谴责→抗议→严重抗议）",
+    label_en: "Diplomatic severity-ladder phrase present (concern → serious concern → condemn → strongly condemn → protest → serious protest)",
+    weight: 0.05,
+    detect: (t) =>
+      has(t, /严重抗议|强烈谴责|严重关切|极大的愤慨|表示遗憾|谴责|抗议|关切/) ? "hit" : "unclear",
+  },
+  {
+    // Meeting-outcome euphemism ladder, weakest to strongest result:
+    // 交换了意见 < 坦率交谈 < 充分交换了意见 < 增进了了解 < 有益的会谈 <
+    // 亲切友好的交谈 < 建设性对话 < 态度积极气氛良好. Same source as above.
+    id: "diplo-outcome-euphemism",
+    category: "diplomatic_severity",
+    label_zh: "会谈成果委婉语阶梯命中（交换意见→坦率交谈→建设性对话→亲切友好）",
+    label_en: "Meeting-outcome euphemism ladder present (exchanged views → candid talk → constructive dialogue → cordial)",
+    weight: 0.04,
+    detect: (t) =>
+      has(t, /建设性对话|亲切友好|坦率交谈|增进了了解|态度是积极的|交换了意见/) ? "hit" : "unclear",
   },
 ];
 

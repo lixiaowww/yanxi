@@ -31,7 +31,7 @@
       },
       {
         "card": "policy-signaling-valves",
-        "note": "Civic ontology-lite [method] desk=all · matched=强调 · sources: Observable public PRC media/reporting conventions (open press patterns). Tag=hypothesis only — not proven secret fact.",
+        "note": "Civic ontology-lite [method] desk=all · matched=强调 · sources: Observable public PRC media/reporting conventions (open press patterns); China Media Project (pen-name bylines); Gao Yang / David Cowhig's Translation Blog (diplomatic jargon ladders); Asia Society Policy Institute (亲自 personal-leadership framing); see docs/DP-V3.md §4 for the full research trail. Tag=hypothesis only — not proven secret fact.",
         "tag": "hypothesis"
       }
     ],
@@ -64,8 +64,8 @@
         {
           "id": "seq-leader-title-order",
           "category": "sequence",
-          "label_zh": "领导人/机构称谓排序可观察",
-          "label_en": "Observable leader/institution title ordering",
+          "label_zh": "领导人/机构称谓排序可观察（协议序位；比较排序变化需要历史通稿，本轮暂不做）",
+          "label_en": "Observable leader/institution title ordering (protocol precedence; order-CHANGE detection needs a prior bulletin, not implemented yet)",
           "weight": 0.04,
           "status": "unclear",
           "raw_score": 0.4,
@@ -150,6 +150,17 @@
           "tag": "hypothesis"
         },
         {
+          "id": "press-authoritative-byline",
+          "category": "press_placement",
+          "label_zh": "党媒权威笔名（任仲平/钟声/国纪平/金观平）——高于普通署名的机构级信号",
+          "label_en": "Coded party-media authority byline (任仲平/钟声/国纪平/金观平) — institutional-level signal, not an ordinary byline",
+          "weight": 0.09,
+          "status": "unclear",
+          "raw_score": 0.4,
+          "weighted_score": 0.036,
+          "tag": "hypothesis"
+        },
+        {
           "id": "verb-hierarchy-cues",
           "category": "speech_verbs",
           "label_zh": "指出/强调/要求等话语动词可分级阅读",
@@ -180,6 +191,17 @@
           "status": "unclear",
           "raw_score": 0.4,
           "weighted_score": 0.016,
+          "tag": "hypothesis"
+        },
+        {
+          "id": "attr-personal-leadership",
+          "category": "attribution",
+          "label_zh": "\"亲自\"个人化领导信号（亲自谋划/部署/推动/主持/出席）",
+          "label_en": "\"亲自\" (personally) personalized-leadership framing",
+          "weight": 0.05,
+          "status": "unclear",
+          "raw_score": 0.4,
+          "weighted_score": 0.02,
           "tag": "hypothesis"
         },
         {
@@ -225,12 +247,56 @@
           "raw_score": 1,
           "weighted_score": 0.03,
           "tag": "hypothesis"
+        },
+        {
+          "id": "tone-minimize-language",
+          "category": "tone_framing",
+          "label_zh": "弱化措辞（个别/极少数/不代表整体）— 刻意降低事件系统性",
+          "label_en": "Minimization wording (个别/极少数/不代表整体) — frames an event as non-systemic",
+          "weight": 0.04,
+          "status": "unclear",
+          "raw_score": 0.4,
+          "weighted_score": 0.016,
+          "tag": "hypothesis"
+        },
+        {
+          "id": "tone-resolve-language",
+          "category": "tone_framing",
+          "label_zh": "强化措辞（坚决维护/严厉打击/高度重视）— 展示管控能力和政治决心",
+          "label_en": "Resolve wording (坚决维护/严厉打击/高度重视) — demonstrates control/political will, not a specific measure",
+          "weight": 0.04,
+          "status": "unclear",
+          "raw_score": 0.4,
+          "weighted_score": 0.016,
+          "tag": "hypothesis"
+        },
+        {
+          "id": "diplo-severity-ladder",
+          "category": "diplomatic_severity",
+          "label_zh": "外交措辞升级阶梯命中（关切→严重关切→谴责→强烈谴责→抗议→严重抗议）",
+          "label_en": "Diplomatic severity-ladder phrase present (concern → serious concern → condemn → strongly condemn → protest → serious protest)",
+          "weight": 0.05,
+          "status": "unclear",
+          "raw_score": 0.4,
+          "weighted_score": 0.02,
+          "tag": "hypothesis"
+        },
+        {
+          "id": "diplo-outcome-euphemism",
+          "category": "diplomatic_severity",
+          "label_zh": "会谈成果委婉语阶梯命中（交换意见→坦率交谈→建设性对话→亲切友好）",
+          "label_en": "Meeting-outcome euphemism ladder present (exchanged views → candid talk → constructive dialogue → cordial)",
+          "weight": 0.04,
+          "status": "unclear",
+          "raw_score": 0.4,
+          "weighted_score": 0.016,
+          "tag": "hypothesis"
         }
       ],
-      "weighted_total": 0.408,
-      "weight_sum": 1,
+      "weighted_total": 0.532,
+      "weight_sum": 1.31,
       "band": "medium",
-      "calibration": "Enumerated 17 public-media heuristics; observed=4, absent=3, unclear=10 → band=medium. Weights are hand-set editorial priors with no labelled corpus and no held-out validation: the band orders and flags, it does not measure. Hypothesis only — not proof of intent.",
+      "calibration": "Enumerated 23 public-media heuristics; observed=4, absent=3, unclear=16 → band=medium. Weights are hand-set editorial priors with no labelled corpus and no held-out validation: the band orders and flags, it does not measure. Hypothesis only — not proof of intent.",
       "tag": "hypothesis"
     },
     "signaling_valves": {
@@ -252,7 +318,7 @@
         "reading": "Category roll-up from enumerated heuristics (hypothesis).",
         "tag": "hypothesis"
       },
-      "calibration": "Enumerated 17 public-media heuristics; observed=4, absent=3, unclear=10 → band=medium. Weights are hand-set editorial priors with no labelled corpus and no held-out validation: the band orders and flags, it does not measure. Hypothesis only — not proof of intent."
+      "calibration": "Enumerated 23 public-media heuristics; observed=4, absent=3, unclear=16 → band=medium. Weights are hand-set editorial priors with no labelled corpus and no held-out validation: the band orders and flags, it does not measure. Hypothesis only — not proof of intent."
     },
     "briefing_en": {
       "what": "Not adopted — this excerpt carries no verifiable detail. Named in the paste: acting party (an unnamed meeting) and subject (local-government debt, hidden local debt and housing-delivery guarantees). Missing: a named instrument, a funding line, a deadline or time marker, a quantified target and a pilot or scope boundary.",
@@ -286,11 +352,12 @@
       "importance": {
         "grade": "P3",
         "label_zh": "Medium priority (background value; needs more sources)",
-        "score_0_to_1": 0.35,
-        "rationale": "Public-source triage from kind hits [finance_risk] and drivers [high_salience_domain, signaling_band_medium]. Not a secrecy marking.",
+        "score_0_to_1": 0.4,
+        "rationale": "Public-source triage from kind hits [finance_risk] and drivers [high_salience_domain, signaling_band_medium, signaling_weighted_total>=0.5]. Not a secrecy marking.",
         "drivers": [
           "high_salience_domain",
-          "signaling_band_medium"
+          "signaling_band_medium",
+          "signaling_weighted_total>=0.5"
         ],
         "tag": "hypothesis"
       },
@@ -435,8 +502,8 @@
           "matched_keywords": [
             "强调"
           ],
-          "updated": "2026-09-20",
-          "sources": "Observable public PRC media/reporting conventions (open press patterns)"
+          "updated": "2026-09-22",
+          "sources": "Observable public PRC media/reporting conventions (open press patterns); China Media Project (pen-name bylines); Gao Yang / David Cowhig's Translation Blog (diplomatic jargon ladders); Asia Society Policy Institute (亲自 personal-leadership framing); see docs/DP-V3.md §4 for the full research trail"
         }
       ],
       "calibration": "Matched 3 cards, kept 3 (desk=economy_investment). Background/hypothesis only — not a formal ontology or secret knowledge.",
@@ -479,17 +546,11 @@
       ],
       "tag": "hypothesis"
     },
-    "confidence_factors": {
-      "framing": "civilian-factorized-confidence",
-      "level": "low",
-      "score_0_to_1": 0.285,
+    "source_credibility": {
+      "framing": "civilian-source-credibility",
+      "level": "medium",
+      "score_0_to_1": 0.33,
       "factors": {
-        "signaling_band": "medium",
-        "substance_band": "mixed",
-        "corroboration_0_to_3": 0,
-        "cross_checked": false,
-        "distinct_source_count": 1,
-        "single_source_cue_count": 0,
         "provenance": "weak",
         "source_class": "unknown_public",
         "source_tier": "U",
@@ -509,11 +570,69 @@
         "evidence": [],
         "tag": "hypothesis"
       },
+      "caps_applied": [],
+      "rationale": "Source credibility=medium from source_class=unknown_public, source_tier=U (stated editorial prior), provenance=weak. Caps: none. Stated editorial priors — not fitted to labelled data.",
+      "tag": "hypothesis"
+    },
+    "analysis_confidence": {
+      "framing": "civilian-analysis-confidence",
+      "level": "low",
+      "score_0_to_1": 0.223,
+      "factors": {
+        "signaling_band": "medium",
+        "substance_band": "mixed",
+        "corroboration_0_to_3": 0,
+        "cross_checked": false,
+        "distinct_source_count": 1,
+        "single_source_cue_count": 0
+      },
       "caps_applied": [
         "single_source_not_cross_checked_cap_low",
         "adoption_reject_no_hard_detail"
       ],
-      "rationale": "Research confidence=low from signaling=medium, substance=mixed, corroboration=minimal (not cross-checked (1 distinct source)), within-passage detail cues=none (not corroboration), provenance=weak, source_class=unknown_public, source_tier=U (stated editorial prior). Caps: single_source_not_cross_checked_cap_low. Bands come from hand-set rule cues with no labelled-data calibration — they order and flag, they do not measure. Not an event-probability forecast. Adoption=reject (no hard detail/data).",
+      "rationale": "Analysis confidence=low from signaling=medium, substance=mixed, corroboration=minimal (not cross-checked (1 distinct source)), within-passage detail cues=none (not corroboration). Caps: single_source_not_cross_checked_cap_low. Bands come from hand-set rule cues with no labelled-data calibration — they order and flag, they do not measure. Not an event-probability forecast. Adoption=reject (no hard detail/data).",
+      "tag": "hypothesis"
+    },
+    "absence_signal": {
+      "framing": "civilian-absence-as-signal",
+      "hits": [
+        {
+          "subject_label": "房地产",
+          "prior_coverage_count": 7,
+          "last_prior_at": "2026-09-22T18:32:02.787Z",
+          "gap_days": 0,
+          "pattern_match": false
+        },
+        {
+          "subject_label": "保交楼",
+          "prior_coverage_count": 7,
+          "last_prior_at": "2026-09-22T18:32:02.787Z",
+          "gap_days": 0,
+          "pattern_match": false
+        },
+        {
+          "subject_label": "地方债",
+          "prior_coverage_count": 7,
+          "last_prior_at": "2026-09-22T18:32:02.787Z",
+          "gap_days": 0,
+          "pattern_match": false
+        },
+        {
+          "subject_label": "隐性债务",
+          "prior_coverage_count": 7,
+          "last_prior_at": "2026-09-22T18:32:02.787Z",
+          "gap_days": 0,
+          "pattern_match": false
+        },
+        {
+          "subject_label": "系统性金融风险",
+          "prior_coverage_count": 7,
+          "last_prior_at": "2026-09-22T18:32:02.787Z",
+          "gap_days": 0,
+          "pattern_match": false
+        }
+      ],
+      "note_en": "Prior coverage found for 6 subject(s) in this excerpt, but no gap exceeds the 14-day threshold or this item is not thin — no absence pattern flagged.",
       "tag": "hypothesis"
     },
     "adoption": {
@@ -536,7 +655,7 @@
     },
     "temporal": {
       "framing": "civilian-temporal-freshness",
-      "briefed_at": "2026-09-22T12:42:21.360Z",
+      "briefed_at": "2026-09-22T18:48:27.550Z",
       "source_as_of_precision": "none",
       "source_as_of_method": "none",
       "freshness": {
@@ -613,9 +732,72 @@
     "passed": true,
     "findings": []
   },
-  "systemPromptChars": 11387,
+  "systemPromptChars": 12558,
   "sourceCount": 1,
   "relatedBriefs": [
+    {
+      "framing": "civilian-related-brief-discovery",
+      "id": "2026-09-22_desk-by-section_domain-finance-risk_grmr",
+      "label": "domain-finance-property",
+      "createdAt": "2026-09-22T18:32:02.787Z",
+      "jsonFile": "2026-09-22_desk-by-section_domain-finance-risk_grmr.json",
+      "shared_keys": [
+        "nugget:local-government debt",
+        "nugget:real estate",
+        "subj:房地产",
+        "subj:保交楼",
+        "subj:地方债",
+        "subj:隐性债务"
+      ],
+      "desk": "Economy & investment",
+      "what_preview": "Not adopted — this excerpt carries no verifiable detail. Named in the paste: acting party (an unnamed meeting) and subject (local-government debt, hidden local ",
+      "corroboration_band": "minimal",
+      "canada_nexus": "none",
+      "note_en": "Same-topic candidate in the outbox — not independent corroboration until you merge the excerpts and re-run.",
+      "tag": "hypothesis"
+    },
+    {
+      "framing": "civilian-related-brief-discovery",
+      "id": "2026-09-22_desk-by-section_domain-finance-risk_4pdp",
+      "label": "domain-finance-property",
+      "createdAt": "2026-09-22T18:22:39.997Z",
+      "jsonFile": "2026-09-22_desk-by-section_domain-finance-risk_4pdp.json",
+      "shared_keys": [
+        "nugget:local-government debt",
+        "nugget:real estate",
+        "subj:房地产",
+        "subj:保交楼",
+        "subj:地方债",
+        "subj:隐性债务"
+      ],
+      "desk": "Economy & investment",
+      "what_preview": "Not adopted — this excerpt carries no verifiable detail. Named in the paste: acting party (an unnamed meeting) and subject (local-government debt, hidden local ",
+      "corroboration_band": "minimal",
+      "canada_nexus": "none",
+      "note_en": "Same-topic candidate in the outbox — not independent corroboration until you merge the excerpts and re-run.",
+      "tag": "hypothesis"
+    },
+    {
+      "framing": "civilian-related-brief-discovery",
+      "id": "2026-09-22_desk-by-section_domain-finance-risk_5ext",
+      "label": "domain-finance-property",
+      "createdAt": "2026-09-22T17:55:13.505Z",
+      "jsonFile": "2026-09-22_desk-by-section_domain-finance-risk_5ext.json",
+      "shared_keys": [
+        "nugget:local-government debt",
+        "nugget:real estate",
+        "subj:房地产",
+        "subj:保交楼",
+        "subj:地方债",
+        "subj:隐性债务"
+      ],
+      "desk": "Economy & investment",
+      "what_preview": "Not adopted — this excerpt carries no verifiable detail. Named in the paste: acting party (an unnamed meeting) and subject (local-government debt, hidden local ",
+      "corroboration_band": "minimal",
+      "canada_nexus": "none",
+      "note_en": "Same-topic candidate in the outbox — not independent corroboration until you merge the excerpts and re-run.",
+      "tag": "hypothesis"
+    },
     {
       "framing": "civilian-related-brief-discovery",
       "id": "2026-09-21_desk-by-section_domain-finance-risk_8zr4",
@@ -634,27 +816,6 @@
       "what_preview": "Not adopted — this excerpt carries no verifiable detail. Named in the paste: acting party (an unnamed meeting) and subject (local-government debt, hidden local ",
       "corroboration_band": "minimal",
       "canada_nexus": "none",
-      "note_en": "Same-topic candidate in the outbox — not independent corroboration until you merge the excerpts and re-run.",
-      "tag": "hypothesis"
-    },
-    {
-      "framing": "civilian-related-brief-discovery",
-      "id": "2026-09-21_job-fit-domain-battery_domain-macro-cewc-domain-macro-instrument-domain-foreign-affairs-domain-industri_p3pv",
-      "label": "domain-macro-cewc + domain-macro-instrument + domain-foreign-bri + domain-tech-chips + domain-finance-property + domain-rural-food + domain-ideology-study + domain-dual-circulation + domain-social-stability + domain-defense-public + domain-canada-canola + domain-hot-taiwan + domain-hot-ev + domain-hot-ai",
-      "createdAt": "2026-09-21T14:38:54.739Z",
-      "jsonFile": "2026-09-21_job-fit-domain-battery_domain-macro-cewc-domain-macro-instrument-domain-foreign-affairs-domain-industri_p3pv.json",
-      "shared_keys": [
-        "subj:房地产",
-        "subj:保交楼",
-        "subj:地方债",
-        "subj:隐性债务",
-        "subj:系统性金融风险",
-        "subj:资本无序扩张"
-      ],
-      "desk": "Hot topics",
-      "what_preview": "Merged 14 public sources (domain-macro-cewc, domain-macro-instrument, domain-foreign-bri, domain-tech-chips, domain-finance-property, domain-rural-food, domain-",
-      "corroboration_band": "strong",
-      "canada_nexus": "direct",
       "note_en": "Same-topic candidate in the outbox — not independent corroboration until you merge the excerpts and re-run.",
       "tag": "hypothesis"
     },

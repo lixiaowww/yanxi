@@ -82,6 +82,7 @@ function parseDesk(s: string): Array<DeskSectionId | "all"> {
     "all",
     "hot_topics",
     "economy_investment",
+    "industrial_tech",
     "foreign_affairs",
     "defense_public",
     "social_governance",

@@ -131,7 +131,7 @@ for (const f of fixtures) {
     ),
     corrBand: corroborationBand(result.briefing.corroboration?.score_0_to_3),
     corr: result.briefing.corroboration?.score_0_to_3 ?? 0,
-    conf: result.briefing.confidence_factors?.level || "?",
+    conf: result.briefing.analysis_confidence?.level || "?",
     what: result.briefing.briefing_en?.what,
     soWhat: (result.briefing.briefing_en?.so_what || "").slice(0, 280),
     canada: result.briefing.canada_nexus?.level,

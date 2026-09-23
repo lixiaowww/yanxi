@@ -10,6 +10,7 @@
 export const DESK_SECTIONS = [
   "hot_topics",
   "economy_investment",
+  "industrial_tech",
   "foreign_affairs",
   "defense_public",
   "social_governance",
@@ -100,7 +101,6 @@ export const DESK_CATALOG: DeskSectionMeta[] = [
       "Fiscal/monetary, industrial investment, special funds, local debt/property, meeting→instrument detail (excl. hot-theme AI/EV/chips which route to Hot topics)",
     rx: /财政政策|货币政策|扩大内需|稳增长|投资|专项资金|专项债|专精特新|地方债|房地产|保交楼|化债|制造业|营商环境|中央经济工作会议|政府工作报告|十四五|十五五|高质量发展|新质生产力|双循环|统一大市场|积极的财政|稳健的货币/,
     kinds: [
-      "industrial_tech_policy",
       "finance_risk",
       "economic_data",
       "implementing_instrument",
@@ -112,13 +112,23 @@ export const DESK_CATALOG: DeskSectionMeta[] = [
     order: 1,
   },
   {
+    id: "industrial_tech",
+    label_zh: "Tech & industry",
+    label_en: "Tech & industry",
+    blurb_zh:
+      "Industrial/tech policy, self-reliance, manufacturing upgrade — chips/AI/EV specifics still route to Hot topics when they hit a hot-theme cue",
+    rx: /制造强国|科技自立自强|专精特新|产业政策|数字经济|战略性新兴产业|卡脖子|国产替代|工业和信息化部|工信部|产业链供应链/,
+    kinds: ["industrial_tech_policy"],
+    order: 2,
+  },
+  {
     id: "foreign_affairs",
     label_zh: "Foreign affairs",
     label_en: "Foreign affairs",
     blurb_zh: "Diplomatic discourse, bilateral ties, Belt and Road, sanctions/cooperation in open text",
     rx: /外交部|外事|一带一路|人类命运共同体|中加|加方|加拿大|制裁|双边|多边|联合国|G7|CPTPP/,
     kinds: ["foreign_affairs"],
-    order: 2,
+    order: 3,
   },
   {
     id: "defense_public",
@@ -128,17 +138,17 @@ export const DESK_CATALOG: DeskSectionMeta[] = [
       "Open defense/military/industry reporting and white-paper style language; not operational intel or targeting",
     rx: /国防|军队|解放军|军委|军工|武警|演训|战备|国防白皮书|强军|军民融合|海空|航母/,
     kinds: ["defense_public"],
-    order: 3,
+    order: 4,
   },
   {
     id: "social_governance",
     label_zh: "Social governance",
     label_en: "Social governance",
     blurb_zh:
-      "Livelihood, grassroots governance, public opinion, common prosperity, party education — open social-governance language",
-    rx: /社会治理|基层治理|民生|共同富裕|舆情|正能量|和谐稳定|主题教育|意识形态|巡视|乡村振兴|粮食安全|三农/,
+      "Livelihood, grassroots governance, education, public opinion, common prosperity, party education — open social-governance language",
+    rx: /社会治理|基层治理|民生|共同富裕|舆情|正能量|和谐稳定|主题教育|意识形态|巡视|乡村振兴|粮食安全|三农|教育部|双减|教育改革|职业教育/,
     kinds: ["social_governance", "ideology_party", "rural_revitalization"],
-    order: 4,
+    order: 5,
   },
 ];
 

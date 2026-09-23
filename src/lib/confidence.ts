@@ -14,6 +14,7 @@ import type { SignalingScorecard } from "./media-heuristics.js";
 import type { SubstanceCut } from "./substance.js";
 import type { SourceClass } from "./source-class.js";
 import { resolveSourceTier, type SourceTier } from "./source-tier.js";
+import { resolveChannelTier, type ChannelTier, type ChannelTierId } from "./source-channel-tier.js";
 import { corroborationBand } from "./score-bands.js";
 
 export type ConfidenceLevel = "low" | "medium" | "high";
@@ -32,7 +33,12 @@ export type SingleSourceCues = {
   tag: "hypothesis";
 };
 
-export type CorroborationSource = { label?: string; text: string };
+export type CorroborationSource = {
+  label?: string;
+  text: string;
+  /** Whitelist channel classification, when known (docs/DP-V3.md §4). */
+  channelTier?: ChannelTierId;
+};
 
 export type Corroboration = {
   framing: "civilian-multi-source-corroboration";
@@ -54,11 +60,49 @@ export type Corroboration = {
   drivers: string[];
   single_source_cues: SingleSourceCues;
   missing: string[];
+  /**
+   * Cross-source agreement is more informative when the sources sit at
+   * different institutional levels (a central organ AND a local outlet
+   * saying the same thing) than when they're at the same level — and a
+   * disagreement across levels is itself worth flagging. Only populated
+   * when ≥2 distinct sources carry known channel tiers (docs/DP-V3.md §4).
+   */
+  channel_tier_spread?: {
+    tiers: ChannelTierId[];
+    cross_tier: boolean;
+    note_en: string;
+  };
   tag: "hypothesis";
 };
 
-export type ConfidenceFactors = {
-  framing: "civilian-factorized-confidence";
+/**
+ * Split confidence (docs/DP-V3.md §5) — "the source is credible" and "the
+ * conclusion is well-evidenced" are different questions, and blending them
+ * into one number hid cases like "authoritative source, thin detail" or
+ * "unknown source, richly detailed" behind a single misleading label.
+ */
+export type SourceCredibility = {
+  framing: "civilian-source-credibility";
+  level: ConfidenceLevel;
+  /** 0–1 internal blend for debugging; UI uses level. */
+  score_0_to_1: number;
+  factors: {
+    provenance: "weak" | "adequate";
+    source_class: SourceClass;
+    source_tier: SourceTier["tier"];
+    source_tier_weight_0_to_1: number;
+    channel_tier?: ChannelTierId;
+    channel_authority_weight?: number;
+  };
+  source_tier: SourceTier;
+  channel_tier?: ChannelTier;
+  caps_applied: string[];
+  rationale: string;
+  tag: "hypothesis";
+};
+
+export type AnalysisConfidence = {
+  framing: "civilian-analysis-confidence";
   level: ConfidenceLevel;
   /** 0–1 internal blend for debugging; UI uses level. */
   score_0_to_1: number;
@@ -69,12 +113,7 @@ export type ConfidenceFactors = {
     cross_checked: boolean;
     distinct_source_count: number;
     single_source_cue_count: number;
-    provenance: "weak" | "adequate";
-    source_class: SourceClass;
-    source_tier: SourceTier["tier"];
-    source_tier_weight_0_to_1: number;
   };
-  source_tier: SourceTier;
   caps_applied: string[];
   rationale: string;
   tag: "hypothesis";
@@ -456,6 +495,26 @@ export function buildCorroboration(opts: {
             : `Weak cross-check, wording overlap only (${n} ${plural})`
           : `Not cross-checked (${n} ${plural})`;
 
+  // Channel-tier spread — a separate dimension from score_0_to_3 (which is
+  // driven only by subject/issuer overlap): does the agreement span
+  // different institutional levels? Only computed when ≥2 distinct sources
+  // carry known whitelist tiers.
+  const knownTiers = distinct
+    .map((s) => s.channelTier)
+    .filter((t): t is ChannelTierId => Boolean(t));
+  let channel_tier_spread: Corroboration["channel_tier_spread"];
+  if (knownTiers.length >= 2) {
+    const uniqueTiers = [...new Set(knownTiers)];
+    const cross_tier = uniqueTiers.length > 1;
+    channel_tier_spread = {
+      tiers: uniqueTiers,
+      cross_tier,
+      note_en: cross_tier
+        ? `Sources span different institutional levels (${uniqueTiers.map((t) => resolveChannelTier(t).label_en).join(" + ")}) — agreement across levels is a stronger signal than same-level repetition; a disagreement here would also be worth flagging.`
+        : `All known sources sit at the same institutional level (${resolveChannelTier(uniqueTiers[0]).label_en}) — agreement doesn't yet show whether a different level would say the same thing.`,
+    };
+  }
+
   return {
     framing: "civilian-multi-source-corroboration",
     method: "cross-source-subject-overlap",
@@ -470,6 +529,7 @@ export function buildCorroboration(opts: {
     drivers,
     single_source_cues,
     missing: missing.slice(0, 5),
+    channel_tier_spread,
     tag: "hypothesis",
   };
 }
@@ -488,27 +548,83 @@ function minLevel(a: ConfidenceLevel, b: ConfidenceLevel): ConfidenceLevel {
   return fromRank(Math.min(rank(a), rank(b)));
 }
 
-export function buildConfidenceFactors(opts: {
-  scorecard: SignalingScorecard;
-  substance: SubstanceCut;
-  corroboration: Corroboration;
+/**
+ * "How credible is this evidence set" — source_class/source_tier (what kind
+ * of document) + channel_tier (which outlet) + provenance. Nothing about
+ * how much the document actually says goes into this score; that's
+ * buildAnalysisConfidence's job.
+ */
+export function buildSourceCredibility(opts: {
   sourceClass: SourceClass;
   sourceLabels: string[];
   sourceText?: string;
-}): ConfidenceFactors {
+  /** Weakest channel tier among the provided sources, if any carry whitelist metadata (docs/DP-V3.md §2). */
+  channelTierId?: ChannelTierId;
+}): SourceCredibility {
   const caps: string[] = [];
-  let level: ConfidenceLevel = opts.scorecard.band;
   const provenance: "weak" | "adequate" = opts.sourceLabels.some(
     (l) => /^https?:\/\//i.test(l) || /新华社|人民日报|gov\.cn|部|国务院/.test(l)
   )
     ? "adequate"
     : "weak";
 
-  const source_tier = resolveSourceTier(
-    opts.sourceClass,
-    opts.sourceText || "",
-    opts.sourceLabels
-  );
+  const source_tier = resolveSourceTier(opts.sourceClass, opts.sourceText || "", opts.sourceLabels);
+  const channel_tier = opts.channelTierId ? resolveChannelTier(opts.channelTierId) : undefined;
+
+  let level: ConfidenceLevel = source_tier.max_confidence;
+
+  if (opts.sourceClass === "social_commentary") {
+    level = "low";
+    caps.push("social_commentary_hard_cap_low");
+  }
+  if (provenance === "weak" && level === "high") {
+    level = "medium";
+    caps.push("weak_provenance_cap_medium");
+  }
+  if (channel_tier && channel_tier.authority_weight < 0.4 && rank(level) > rank("medium")) {
+    level = "medium";
+    caps.push(`channel_tier_${channel_tier.tier}_cap_medium`);
+  }
+
+  const blend =
+    source_tier.weight_0_to_1 * 0.5 +
+    (channel_tier?.authority_weight ?? source_tier.weight_0_to_1) * 0.3 +
+    (provenance === "adequate" ? 0.2 : 0.05);
+  const ceiling = level === "high" ? 1 : level === "medium" ? 0.7 : 0.45;
+  const score_0_to_1 = Number(Math.min(blend, ceiling, 1).toFixed(3));
+
+  return {
+    framing: "civilian-source-credibility",
+    level,
+    score_0_to_1,
+    factors: {
+      provenance,
+      source_class: opts.sourceClass,
+      source_tier: source_tier.tier,
+      source_tier_weight_0_to_1: source_tier.weight_0_to_1,
+      channel_tier: channel_tier?.tier,
+      channel_authority_weight: channel_tier?.authority_weight,
+    },
+    source_tier,
+    channel_tier,
+    caps_applied: caps,
+    rationale: `Source credibility=${level} from source_class=${opts.sourceClass}, source_tier=${source_tier.tier} (stated editorial prior)${channel_tier ? `, channel_tier=${channel_tier.tier} (${channel_tier.basis_en})` : ""}, provenance=${provenance}. Caps: ${caps.join(", ") || "none"}. Stated editorial priors — not fitted to labelled data.`,
+    tag: "hypothesis",
+  };
+}
+
+/**
+ * "How well does the excerpt itself support its conclusions" — signaling
+ * band, substance depth, cross-source corroboration. Says nothing about
+ * which outlet published it; that's buildSourceCredibility's job.
+ */
+export function buildAnalysisConfidence(opts: {
+  scorecard: SignalingScorecard;
+  substance: SubstanceCut;
+  corroboration: Corroboration;
+}): AnalysisConfidence {
+  const caps: string[] = [];
+  let level: ConfidenceLevel = opts.scorecard.band;
 
   const corr = opts.corroboration;
   const cueCount = corr.single_source_cues?.count_0_to_3 ?? 0;
@@ -529,28 +645,12 @@ export function buildConfidenceFactors(opts: {
       caps.push("corroboration_no_shared_subject_cap_low");
     }
   }
-  if (opts.sourceClass === "social_commentary") {
-    level = "low";
-    caps.push("social_commentary_hard_cap_low");
-  }
-  if (provenance === "weak" && level === "high") {
-    level = "medium";
-    caps.push("weak_provenance_cap_medium");
-  }
-
-  // Curated tier max (A/B may reach high; C/U ≤ medium; D ≤ low)
-  if (rank(level) > rank(source_tier.max_confidence)) {
-    level = source_tier.max_confidence;
-    caps.push(`source_tier_${source_tier.tier}_max_${source_tier.max_confidence}`);
-  }
 
   const blend =
     (opts.scorecard.band === "high" ? 0.7 : opts.scorecard.band === "medium" ? 0.45 : 0.2) * 0.3 +
     (opts.substance.substance_score_0_to_1 || 0) * 0.22 +
     (corr.score_0_to_3 / 3) * 0.18 +
-    (cueCount / 3) * 0.1 +
-    (provenance === "adequate" ? 0.08 : 0.02) +
-    source_tier.weight_0_to_1 * 0.12;
+    (cueCount / 3) * 0.1;
   // The debug blend must not read higher than the level the caps allow.
   const ceiling = level === "high" ? 1 : level === "medium" ? 0.7 : 0.45;
   const score_0_to_1 = Number(Math.min(blend, ceiling).toFixed(3));
@@ -560,7 +660,7 @@ export function buildConfidenceFactors(opts: {
     : `not cross-checked (${corr.distinct_source_count} distinct source${corr.distinct_source_count === 1 ? "" : "s"})`;
 
   return {
-    framing: "civilian-factorized-confidence",
+    framing: "civilian-analysis-confidence",
     level,
     score_0_to_1: Math.min(1, score_0_to_1),
     factors: {
@@ -570,14 +670,9 @@ export function buildConfidenceFactors(opts: {
       cross_checked: corr.cross_checked,
       distinct_source_count: corr.distinct_source_count,
       single_source_cue_count: cueCount,
-      provenance,
-      source_class: opts.sourceClass,
-      source_tier: source_tier.tier,
-      source_tier_weight_0_to_1: source_tier.weight_0_to_1,
     },
-    source_tier,
     caps_applied: caps,
-    rationale: `Research confidence=${level} from signaling=${opts.scorecard.band}, substance=${opts.substance.band}, corroboration=${corroborationBand(corr.score_0_to_3)} (${crossCheckNote}), within-passage detail cues=${cueCount >= 2 ? "several" : cueCount === 1 ? "one" : "none"} (not corroboration), provenance=${provenance}, source_class=${opts.sourceClass}, source_tier=${source_tier.tier} (stated editorial prior). Caps: ${caps.join(", ") || "none"}. Bands come from hand-set rule cues with no labelled-data calibration — they order and flag, they do not measure. Not an event-probability forecast.`,
+    rationale: `Analysis confidence=${level} from signaling=${opts.scorecard.band}, substance=${opts.substance.band}, corroboration=${corroborationBand(corr.score_0_to_3)} (${crossCheckNote}), within-passage detail cues=${cueCount >= 2 ? "several" : cueCount === 1 ? "one" : "none"} (not corroboration). Caps: ${caps.join(", ") || "none"}. Bands come from hand-set rule cues with no labelled-data calibration — they order and flag, they do not measure. Not an event-probability forecast.`,
     tag: "hypothesis",
   };
 }

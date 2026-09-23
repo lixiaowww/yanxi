@@ -56,7 +56,7 @@ export type InfoTriageJson = {
 };
 
 export type BriefingJson = {
-  source_digest_zh?: { point?: string; quote?: string; source_label?: string }[];
+  source_digest_zh?: { point?: string; quote?: string; source_label?: string; source_url?: string }[];
   context_notes?: { card?: string; note?: string; tag?: string }[];
   /**
    * 信息种类 + 重要性分级（民用公开源分诊）。
@@ -206,9 +206,14 @@ export type BriefingJson = {
       tag?: string;
     };
     missing?: string[];
+    channel_tier_spread?: {
+      tiers?: string[];
+      cross_tier?: boolean;
+      note_en?: string;
+    };
     tag?: string;
   };
-  confidence_factors?: {
+  source_credibility?: {
     framing?: string;
     level?: string;
     score_0_to_1?: number;
@@ -221,8 +226,30 @@ export type BriefingJson = {
       max_confidence?: string;
       tag?: string;
     };
+    channel_tier?: { tier?: string; label_en?: string; authority_weight?: number; basis_en?: string };
     caps_applied?: string[];
     rationale?: string;
+    tag?: string;
+  };
+  analysis_confidence?: {
+    framing?: string;
+    level?: string;
+    score_0_to_1?: number;
+    factors?: Record<string, unknown>;
+    caps_applied?: string[];
+    rationale?: string;
+    tag?: string;
+  };
+  absence_signal?: {
+    framing?: string;
+    hits?: {
+      subject_label?: string;
+      prior_coverage_count?: number;
+      last_prior_at?: string;
+      gap_days?: number;
+      pattern_match?: boolean;
+    }[];
+    note_en?: string;
     tag?: string;
   };
   canada_policy_link?: {
@@ -279,6 +306,7 @@ export type BriefingJson = {
     calibration?: string;
   };
   briefing_en?: {
+    headline?: string;
     what?: string;
     context?: string;
     so_what?: string;
@@ -727,12 +755,12 @@ export function runClaimGate(
         evidence: "confidence=high",
       });
     }
-    if ((briefing.confidence_factors?.level || "").toLowerCase() === "high") {
+    if ((briefing.source_credibility?.level || "").toLowerCase() === "high") {
       findings.push({
-        id: "social-confidence-factors-cap",
+        id: "social-source-credibility-cap",
         severity: "soft",
-        message: "confidence_factors.level must stay ≤ medium for social_commentary (prefer low).",
-        evidence: String(briefing.confidence_factors?.level),
+        message: "source_credibility.level must stay ≤ medium for social_commentary (prefer low).",
+        evidence: String(briefing.source_credibility?.level),
       });
     }
   }
@@ -745,21 +773,41 @@ export function runClaimGate(
     });
   }
 
-  const confFactors = briefing.confidence_factors;
-  if (confFactors) {
-    if (confFactors.tag && confFactors.tag.toLowerCase() !== "hypothesis") {
+  const analysisConf = briefing.analysis_confidence;
+  if (analysisConf) {
+    if (analysisConf.tag && analysisConf.tag.toLowerCase() !== "hypothesis") {
       findings.push({
         id: "confidence-tag-invalid",
         severity: "soft",
-        message: "confidence_factors.tag must be hypothesis.",
+        message: "analysis_confidence.tag must be hypothesis.",
+        evidence: String(analysisConf.tag),
+      });
+    }
+    if (analysisConf.level && !["low", "medium", "high"].includes(analysisConf.level)) {
+      findings.push({
+        id: "confidence-level-invalid",
+        severity: "soft",
+        message: "analysis_confidence.level must be low|medium|high.",
+        evidence: String(analysisConf.level),
+      });
+    }
+  }
+
+  const confFactors = briefing.source_credibility;
+  if (confFactors) {
+    if (confFactors.tag && confFactors.tag.toLowerCase() !== "hypothesis") {
+      findings.push({
+        id: "source-credibility-tag-invalid",
+        severity: "soft",
+        message: "source_credibility.tag must be hypothesis.",
         evidence: String(confFactors.tag),
       });
     }
     if (confFactors.level && !["low", "medium", "high"].includes(confFactors.level)) {
       findings.push({
-        id: "confidence-level-invalid",
+        id: "source-credibility-level-invalid",
         severity: "soft",
-        message: "confidence_factors.level must be low|medium|high.",
+        message: "source_credibility.level must be low|medium|high.",
         evidence: String(confFactors.level),
       });
     }

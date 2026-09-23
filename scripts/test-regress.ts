@@ -98,13 +98,13 @@ for (const file of files) {
       substance: b.substance_cut?.band || "?",
       substanceScore: b.substance_cut?.substance_score_0_to_1 ?? 0,
       corr: b.corroboration?.score_0_to_3 ?? -1,
-      conf: b.confidence_factors?.level || b.briefing_en?.confidence || "?",
+      conf: b.analysis_confidence?.level || b.briefing_en?.confidence || "?",
       desk: b.desk_section?.primary,
       kind: b.info_triage?.primary_kind,
       sourceClass: b.source_class?.class,
       canadaNexus: b.canada_nexus?.level,
       canadaPolicy: b.canada_policy_link?.level,
-      caps: b.confidence_factors?.caps_applied || [],
+      caps: [...(b.analysis_confidence?.caps_applied || []), ...(b.source_credibility?.caps_applied || [])],
       missing: b.corroboration?.missing || [],
     };
     stageMap.set(stage.id, snap);

@@ -21,20 +21,20 @@
   "briefing": {
     "source_digest_zh": [
       {
-        "point": "国务院办公厅印发通知，要求有关部门制定实施方案，因地制宜推进新质生产力相关试点",
+        "point": "国务院办公厅印发通知，要求有关部门制定实施方案、推进新质生产力相关试点",
         "quote": "国务院办公厅近日印发通知，要求有关部门制定实施方案，因地制宜推进新质生产力相关试点",
-        "source_label": "paste-2"
+        "source_label": "State Council General Office — implementing notice"
       },
       {
-        "point": "通知要求做好政策解读、适时出台配套办法，确保中央经济工作会议部署落实",
+        "point": "通知要求做好政策解读、适时出台配套办法，确保会议部署落实",
         "quote": "要做好政策解读，适时出台配套办法，确保中央经济工作会议部署落到实处",
-        "source_label": "paste-2"
+        "source_label": "State Council General Office — implementing notice"
       }
     ],
     "context_notes": [
       {
         "card": "policy-signaling-valves",
-        "note": "Civic ontology-lite [method] desk=all · matched=中央经济工作会议, 新华社, 实施方案, 办法, 通知, 国务院 · sources: Observable public PRC media/reporting conventions (open press patterns). Tag=hypothesis only — not proven secret fact.",
+        "note": "Civic ontology-lite [method] desk=all · matched=中央经济工作会议, 新华社, 实施方案, 办法, 通知, 国务院 · sources: Observable public PRC media/reporting conventions (open press patterns); China Media Project (pen-name bylines); Gao Yang / David Cowhig's Translation Blog (diplomatic jargon ladders); Asia Society Policy Institute (亲自 personal-leadership framing); see docs/DP-V3.md §4 for the full research trail. Tag=hypothesis only — not proven secret fact.",
         "tag": "hypothesis"
       },
       {
@@ -157,8 +157,8 @@
         {
           "id": "seq-leader-title-order",
           "category": "sequence",
-          "label_zh": "领导人/机构称谓排序可观察",
-          "label_en": "Observable leader/institution title ordering",
+          "label_zh": "领导人/机构称谓排序可观察（协议序位；比较排序变化需要历史通稿，本轮暂不做）",
+          "label_en": "Observable leader/institution title ordering (protocol precedence; order-CHANGE detection needs a prior bulletin, not implemented yet)",
           "weight": 0.04,
           "status": "unclear",
           "raw_score": 0.4,
@@ -243,6 +243,17 @@
           "tag": "hypothesis"
         },
         {
+          "id": "press-authoritative-byline",
+          "category": "press_placement",
+          "label_zh": "党媒权威笔名（任仲平/钟声/国纪平/金观平）——高于普通署名的机构级信号",
+          "label_en": "Coded party-media authority byline (任仲平/钟声/国纪平/金观平) — institutional-level signal, not an ordinary byline",
+          "weight": 0.09,
+          "status": "unclear",
+          "raw_score": 0.4,
+          "weighted_score": 0.036,
+          "tag": "hypothesis"
+        },
+        {
           "id": "verb-hierarchy-cues",
           "category": "speech_verbs",
           "label_zh": "指出/强调/要求等话语动词可分级阅读",
@@ -273,6 +284,17 @@
           "status": "unclear",
           "raw_score": 0.4,
           "weighted_score": 0.016,
+          "tag": "hypothesis"
+        },
+        {
+          "id": "attr-personal-leadership",
+          "category": "attribution",
+          "label_zh": "\"亲自\"个人化领导信号（亲自谋划/部署/推动/主持/出席）",
+          "label_en": "\"亲自\" (personally) personalized-leadership framing",
+          "weight": 0.05,
+          "status": "unclear",
+          "raw_score": 0.4,
+          "weighted_score": 0.02,
           "tag": "hypothesis"
         },
         {
@@ -318,12 +340,56 @@
           "raw_score": 1,
           "weighted_score": 0.03,
           "tag": "hypothesis"
+        },
+        {
+          "id": "tone-minimize-language",
+          "category": "tone_framing",
+          "label_zh": "弱化措辞（个别/极少数/不代表整体）— 刻意降低事件系统性",
+          "label_en": "Minimization wording (个别/极少数/不代表整体) — frames an event as non-systemic",
+          "weight": 0.04,
+          "status": "unclear",
+          "raw_score": 0.4,
+          "weighted_score": 0.016,
+          "tag": "hypothesis"
+        },
+        {
+          "id": "tone-resolve-language",
+          "category": "tone_framing",
+          "label_zh": "强化措辞（坚决维护/严厉打击/高度重视）— 展示管控能力和政治决心",
+          "label_en": "Resolve wording (坚决维护/严厉打击/高度重视) — demonstrates control/political will, not a specific measure",
+          "weight": 0.04,
+          "status": "unclear",
+          "raw_score": 0.4,
+          "weighted_score": 0.016,
+          "tag": "hypothesis"
+        },
+        {
+          "id": "diplo-severity-ladder",
+          "category": "diplomatic_severity",
+          "label_zh": "外交措辞升级阶梯命中（关切→严重关切→谴责→强烈谴责→抗议→严重抗议）",
+          "label_en": "Diplomatic severity-ladder phrase present (concern → serious concern → condemn → strongly condemn → protest → serious protest)",
+          "weight": 0.05,
+          "status": "unclear",
+          "raw_score": 0.4,
+          "weighted_score": 0.02,
+          "tag": "hypothesis"
+        },
+        {
+          "id": "diplo-outcome-euphemism",
+          "category": "diplomatic_severity",
+          "label_zh": "会谈成果委婉语阶梯命中（交换意见→坦率交谈→建设性对话→亲切友好）",
+          "label_en": "Meeting-outcome euphemism ladder present (exchanged views → candid talk → constructive dialogue → cordial)",
+          "weight": 0.04,
+          "status": "unclear",
+          "raw_score": 0.4,
+          "weighted_score": 0.016,
+          "tag": "hypothesis"
         }
       ],
-      "weighted_total": 0.604,
-      "weight_sum": 1,
+      "weighted_total": 0.728,
+      "weight_sum": 1.31,
       "band": "high",
-      "calibration": "Enumerated 17 public-media heuristics; observed=7, absent=2, unclear=8 → band=high. Weights are hand-set editorial priors with no labelled corpus and no held-out validation: the band orders and flags, it does not measure. Hypothesis only — not proof of intent.",
+      "calibration": "Enumerated 23 public-media heuristics; observed=7, absent=2, unclear=14 → band=high. Weights are hand-set editorial priors with no labelled corpus and no held-out validation: the band orders and flags, it does not measure. Hypothesis only — not proof of intent.",
       "tag": "hypothesis"
     },
     "signaling_valves": {
@@ -345,64 +411,45 @@
         "reading": "Category roll-up from enumerated heuristics (hypothesis).",
         "tag": "hypothesis"
       },
-      "calibration": "Enumerated 17 public-media heuristics; observed=7, absent=2, unclear=8 → band=high. Weights are hand-set editorial priors with no labelled corpus and no held-out validation: the band orders and flags, it does not measure. Hypothesis only — not proof of intent."
+      "calibration": "Enumerated 23 public-media heuristics; observed=7, absent=2, unclear=14 → band=high. Weights are hand-set editorial priors with no labelled corpus and no held-out validation: the band orders and flags, it does not measure. Hypothesis only — not proof of intent."
     },
     "briefing_en": {
-      "what": "Two public texts describe a policy sequence: a Central Economic Work Conference stressing high-quality development, 'new quality productive forces' adapted to local conditions, continued reform and opening, livelihood protection and social stability; and a State Council General Office notice directing relevant departments to draft implementation plans, run pilots on new quality productive forces adapted to local conditions, do policy interpretation, and issue supporting measures in due course. The conference text also restates the standard fiscal/monetary stance (proactive fiscal, prudent monetary), domestic-demand expansion and growth stabilization.",
-      "context": "The vocabulary is standard annual economic-work-meeting language: 高质量发展, 新质生产力, 稳增长, 扩大内需, 积极的财政政策/稳健的货币政策. The second text is the administrative follow-through layer — a State Council General Office notice asking departments to produce 实施方案 and 配套办法. Both are summary-level public texts; no numeric targets, deadlines, funding figures, or named sectors appear in the pasted excerpts.",
-      "so_what": "The substantive nuggets are procedural rather than quantitative: a named instrument (国办通知), a named follow-on instrument (实施方案/配套办法), a pilot-scope cue (因地制宜推进试点), and an identifiable issuing body. That combination suggests the policy chain has moved from meeting framing to drafting stage, but the pasted text does not show what will actually be piloted, where, at what scale, or by when. Treat the slogans as agenda-ordering cues, not operational facts; the next verifiable step is the publication of the referenced implementation plans and supporting measures.",
-      "confidence": "medium",
+      "what": "Two public excerpts describe a meeting-to-document sequence on economic policy. Source 1 (Xinhua wire) reports the Central Economic Work Conference stressing high-quality development, developing 'new quality productive forces' according to local conditions, continued reform and opening, livelihood protection, and social stability, while calling for a proactive fiscal policy, a prudent monetary policy, expanded domestic demand, and growth stabilization. Source 2 says the State Council General Office has issued a notice requiring relevant departments to draft implementation plans, advance pilots related to new quality productive forces according to local conditions, do policy interpretation, and issue supporting measures in due course. Hard detail is limited: named instruments (notice, implementation plan, supporting measures), responsible bodies (State Council General Office, relevant departments), and pilot-scope language are present, but there are no numeric targets, deadlines, or funding figures.",
+      "context": "The vocabulary is standard annual macro-policy language: the Central Economic Work Conference typically sets priority framing for the coming year, and State Council General Office notices are a common follow-on instrument. 'New quality productive forces' is post-2023 upgrading vocabulary; 'proactive fiscal / prudent monetary' are standard stance labels. Livelihood and social-stability phrasing is routine priority labeling unless concrete measures follow.",
+      "so_what": "The pair is best read as a priority-signaling and implementation-staging signal, not an operational plan. The observable nuggets are the named instruments and the pilot-scope wording; the absence of numbers, deadlines, and funding keeps this at medium confidence. Analysts should treat the notice as a pointer to forthcoming public documents rather than as evidence of specific targets or resource commitments.",
+      "confidence": "high",
       "sources_used": [
         "Xinhua — Central Economic Work Conference",
         "State Council General Office — implementing notice"
-      ]
+      ],
+      "headline": "The State Council General Office Issues a notice"
     },
     "policy_outlook": {
       "horizon": "near",
       "scenarios": [
         {
-          "label": "Drafting-stage follow-through",
+          "label": "Continuity: meeting framing followed by supporting documents, no hard targets yet",
           "likelihood": "medium",
-          "basis": "国办通知明确要求有关部门制定实施方案、适时出台配套办法，属会议→文件链条的下一环。",
-          "trigger": "公开渠道出现部门级实施方案或配套办法全文，含试点地区、领域或时间节点。",
-          "alternative": "The notice may merely reiterate the meeting’s broad goals without mandating concrete implementation documents, suggesting the next steps are still open-ended.",
-          "falsifier": "No public budget line item or funding allocation for the new quality productivity pilot appears in the next fiscal budget.",
-          "tag": "hypothesis"
-        },
-        {
-          "label": "Pilot scope stays vague",
-          "likelihood": "medium",
-          "basis": "文本仅称'因地制宜推进新质生产力相关试点'，未给出地区、行业或规模。",
-          "trigger": "后续公开文件仍以'因地制宜''有序推进'等定性表述为主，无具体试点名单。",
-          "alternative": "The phrase '因地制宜' could be understood as referencing a pre‑identified set of regions or sectors already earmarked by higher authorities, implying a defined pilot scope.",
-          "falsifier": "A public announcement lists a specific region or industry as a pilot, and related investment projects are disclosed within a month.",
-          "tag": "hypothesis"
-        },
-        {
-          "label": "Priority continuity without new numbers",
-          "likelihood": "medium",
-          "basis": "会议文本重申既有宏观政策标签（积极财政、稳健货币、扩大内需、稳增长），未见新提法或新数字。",
-          "trigger": "下一份公开经济工作文件或统计发布延续同一套词汇，无新增量化目标。",
-          "alternative": "The wording around '扩大内需' and '稳增长' may conceal a new quantitative target for domestic demand expansion or a revised GDP growth goal.",
-          "falsifier": "The next economic bulletin includes a revised GDP growth forecast or introduces a new quantitative indicator, indicating a change in priorities.",
+          "basis": "Source 2 explicitly requires departments to draft implementation plans and issue supporting measures in due course, but no numbers, deadlines, or funding appear in either excerpt.",
+          "trigger": "Publication of a named implementation plan, supporting measures (办法/细则), or a pilot list by a named ministry.",
+          "alternative": "The excerpt actually signals that the central economic work conference set concrete quantitative targets for GDP growth and investment, and the subsequent notice mandates ministries to publish detailed implementation guidelines with specific deadlines and funding allocations, indicating a move toward hard targets rather than mere framing.",
+          "falsifier": "Within two weeks of the conference, no ministry issued a formal policy document listing specific pilot projects, deadlines, or budget allocations, indicating that the meeting did not trigger concrete implementation plans.",
           "tag": "hypothesis"
         }
       ],
       "watchpoints": [
-        "国务院相关部门公开发布的实施方案或配套办法全文",
-        "试点地区/行业名单或目录的公开披露",
-        "后续中央或国办文件是否给出数字目标与时间表",
-        "新华社/人民日报对同一主题的版面位置与文体变化",
-        "统计部门对相关产业或内需数据的后续发布"
+        "Any named implementation plan or supporting measures (办法/细则) issued by a specific ministry",
+        "Any published pilot list or pilot region for new quality productive forces",
+        "Any numeric target, deadline, or funding figure attached to the notice",
+        "Front-page or editorial placement of follow-on coverage in party media"
       ]
     },
     "open_questions": [
-      "国办通知的完整标题、发文号与发布日期未在文本中给出，无法核验具体文件。",
-      "两篇文本均无日期标注（仅'近日'），无法确定会议与通知的确切时间顺序。",
-      "新质生产力试点的地区、行业、规模与时间表均未披露。",
-      "积极的财政政策与稳健的货币政策未附任何具体额度、工具或资金安排。",
-      "民生与和谐稳定表述无对应具体措施，属优先级标签而非操作细节。",
-      "来源2是否为新华社通稿、人民日报转载或政府网站原文，版面与文体信息缺失。"
+      "Which specific departments are named in the State Council General Office notice, and what is the notice number or date?",
+      "What is the scope of the 'new quality productive forces' pilots — which sectors or regions?",
+      "Are there numeric targets, timelines, or funding arrangements attached to the implementation plans?",
+      "What is the publication placement (front page, editorial) of the Xinhua report and the notice coverage?",
+      "Does the notice reference any specific prior document or deadline for departments to report back?"
     ],
     "canada_nexus": {
       "framing": "civilian-reader-interest-flag",
@@ -520,8 +567,8 @@
             "通知",
             "国务院"
           ],
-          "updated": "2026-09-20",
-          "sources": "Observable public PRC media/reporting conventions (open press patterns)"
+          "updated": "2026-09-22",
+          "sources": "Observable public PRC media/reporting conventions (open press patterns); China Media Project (pen-name bylines); Gao Yang / David Cowhig's Translation Blog (diplomatic jargon ladders); Asia Society Policy Institute (亲自 personal-leadership framing); see docs/DP-V3.md §4 for the full research trail"
         },
         {
           "id": "macro-policy-cycle",
@@ -673,17 +720,11 @@
       "missing": [],
       "tag": "hypothesis"
     },
-    "confidence_factors": {
-      "framing": "civilian-factorized-confidence",
+    "source_credibility": {
+      "framing": "civilian-source-credibility",
       "level": "medium",
       "score_0_to_1": 0.7,
       "factors": {
-        "signaling_band": "high",
-        "substance_band": "dense",
-        "corroboration_0_to_3": 3,
-        "cross_checked": true,
-        "distinct_source_count": 2,
-        "single_source_cue_count": 3,
         "provenance": "weak",
         "source_class": "policy_instrument",
         "source_tier": "A",
@@ -706,7 +747,44 @@
       "caps_applied": [
         "weak_provenance_cap_medium"
       ],
-      "rationale": "Research confidence=medium from signaling=high, substance=dense, corroboration=strong (cross-checked across 2 sources on 中央经济工作会议, 新质生产力), within-passage detail cues=several (not corroboration), provenance=weak, source_class=policy_instrument, source_tier=A (stated editorial prior). Caps: weak_provenance_cap_medium. Bands come from hand-set rule cues with no labelled-data calibration — they order and flag, they do not measure. Not an event-probability forecast.",
+      "rationale": "Source credibility=medium from source_class=policy_instrument, source_tier=A (stated editorial prior), provenance=weak. Caps: weak_provenance_cap_medium. Stated editorial priors — not fitted to labelled data.",
+      "tag": "hypothesis"
+    },
+    "analysis_confidence": {
+      "framing": "civilian-analysis-confidence",
+      "level": "high",
+      "score_0_to_1": 0.613,
+      "factors": {
+        "signaling_band": "high",
+        "substance_band": "dense",
+        "corroboration_0_to_3": 3,
+        "cross_checked": true,
+        "distinct_source_count": 2,
+        "single_source_cue_count": 3
+      },
+      "caps_applied": [],
+      "rationale": "Analysis confidence=high from signaling=high, substance=dense, corroboration=strong (cross-checked across 2 sources on 中央经济工作会议, 新质生产力), within-passage detail cues=several (not corroboration). Caps: none. Bands come from hand-set rule cues with no labelled-data calibration — they order and flag, they do not measure. Not an event-probability forecast.",
+      "tag": "hypothesis"
+    },
+    "absence_signal": {
+      "framing": "civilian-absence-as-signal",
+      "hits": [
+        {
+          "subject_label": "中央经济工作会议",
+          "prior_coverage_count": 21,
+          "last_prior_at": "2026-09-22T18:32:03.235Z",
+          "gap_days": 0,
+          "pattern_match": false
+        },
+        {
+          "subject_label": "新质生产力",
+          "prior_coverage_count": 20,
+          "last_prior_at": "2026-09-22T18:32:03.235Z",
+          "gap_days": 0,
+          "pattern_match": false
+        }
+      ],
+      "note_en": "Prior coverage found for 2 subject(s) in this excerpt, but no gap exceeds the 14-day threshold or this item is not thin — no absence pattern flagged.",
       "tag": "hypothesis"
     },
     "adoption": {
@@ -762,7 +840,7 @@
     },
     "temporal": {
       "framing": "civilian-temporal-freshness",
-      "briefed_at": "2026-09-22T12:42:19.544Z",
+      "briefed_at": "2026-09-22T18:48:26.593Z",
       "source_as_of": "2026-09-15",
       "source_as_of_precision": "day",
       "source_as_of_evidence": "2026-09-15",
@@ -770,7 +848,7 @@
       "freshness": {
         "band": "fresh",
         "label_en": "Fresh (≤7 days)",
-        "basis_en": "source_as_of is 7 day(s) before briefed_at.",
+        "basis_en": "The source date is 7 day(s) before this briefing was drafted.",
         "age_days": 7
       },
       "forward_deadlines_en": [],
@@ -784,30 +862,22 @@
       "so_what": "Without a named vehicle or allocation, the burden question stays open: central transfer, local bond quota and bank credit distribute the same nominal support very differently. Recipients gain a funded channel while the financing side absorbs the residual risk, so the distribution of burden matters more than the headline figure. The trade-off is stabilisation versus moral hazard: absorbing risk protects near-term delivery and confidence, while weakening the incentive for local authorities and developers to price risk in future. Delivery is delegated to unnamed “relevant departments” rather than to the speaking institution, so administrative capacity and geographic coverage depend on units the excerpt does not identify. An issued notice moves this from intent to an administrative instrument, so the binding questions become scope and enforcement rather than whether a document exists.",
       "scenarios": [
         {
-          "label": "Drafting-stage follow-through",
+          "label": "Support is routed through local budgets and bond quotas, concentrating delivery in fiscally stronger provinces",
           "likelihood": "medium",
-          "basis": "国办通知明确要求有关部门制定实施方案、适时出台配套办法，属会议→文件链条的下一环。",
-          "trigger": "公开渠道出现部门级实施方案或配套办法全文，含试点地区、领域或时间节点。",
-          "alternative": "The notice may merely reiterate the meeting’s broad goals without mandating concrete implementation documents, suggesting the next steps are still open-ended.",
-          "falsifier": "No public budget line item or funding allocation for the new quality productivity pilot appears in the next fiscal budget.",
+          "horizon": "6-18 months",
+          "basis": "Where the excerpt names no central transfer mechanism, delivery historically depends on local fiscal capacity, which widens regional divergence (hypothesis).",
+          "trigger": "Provincial bond issuance volumes, quota allocations, or published project lists skewed by region.",
+          "alternative": "A central transfer mechanism is named later, reducing regional divergence rather than leaving delivery to local fiscal capacity alone (hypothesis).",
+          "falsifier": "A named central transfer channel is published, or provincial bond issuance and project lists show even distribution rather than concentration in fiscally stronger provinces.",
           "tag": "hypothesis"
         },
         {
-          "label": "Pilot scope stays vague",
-          "likelihood": "medium",
-          "basis": "文本仅称'因地制宜推进新质生产力相关试点'，未给出地区、行业或规模。",
-          "trigger": "后续公开文件仍以'因地制宜''有序推进'等定性表述为主，无具体试点名单。",
-          "alternative": "The phrase '因地制宜' could be understood as referencing a pre‑identified set of regions or sectors already earmarked by higher authorities, implying a defined pilot scope.",
-          "falsifier": "A public announcement lists a specific region or industry as a pilot, and related investment projects are disclosed within a month.",
-          "tag": "hypothesis"
-        },
-        {
-          "label": "Priority continuity without new numbers",
-          "likelihood": "medium",
-          "basis": "会议文本重申既有宏观政策标签（积极财政、稳健货币、扩大内需、稳增长），未见新提法或新数字。",
-          "trigger": "下一份公开经济工作文件或统计发布延续同一套词汇，无新增量化目标。",
-          "alternative": "The wording around '扩大内需' and '稳增长' may conceal a new quantitative target for domestic demand expansion or a revised GDP growth goal.",
-          "falsifier": "The next economic bulletin includes a revised GDP growth forecast or introduces a new quantitative indicator, indicating a change in priorities.",
+          "label": "Notice is published naming the transmission vehicle, quota allocation and eligibility",
+          "likelihood": "low",
+          "basis": "The excerpt already commits to notice, and funded commitments in public texts are usually followed by an administrative document (hypothesis).",
+          "trigger": "A named issuing body, a draft circulated for public comment, or a document number appearing in an official gazette.",
+          "alternative": "Competing reading: the commitment stays rhetorical and no administrative text is issued in the stated window (hypothesis).",
+          "falsifier": "No draft, document number, or named issuer appears, or a published text omits the funded/pilot element named here.",
           "tag": "hypothesis"
         }
       ],
@@ -838,30 +908,17 @@
   },
   "gate": {
     "passed": true,
-    "findings": [
-      {
-        "id": "quote-source-label-mismatch",
-        "severity": "soft",
-        "message": "source_label=\"paste-2\" does not match any provided source; quote verified against the full corpus instead.",
-        "evidence": "国务院办公厅近日印发通知，要求有关部门制定实施方案，因地制宜推进新质生产力相关试点"
-      },
-      {
-        "id": "quote-source-label-mismatch",
-        "severity": "soft",
-        "message": "source_label=\"paste-2\" does not match any provided source; quote verified against the full corpus instead.",
-        "evidence": "要做好政策解读，适时出台配套办法，确保中央经济工作会议部署落到实处"
-      }
-    ]
+    "findings": []
   },
-  "systemPromptChars": 16172,
+  "systemPromptChars": 17343,
   "sourceCount": 2,
   "relatedBriefs": [
     {
       "framing": "civilian-related-brief-discovery",
-      "id": "2026-09-21_same-topic-pairs_domain-macro-cewc-domain-macro-instrument_8zue",
+      "id": "2026-09-22_same-topic-pairs_domain-macro-cewc-domain-macro-instrument_grz7",
       "label": "domain-macro-cewc + domain-macro-instrument",
-      "createdAt": "2026-09-21T20:58:17.846Z",
-      "jsonFile": "2026-09-21_same-topic-pairs_domain-macro-cewc-domain-macro-instrument_8zue.json",
+      "createdAt": "2026-09-22T18:32:03.235Z",
+      "jsonFile": "2026-09-22_same-topic-pairs_domain-macro-cewc-domain-macro-instrument_grz7.json",
       "shared_keys": [
         "subj:中央经济工作会议",
         "subj:新质生产力",
@@ -878,10 +935,10 @@
     },
     {
       "framing": "civilian-related-brief-discovery",
-      "id": "2026-09-21_macro-public-digest_domain-macro-cewc-domain-macro-instrument_8ztr",
+      "id": "2026-09-22_macro-public-digest_domain-macro-cewc-domain-macro-instrument_grx1",
       "label": "domain-macro-cewc + domain-macro-instrument",
-      "createdAt": "2026-09-21T20:58:17.823Z",
-      "jsonFile": "2026-09-21_macro-public-digest_domain-macro-cewc-domain-macro-instrument_8ztr.json",
+      "createdAt": "2026-09-22T18:32:03.157Z",
+      "jsonFile": "2026-09-22_macro-public-digest_domain-macro-cewc-domain-macro-instrument_grx1.json",
       "shared_keys": [
         "subj:中央经济工作会议",
         "subj:新质生产力",
@@ -898,33 +955,19 @@
     },
     {
       "framing": "civilian-related-brief-discovery",
-      "id": "2026-09-21_job-fit-domain-battery_domain-macro-cewc-domain-macro-instrument-domain-foreign-affairs-domain-industri_p3pv",
-      "label": "domain-macro-cewc + domain-macro-instrument + domain-foreign-bri + domain-tech-chips + domain-finance-property + domain-rural-food + domain-ideology-study + domain-dual-circulation + domain-social-stability + domain-defense-public + domain-canada-canola + domain-hot-taiwan + domain-hot-ev + domain-hot-ai",
-      "createdAt": "2026-09-21T14:38:54.739Z",
-      "jsonFile": "2026-09-21_job-fit-domain-battery_domain-macro-cewc-domain-macro-instrument-domain-foreign-affairs-domain-industri_p3pv.json",
-      "shared_keys": [
-        "subj:中央经济工作会议",
-        "subj:新质生产力"
-      ],
-      "desk": "Hot topics",
-      "what_preview": "Merged 14 public sources (domain-macro-cewc, domain-macro-instrument, domain-foreign-bri, domain-tech-chips, domain-finance-property, domain-rural-food, domain-",
-      "corroboration_band": "strong",
-      "canada_nexus": "direct",
-      "note_en": "Same-topic candidate in the outbox — not independent corroboration until you merge the excerpts and re-run.",
-      "tag": "hypothesis"
-    },
-    {
-      "framing": "civilian-related-brief-discovery",
-      "id": "2026-09-21_macro-public-digest_domain-macro-cewc-domain-macro-instrument_p3st",
+      "id": "2026-09-22_same-topic-pairs_domain-macro-cewc-domain-macro-instrument_4pjw",
       "label": "domain-macro-cewc + domain-macro-instrument",
-      "createdAt": "2026-09-21T14:38:54.845Z",
-      "jsonFile": "2026-09-21_macro-public-digest_domain-macro-cewc-domain-macro-instrument_p3st.json",
+      "createdAt": "2026-09-22T18:22:40.220Z",
+      "jsonFile": "2026-09-22_same-topic-pairs_domain-macro-cewc-domain-macro-instrument_4pjw.json",
       "shared_keys": [
         "subj:中央经济工作会议",
-        "subj:新质生产力"
+        "subj:新质生产力",
+        "nugget:a notice",
+        "nugget:an implementation plan",
+        "nugget:supporting measures"
       ],
       "desk": "Economy & investment",
-      "what_preview": "Merged 2 public sources (domain-macro-cewc, domain-macro-instrument). Lead excerpt: 据新华社北京电，近日召开的中央经济工作会议强调，要坚持高质量发展，因地制宜发展新质生产力，继续推进改革开放，在发展中保障和改善民生，维护社会和谐稳定",
+      "what_preview": "Merged 2 public excerpts (domain-macro-cewc, domain-macro-instrument). the Central Economic Work Conference readout and the State Council General Office; a noti",
       "corroboration_band": "strong",
       "canada_nexus": "none",
       "note_en": "Same-topic candidate in the outbox — not independent corroboration until you merge the excerpts and re-run.",
@@ -932,34 +975,60 @@
     },
     {
       "framing": "civilian-related-brief-discovery",
-      "id": "2026-09-21_desk-by-section_domain-macro-cewc_8zqe",
-      "label": "domain-macro-cewc",
-      "createdAt": "2026-09-21T20:58:17.702Z",
-      "jsonFile": "2026-09-21_desk-by-section_domain-macro-cewc_8zqe.json",
+      "id": "2026-09-22_macro-public-digest_domain-macro-cewc-domain-macro-instrument_4pil",
+      "label": "domain-macro-cewc + domain-macro-instrument",
+      "createdAt": "2026-09-22T18:22:40.173Z",
+      "jsonFile": "2026-09-22_macro-public-digest_domain-macro-cewc-domain-macro-instrument_4pil.json",
       "shared_keys": [
         "subj:中央经济工作会议",
-        "subj:新质生产力"
+        "subj:新质生产力",
+        "nugget:a notice",
+        "nugget:an implementation plan",
+        "nugget:supporting measures"
       ],
       "desk": "Economy & investment",
-      "what_preview": "Not adopted — this excerpt carries no verifiable detail. Named in the paste: acting party (the Central Economic Work Conference). Missing: a named instrument, a",
-      "corroboration_band": "weak",
+      "what_preview": "Merged 2 public excerpts (domain-macro-cewc, domain-macro-instrument). the Central Economic Work Conference readout and the State Council General Office; a noti",
+      "corroboration_band": "strong",
       "canada_nexus": "none",
       "note_en": "Same-topic candidate in the outbox — not independent corroboration until you merge the excerpts and re-run.",
       "tag": "hypothesis"
     },
     {
       "framing": "civilian-related-brief-discovery",
-      "id": "2026-09-21_desk-by-section_domain-macro-cewc_p3r2",
-      "label": "domain-macro-cewc",
-      "createdAt": "2026-09-21T14:38:54.782Z",
-      "jsonFile": "2026-09-21_desk-by-section_domain-macro-cewc_p3r2.json",
+      "id": "2026-09-22_same-topic-pairs_domain-macro-cewc-domain-macro-instrument_5f31",
+      "label": "domain-macro-cewc + domain-macro-instrument",
+      "createdAt": "2026-09-22T17:55:13.693Z",
+      "jsonFile": "2026-09-22_same-topic-pairs_domain-macro-cewc-domain-macro-instrument_5f31.json",
       "shared_keys": [
         "subj:中央经济工作会议",
-        "subj:新质生产力"
+        "subj:新质生产力",
+        "nugget:a notice",
+        "nugget:an implementation plan",
+        "nugget:supporting measures"
       ],
       "desk": "Economy & investment",
-      "what_preview": "Not adopted: paste lacks verifiable detail (numbers, deadlines, named instruments, or funding lines).",
-      "corroboration_band": "minimal",
+      "what_preview": "Merged 2 public excerpts (domain-macro-cewc, domain-macro-instrument). the Central Economic Work Conference readout and the State Council General Office; a noti",
+      "corroboration_band": "strong",
+      "canada_nexus": "none",
+      "note_en": "Same-topic candidate in the outbox — not independent corroboration until you merge the excerpts and re-run.",
+      "tag": "hypothesis"
+    },
+    {
+      "framing": "civilian-related-brief-discovery",
+      "id": "2026-09-22_macro-public-digest_domain-macro-cewc-domain-macro-instrument_5f1z",
+      "label": "domain-macro-cewc + domain-macro-instrument",
+      "createdAt": "2026-09-22T17:55:13.655Z",
+      "jsonFile": "2026-09-22_macro-public-digest_domain-macro-cewc-domain-macro-instrument_5f1z.json",
+      "shared_keys": [
+        "subj:中央经济工作会议",
+        "subj:新质生产力",
+        "nugget:a notice",
+        "nugget:an implementation plan",
+        "nugget:supporting measures"
+      ],
+      "desk": "Economy & investment",
+      "what_preview": "Merged 2 public excerpts (domain-macro-cewc, domain-macro-instrument). the Central Economic Work Conference readout and the State Council General Office; a noti",
+      "corroboration_band": "strong",
       "canada_nexus": "none",
       "note_en": "Same-topic candidate in the outbox — not independent corroboration until you merge the excerpts and re-run.",
       "tag": "hypothesis"

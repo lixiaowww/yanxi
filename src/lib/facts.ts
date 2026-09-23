@@ -1182,6 +1182,71 @@ export function composeWhatEn(
   return sentences.join(" ");
 }
 
+/**
+ * A short declarative headline (≤~14 words) — real briefing samples (PDB
+ * items, CRS "In Focus" titles) lead with a specific claim, not a
+ * description of the artifact itself ("Showcase — complete brief..."). Only
+ * called for adopted briefs; deferred/not-adopted ones keep their own
+ * "Deferred — watch queue" / "Not adopted" heading, which already reads as
+ * the headline for that case.
+ */
+export function composeHeadlineEn(set: FactSet): string {
+  const named = set.actor.filter((a) => a.actor_form !== "unnamed");
+
+  // With merged multi-source text, "the first named actor overall" is
+  // often just whichever source happened to be pasted first (e.g. a
+  // meeting readout) — not the body actually tied to the fact the
+  // headline is about (e.g. the office that issued the notice mentioned
+  // in source 2). Pick the actor whose mention sits closest to the fact
+  // in question, preferring an institutional "body" over a "meeting" on
+  // a near-tie, since bodies are what grammatically issue/commit things.
+  function nearestActor(refIndex: number): ExtractedFact | undefined {
+    if (!named.length) return undefined;
+    return [...named].sort((a, b) => {
+      const da = Math.abs(a.index - refIndex);
+      const db = Math.abs(b.index - refIndex);
+      if (Math.abs(da - db) > 40) return da - db;
+      const bodyBonus = (f: ExtractedFact) => (f.actor_form === "body" ? -1 : 0);
+      return bodyBonus(a) - bodyBonus(b) || da - db;
+    })[0];
+  }
+  function actorCapFor(f?: ExtractedFact): string {
+    const v = f?.value_en || "";
+    return v ? v[0].toUpperCase() + v.slice(1) : "";
+  }
+
+  const instrument = set.instrument[0];
+  const money = set.money.find((f) => f.has_amount);
+  const deadline = set.deadline[0];
+  const prohibition = set.prohibition[0];
+
+  if (instrument) {
+    const actorCap = actorCapFor(nearestActor(instrument.index));
+    const verb = instrument.issued ? "Issues" : "Signals Plan to Issue";
+    return actorCap ? `${actorCap} ${verb} ${instrument.value_en}` : `${verb} ${instrument.value_en}`;
+  }
+  if (money) {
+    const actorCap = actorCapFor(nearestActor(money.index));
+    const forWhat = set.scope[0]?.value_en;
+    return actorCap
+      ? `${actorCap} Commits ${money.value_en}${forWhat ? ` for ${forWhat}` : ""}`
+      : `${money.value_en} Committed${forWhat ? ` for ${forWhat}` : ""}`;
+  }
+  if (deadline) {
+    const actorCap = actorCapFor(nearestActor(deadline.index));
+    return actorCap
+      ? `${actorCap} Sets Deadline ${deadline.value_en}`
+      : `Deadline Set ${deadline.value_en}`;
+  }
+  if (prohibition) {
+    const actorCap = actorCapFor(nearestActor(prohibition.index));
+    return actorCap ? `${actorCap} ${prohibition.value_en}` : sentenceCase(prohibition.value_en);
+  }
+  const actorCap = actorCapFor(named[0]);
+  if (actorCap) return `${actorCap} Restates Policy Priorities`;
+  return "Public Mandarin Source — Policy Signal";
+}
+
 /** Capitalise the opening word without disturbing the rest of the sentence. */
 function sentenceCase(s: string): string {
   const trimmed = s.replace(/^the\s+/, "The ");

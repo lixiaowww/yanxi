@@ -990,6 +990,23 @@ export function buildContentAnalysis(
   const watchpoints = [...new Set(profile.watchpoints(v).filter(Boolean))].slice(0, 6);
   const open_questions = [...new Set(profile.questions(v).filter(Boolean))].slice(0, 5);
 
+  // Scenario count follows how much hard material actually exists — a
+  // routine "meeting + notice, no numbers/scope yet" excerpt doesn't earn
+  // three fully spun-up alternative-hypothesis scenarios just because the
+  // template always had three slots. Real analysts write one line for a
+  // routine step and expand only when there's enough at stake to warrant
+  // it. Counted against the same six hard-nugget categories substance_cut
+  // uses (instrument/deadline/money/quantity/scope/prohibition).
+  const hardSignalCount = [
+    facts.instrument.length,
+    facts.deadline.length,
+    facts.money.length,
+    facts.quantity.length,
+    facts.scope.length,
+    facts.prohibition.length,
+  ].filter((n) => n > 0).length;
+  const maxScenarios = hardSignalCount <= 1 ? 1 : hardSignalCount === 2 ? 2 : 3;
+
   return {
     framing: "civilian-content-analysis",
     domain: profile.id,
@@ -998,7 +1015,7 @@ export function buildContentAnalysis(
     so_what:
       so_what ||
       "The excerpt does not carry enough substantive detail to support impact analysis.",
-    scenarios: scenarios.slice(0, 3),
+    scenarios: scenarios.slice(0, maxScenarios),
     watchpoints,
     open_questions,
     tag: "hypothesis",

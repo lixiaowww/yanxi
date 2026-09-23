@@ -1,7 +1,7 @@
 ---
 name: industrial-tech-policy
 type: lexicon
-desk: hot_topics,economy_investment
+desk: hot_topics,industrial_tech
 match: "制造强国" "科技自立自强" "卡脖子" "国产替代" "专精特新" "人工智能" "半导体" "芯片" "新能源" "数字经济" "战略性新兴产业" "产业政策"
 description: Background glosses for industrial and tech-policy vocabulary in public PRC sources.
 tag: background

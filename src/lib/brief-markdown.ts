@@ -6,7 +6,7 @@
  */
 import type { BriefingJson } from "./gate.js";
 import type { BriefResponse } from "./pipeline.js";
-import { corroborationLineEn } from "./score-bands.js";
+import { buildVerdictLine, corroborationLineEn } from "./score-bands.js";
 
 export type BriefMarkdownMeta = {
   title: string;
@@ -29,44 +29,27 @@ export function formatBriefMarkdown(
   const deferred = briefing.intake?.label === "defer";
   const out: string[] = [];
 
-  out.push(`# ${meta.title}`, "");
-  if (meta.id) out.push(`- **id:** ${meta.id}`);
-  if (meta.createdAt) out.push(`- **created:** ${meta.createdAt}`);
+  // A generated headline is a specific claim about the subject (real
+  // briefing samples lead with one); meta.title is often just the
+  // subscription/desk label — keep both when they differ.
+  const headline = adopted ? en?.headline : undefined;
+  out.push(`# ${headline || meta.title}`, "");
+  if (headline && headline !== meta.title) out.push(`_${meta.title}_`, "");
+
+  // BLUF first, from the SAME builder the UI uses (score-bands.ts) — the
+  // two drifted once already when only the UI got a reader/audit split and
+  // this file kept growing a metadata dump instead. Don't repeat that.
+  const verdict = buildVerdictLine(briefing);
+  out.push(`**${verdict.text}**`, "");
   if (meta.sourceLabel) {
-    out.push(
-      `- **source:** ${meta.sourceLabel}${meta.sourceUrl ? ` · ${meta.sourceUrl}` : ""}`
-    );
-  }
-  if (opts?.mode) out.push(`- **mode:** ${opts.mode}`);
-  if (opts?.sourceCount != null) out.push(`- **sources in run:** ${opts.sourceCount}`);
-  if (briefing.desk_section?.label_en || briefing.desk_section?.label_zh) {
-    out.push(`- **desk:** ${briefing.desk_section.label_en || briefing.desk_section.label_zh}`);
-  }
-  if (briefing.info_triage) {
-    out.push(
-      `- **triage:** ${briefing.info_triage.primary_kind || "?"} / ${briefing.info_triage.importance?.grade || "?"}`
-    );
-  }
-  if (briefing.confidence_factors?.level || en?.confidence) {
-    out.push(`- **confidence:** ${briefing.confidence_factors?.level || en?.confidence}`);
-  }
-  if (briefing.intake?.label) out.push(`- **intake:** ${briefing.intake.label}`);
-  if (briefing.brief_quality?.level) {
-    out.push(
-      `- **brief quality:** ${briefing.brief_quality.level}${
-        briefing.brief_quality.missing?.length
-          ? ` (missing: ${briefing.brief_quality.missing.join(", ")})`
-          : ""
-      }`
-    );
+    out.push(`Source: ${meta.sourceLabel}${meta.sourceUrl ? ` · ${meta.sourceUrl}` : ""}  `);
   }
   if (briefing.temporal) {
     const t = briefing.temporal;
     out.push(
-      `- **time:** briefed ${t.briefed_at?.slice(0, 19) || "?"} · source as-of ${t.source_as_of || "unknown"} (${t.source_as_of_precision || "none"}) · ${t.freshness?.label_en || "Freshness unknown"}`
+      `Briefed ${t.briefed_at?.slice(0, 19) || "?"} · source as-of ${t.source_as_of || "unknown"} (${t.source_as_of_precision || "none"})`
     );
   }
-  if (ca?.domain_label_en) out.push(`- **domain:** ${ca.domain_label_en}`);
   out.push("");
 
   if (!adopted) {
@@ -160,6 +143,62 @@ export function formatBriefMarkdown(
         out.push(`Shared subjects: ${briefing.corroboration.shared_subjects.join(", ")}`, "");
       }
     }
+  }
+
+  // Everything below is process metadata, not the briefing — collapsed by
+  // default (GitHub-flavored markdown renders <details> as a real
+  // disclosure widget). Same "reader first, audit behind a fold" split as
+  // the UI's Analyst appendix.
+  const auditLines: string[] = [];
+  if (meta.id) auditLines.push(`- id: ${meta.id}`);
+  if (meta.createdAt) auditLines.push(`- created: ${meta.createdAt}`);
+  if (opts?.mode) auditLines.push(`- mode: ${opts.mode}`);
+  if (opts?.sourceCount != null) auditLines.push(`- sources in run: ${opts.sourceCount}`);
+  if (briefing.desk_section?.label_en || briefing.desk_section?.label_zh) {
+    auditLines.push(`- desk: ${briefing.desk_section.label_en || briefing.desk_section.label_zh}`);
+  }
+  if (briefing.info_triage) {
+    auditLines.push(
+      `- triage: ${briefing.info_triage.primary_kind || "?"} / ${briefing.info_triage.importance?.grade || "?"}`
+    );
+  }
+  if (briefing.intake?.label) auditLines.push(`- intake: ${briefing.intake.label}`);
+  if (briefing.brief_quality?.level) {
+    auditLines.push(
+      `- brief quality: ${briefing.brief_quality.level}${
+        briefing.brief_quality.missing?.length
+          ? ` (missing: ${briefing.brief_quality.missing.join(", ")})`
+          : ""
+      }`
+    );
+  }
+  if (briefing.analysis_confidence?.level || en?.confidence) {
+    auditLines.push(`- analysis confidence: ${briefing.analysis_confidence?.level || en?.confidence}`);
+  }
+  if (briefing.source_credibility?.level) {
+    auditLines.push(
+      `- source credibility: ${briefing.source_credibility.level}${
+        briefing.source_credibility.caps_applied?.includes("weak_provenance_cap_medium")
+          ? " (no independent URL to verify this specific excerpt — not a comment on the issuing body's standing)"
+          : ""
+      }`
+    );
+  }
+  if (briefing.temporal?.freshness?.label_en) {
+    auditLines.push(`- freshness: ${briefing.temporal.freshness.label_en}`);
+  }
+  if (ca?.domain_label_en) auditLines.push(`- domain: ${ca.domain_label_en}`);
+
+  if (auditLines.length) {
+    out.push(
+      "<details>",
+      "<summary>Analysis details (id, mode, triage, confidence factors — not the briefing body)</summary>",
+      "",
+      ...auditLines,
+      "",
+      "</details>",
+      ""
+    );
   }
 
   out.push(

@@ -1,16 +1,9 @@
 # Showcase — deferred (single source, no date, no named body)
 
-- **id:** showcase-deferred-finance-risk
-- **created:** 2026-09-22T12:42:21.380Z
-- **source:** single-source-finance-risk
-- **mode:** offline
-- **sources in run:** 1
-- **desk:** Economy & investment
-- **triage:** finance_risk / P3
-- **confidence:** low
-- **intake:** defer
-- **brief quality:** rejected (missing: actionable_hard_detail)
-- **time:** briefed 2026-09-22T12:42:21 · source as-of unknown (none) · Freshness unknown
+**Deferred — watch queue (no actionable hard detail yet).**
+
+Source: single-source-finance-risk  
+Briefed 2026-09-22T18:48:27 · source as-of unknown (none)
 
 ## Deferred — watch queue
 
@@ -24,5 +17,22 @@ Local gray heuristic: watch-worthy without actionable hard detail — defer.
 
 - Whether an implementing notice or funded pilot is published on the same subject
 - Whether a named body takes ownership of the timeline or product list
+
+<details>
+<summary>Analysis details (id, mode, triage, confidence factors — not the briefing body)</summary>
+
+- id: showcase-deferred-finance-risk
+- created: 2026-09-22T18:48:27.587Z
+- mode: offline
+- sources in run: 1
+- desk: Economy & investment
+- triage: finance_risk / P3
+- intake: defer
+- brief quality: rejected (missing: actionable_hard_detail)
+- analysis confidence: low
+- source credibility: medium
+- freshness: Freshness unknown
+
+</details>
 
 > Draft for human review · Public sources only · Not an intelligence product

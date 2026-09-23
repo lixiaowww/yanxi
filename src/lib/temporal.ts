@@ -173,7 +173,7 @@ function bandFromAge(days: number | undefined, precision: TemporalPrecision): {
     return {
       band: "fresh",
       label_en: "Source date after brief time",
-      basis_en: "Source as-of is after briefed_at (clock skew or future-dated text) — verify the dateline.",
+      basis_en: "The source date is after this briefing's draft time (clock skew or future-dated text) — verify the dateline.",
       age_days: days,
     };
   }
@@ -181,7 +181,7 @@ function bandFromAge(days: number | undefined, precision: TemporalPrecision): {
     return {
       band: "fresh",
       label_en: "Fresh (≤7 days)",
-      basis_en: `source_as_of is ${days} day(s) before briefed_at.`,
+      basis_en: `The source date is ${days} day(s) before this briefing was drafted.`,
       age_days: days,
     };
   }
@@ -189,7 +189,7 @@ function bandFromAge(days: number | undefined, precision: TemporalPrecision): {
     return {
       band: "recent",
       label_en: "Recent (≤30 days)",
-      basis_en: `source_as_of is ${days} day(s) before briefed_at.`,
+      basis_en: `The source date is ${days} day(s) before this briefing was drafted.`,
       age_days: days,
     };
   }
@@ -197,14 +197,14 @@ function bandFromAge(days: number | undefined, precision: TemporalPrecision): {
     return {
       band: "aging",
       label_en: "Aging (≤90 days)",
-      basis_en: `source_as_of is ${days} day(s) before briefed_at — re-check whether a newer public text supersedes this excerpt.`,
+      basis_en: `The source date is ${days} day(s) before this briefing was drafted — re-check whether a newer public text supersedes this excerpt.`,
       age_days: days,
     };
   }
   return {
     band: "stale",
     label_en: "Stale (>90 days)",
-    basis_en: `source_as_of is ${days} day(s) before briefed_at — treat as historical context unless a newer source is pasted.`,
+    basis_en: `The source date is ${days} day(s) before this briefing was drafted — treat as historical context unless a newer source is pasted.`,
     age_days: days,
   };
 }

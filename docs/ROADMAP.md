@@ -50,6 +50,7 @@
 - [x] F17 情景四件套扩展到全部 10 个领域画像，不再依赖 LLM 增强就能去模板化 · `npm run test:scenario-diversity`  
 - [x] F18 Outlook 时效降权区分"相对时间词"与"完全无日期"，封顶前保留情景相对排序 · `npm run test:outlook-differentiation`  
 - [x] F19 运行事实确认：本地 `.env` + Render 均配置双 LLM（Groq 主 + DeepSeek 备），offline 模板降级为最终兜底，非默认路径 — 见 `docs/DP.md` §7
+- [x] F20 Reader 页（类别 → 列表 → 详情的阅读产品，`docs/DP-V3.md` 收尾）：`/` 改为 Reader（按 desk 分类浏览 outbox，默认隐藏分析细节，`⚙ Settings` 可选展开 `AnalystAppendix`），粘贴玩法移到 `/compose`；`/api/outbox?desk=` 新增按 importance/日期排序；新组件 `src/Reader.tsx`、`src/lib/reader-settings.ts`（per-viewer localStorage，不是共享状态）
 
 ## Next（产品）
 

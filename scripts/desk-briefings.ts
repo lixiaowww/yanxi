@@ -82,7 +82,7 @@ for (const f of fixtures) {
     canada: result.briefing.canada_nexus?.level,
     corr: result.briefing.corroboration?.score_0_to_3 ?? 0,
     corrDrivers: result.briefing.corroboration?.drivers || [],
-    conf: result.briefing.confidence_factors?.level || result.briefing.briefing_en?.confidence || "?",
+    conf: result.briefing.analysis_confidence?.level || result.briefing.briefing_en?.confidence || "?",
     missing: result.briefing.corroboration?.missing || [],
     sourceText: f.sourceText,
     what: result.briefing.briefing_en?.what,
@@ -168,7 +168,7 @@ for (const sec of DESK_CATALOG) {
         beforeMax,
         beforeMin,
         afterCorr,
-        afterConf: merged.briefing.confidence_factors?.level || "?",
+        afterConf: merged.briefing.analysis_confidence?.level || "?",
         rose: afterCorr > beforeMax,
         reinforced: beforeMin < 2 && afterCorr >= 2,
       });

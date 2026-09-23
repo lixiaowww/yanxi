@@ -34,27 +34,15 @@
         "Xinhua — Central Economic Work Conference",
         "State Council General Office — implementing notice"
       ],
-      "what": "Two public texts describe a policy sequence: a Central Economic Work Conference stressing high-quality development, 'new quality productive forces' adapted to local conditions, continued reform and opening, livelihood protection and social stability; and a State Council General Office notice directing relevant departments to draft implementation plans, run pilots on new quality productive forces adapted to local conditions, do policy interpretation, and issue supporting measures in due course. The conference text also restates the standard fiscal/monetary stance (proactive fiscal, prudent monetary), domestic-demand expansion and growth stabilization.",
-      "context": "The vocabulary is standard annual economic-work-meeting language: 高质量发展, 新质生产力, 稳增长, 扩大内需, 积极的财政政策/稳健的货币政策. The second text is the administrative follow-through layer — a State Council General Office notice asking departments to produce 实施方案 and 配套办法. Both are summary-level public texts; no numeric targets, deadlines, funding figures, or named sectors appear in the pasted excerpts.",
-      "soWhat": "The substantive nuggets are procedural rather than quantitative: a named instrument (国办通知), a named follow-on instrument (实施方案/配套办法), a pilot-scope cue (因地制宜推进试点), and an identifiable issuing body. That combination suggests the policy chain has moved from meeting framing to drafting stage, but the pasted text does not show what will actually be piloted, where, at what scale, or by when. Treat the slogans as agenda-ordering cues, not operational facts; the next verifiable step is the publication of the referenced implementation plans and supporting measures.",
+      "what": "Two public excerpts describe a meeting-to-document sequence on economic policy. Source 1 (Xinhua wire) reports the Central Economic Work Conference stressing high-quality development, developing 'new quality productive forces' according to local conditions, continued reform and opening, livelihood protection, and social stability, while calling for a proactive fiscal policy, a prudent monetary policy, expanded domestic demand, and growth stabilization. Source 2 says the State Council General Office has issued a notice requiring relevant departments to draft implementation plans, advance pilots related to new quality productive forces according to local conditions, do policy interpretation, and issue supporting measures in due course. Hard detail is limited: named instruments (notice, implementation plan, supporting measures), responsible bodies (State Council General Office, relevant departments), and pilot-scope language are present, but there are no numeric targets, deadlines, or funding figures.",
+      "context": "The vocabulary is standard annual macro-policy language: the Central Economic Work Conference typically sets priority framing for the coming year, and State Council General Office notices are a common follow-on instrument. 'New quality productive forces' is post-2023 upgrading vocabulary; 'proactive fiscal / prudent monetary' are standard stance labels. Livelihood and social-stability phrasing is routine priority labeling unless concrete measures follow.",
+      "soWhat": "The pair is best read as a priority-signaling and implementation-staging signal, not an operational plan. The observable nuggets are the named instruments and the pilot-scope wording; the absence of numbers, deadlines, and funding keeps this at medium confidence. Analysts should treat the notice as a pointer to forthcoming public documents rather than as evidence of specific targets or resource commitments.",
       "scenarios": [
         {
-          "label": "Drafting-stage follow-through",
+          "label": "Continuity: meeting framing followed by supporting documents, no hard targets yet",
           "likelihood": "medium",
-          "alternative": "The notice may merely reiterate the meeting’s broad goals without mandating concrete implementation documents, suggesting the next steps are still open-ended.",
-          "falsifier": "No public budget line item or funding allocation for the new quality productivity pilot appears in the next fiscal budget."
-        },
-        {
-          "label": "Pilot scope stays vague",
-          "likelihood": "medium",
-          "alternative": "The phrase '因地制宜' could be understood as referencing a pre‑identified set of regions or sectors already earmarked by higher authorities, implying a defined pilot scope.",
-          "falsifier": "A public announcement lists a specific region or industry as a pilot, and related investment projects are disclosed within a month."
-        },
-        {
-          "label": "Priority continuity without new numbers",
-          "likelihood": "medium",
-          "alternative": "The wording around '扩大内需' and '稳增长' may conceal a new quantitative target for domestic demand expansion or a revised GDP growth goal.",
-          "falsifier": "The next economic bulletin includes a revised GDP growth forecast or introduces a new quantitative indicator, indicating a change in priorities."
+          "alternative": "The excerpt actually signals that the central economic work conference set concrete quantitative targets for GDP growth and investment, and the subsequent notice mandates ministries to publish detailed implementation guidelines with specific deadlines and funding allocations, indicating a move toward hard targets rather than mere framing.",
+          "falsifier": "Within two weeks of the conference, no ministry issued a formal policy document listing specific pilot projects, deadlines, or budget allocations, indicating that the meeting did not trigger concrete implementation plans."
         }
       ],
       "markdownUrl": "/examples/showcase/complete-macro-instrument.md"
@@ -264,10 +252,6 @@
             {
               "label": "Notice is published naming the transmission vehicle, quota allocation and eligibility",
               "likelihood": "low"
-            },
-            {
-              "label": "Headline commitments are restated without a matching implementation vehicle, and transmission stays limited",
-              "likelihood": "low"
             }
           ]
         }
@@ -439,7 +423,7 @@
     "cases": 8,
     "stages": 11,
     "failed": 0,
-    "stamp": "2026-09-22-13-27-47",
+    "stamp": "2026-09-22-18-47-54",
     "highlights": [
       "会议单独 → 弱印证；会议+细则 → 印证上升",
       "八股+干货 → substance 升档",
@@ -774,8 +758,8 @@
       ],
       "tag": "hypothesis",
       "description": "Enumerated public PRC media heuristics with weights — civilian research calibrators (not secrets).",
-      "updated": "2026-09-20",
-      "sources": "Observable public PRC media/reporting conventions (open press patterns)",
+      "updated": "2026-09-22",
+      "sources": "Observable public PRC media/reporting conventions (open press patterns); China Media Project (pen-name bylines); Gao Yang / David Cowhig's Translation Blog (diplomatic jargon ladders); Asia Society Policy Institute (亲自 personal-leadership framing); see docs/DP-V3.md §4 for the full research trail",
       "reviewedBy": "Sean Li (native Mandarin speaker, author)",
       "reviewDate": "2026-09-22"
     },
@@ -814,5 +798,5 @@
     "UI is English; Chinese appears only in source paste and quoted excerpts",
     "Substance / corroboration / confidence / source tier are hand-set rule heuristics shown as bands — no labelled corpus, no validation set, so no scores are reported"
   ],
-  "generatedAt": "2026-09-22T13:33:57.161Z"
+  "generatedAt": "2026-09-22T18:48:42.107Z"
 }

@@ -13,6 +13,20 @@ export type CorroborationBand = "minimal" | "weak" | "moderate" | "strong";
 export const HEURISTIC_BASIS_NOTE =
   "Bands come from hand-set rule cues, not a calibrated model — they order and flag, they do not measure.";
 
+/**
+ * Words of Estimative Probability — ICD 203 (Analytic Standards), rule
+ * e(2)(a): "an analytic product must use one of the following sets of
+ * terms" (two rows given; do not mix rows in one product). This project's
+ * likelihood field only has three bands (high/medium/low), so each maps to
+ * one term from ICD 203's "probable" row rather than an invented word.
+ * ICD 203 rule e(2)(b) also requires never combining a likelihood word and
+ * a confidence-level word in the same sentence — callers must keep this
+ * word and any confidence badge visually/grammatically separate.
+ */
+export function likelihoodWord(l?: string): string {
+  return l === "high" ? "likely" : l === "medium" ? "roughly even odds" : "unlikely";
+}
+
 const CORROBORATION_DRIVER_EN: Record<string, string> = {
   multi_source_merge: "two or more public sources",
   cross_source_subject_match: "two sources naming the same subject",
@@ -177,17 +191,18 @@ function capBasisEn(caps?: string[]): string {
 }
 
 /**
- * Human-facing confidence line: the level plus the bands and caps that produced it.
- * Deliberately carries no score — `score_0_to_1` is an internal blend only.
+ * Human-facing confidence lines — split per docs/DP-V3.md §5: how well the
+ * excerpt supports its own conclusions vs. how credible the source/outlet
+ * is are different questions, so they get separate lines. Deliberately
+ * carry no score — `score_0_to_1` is an internal blend only.
  */
-export function confidenceLineEn(cf?: {
+export function analysisConfidenceLineEn(cf?: {
   level?: string;
   caps_applied?: string[];
   factors?: {
     signaling_band?: string;
     substance_band?: string;
     corroboration_0_to_3?: number;
-    source_tier?: string;
   };
 }): string {
   if (!cf?.level) return "";
@@ -196,10 +211,30 @@ export function confidenceLineEn(cf?: {
     f.substance_band ? `verifiable detail ${f.substance_band}` : "",
     `corroboration ${corroborationBand(f.corroboration_0_to_3)}`,
     f.signaling_band ? `signaling cues ${f.signaling_band}` : "",
-    f.source_tier ? `source tier ${f.source_tier} (stated editorial prior)` : "",
   ].filter(Boolean);
   const caps = capBasisEn(cf.caps_applied);
-  const head = `Confidence ${cf.level} — from ${parts.join(", ")}`;
+  const head = `Analysis confidence ${cf.level} — from ${parts.join(", ")}`;
+  return caps ? `${head}; ${caps}.` : `${head}.`;
+}
+
+export function sourceCredibilityLineEn(cf?: {
+  level?: string;
+  caps_applied?: string[];
+  factors?: {
+    provenance?: string;
+    source_tier?: string;
+    channel_tier?: string;
+  };
+}): string {
+  if (!cf?.level) return "";
+  const f = cf.factors || {};
+  const parts = [
+    f.source_tier ? `source tier ${f.source_tier} (stated editorial prior)` : "",
+    f.channel_tier ? `channel tier ${f.channel_tier}` : "",
+    f.provenance ? `provenance ${f.provenance}` : "",
+  ].filter(Boolean);
+  const caps = capBasisEn(cf.caps_applied);
+  const head = `Source credibility ${cf.level} — from ${parts.join(", ")}`;
   return caps ? `${head}; ${caps}.` : `${head}.`;
 }
 
@@ -216,4 +251,39 @@ export function sourceTierLineEn(tier?: {
   const what = TIER_PRIOR_EN[id] || "public text";
   const cap = tier?.max_confidence ? `, caps confidence at ${tier.max_confidence}` : "";
   return `Source tier ${id} · ${what} — stated editorial prior${cap}`;
+}
+
+/**
+ * The one line a reader actually needs first — verdict, brief quality,
+ * freshness, both confidence scores, in one sentence. Single source of
+ * truth for the UI's BLUF line (BriefingNote.tsx) AND the markdown export
+ * (brief-markdown.ts): they drifted once already (the markdown header grew
+ * into a 12-line metadata dump while the UI got a proper reader/audit
+ * split) because the same text lived in two places. Fix that class of bug
+ * by construction, not just this once.
+ */
+export function buildVerdictLine(b?: {
+  adoption?: { adopted?: boolean };
+  intake?: { label?: string };
+  brief_quality?: { label_en?: string };
+  temporal?: { freshness?: { label_en?: string } };
+  analysis_confidence?: { level?: string };
+  source_credibility?: { level?: string };
+}): { tone: "ok" | "warn"; text: string } {
+  const deferred = b?.intake?.label === "defer";
+  const adopted = b?.adoption?.adopted !== false;
+  if (deferred) {
+    return { tone: "warn", text: "Deferred — watch queue (no actionable hard detail yet)." };
+  }
+  if (!adopted) {
+    return { tone: "warn", text: "Not adopted — no verifiable detail in this excerpt." };
+  }
+  const parts = [
+    "Adopted",
+    b?.brief_quality?.label_en,
+    b?.temporal?.freshness?.label_en,
+    b?.analysis_confidence?.level ? `analysis confidence ${b.analysis_confidence.level}` : undefined,
+    b?.source_credibility?.level ? `source credibility ${b.source_credibility.level}` : undefined,
+  ].filter(Boolean);
+  return { tone: "ok", text: `${parts.join(" · ")}.` };
 }

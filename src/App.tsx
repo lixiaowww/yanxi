@@ -1,238 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
-import {
-  confidenceLineEn,
-  corroborationLineEn,
-  signalingBasisEn,
-  substanceBasisEn,
-} from "./lib/score-bands";
+import { BriefingNote, highlightSource } from "./components/BriefingNote";
+import { AnalystAppendix } from "./components/AnalystAppendix";
+import type { ApiResult } from "./lib/briefing-types";
 
 const SAMPLE = `据新华社北京电，近日召开的中央经济工作会议强调，要坚持高质量发展。会议要求有关部门于2026年底前出台配套办法，安排专项资金不少于50亿元支持芯片与半导体中小企业试点。`;
-
-type DigestRow = { point?: string; quote?: string; source_label?: string };
-type Briefing = {
-  source_digest_zh?: DigestRow[];
-  context_notes?: { card?: string; note?: string; tag?: string }[];
-  adoption?: {
-    adopted?: boolean;
-    label_zh?: string;
-    reason_zh?: string;
-    hard_nuggets?: { kind?: string; label_zh?: string; evidence?: string }[];
-  };
-  intake?: {
-    label?: string;
-    first_cut?: string;
-    second_cut?: string | null;
-    second_cut_engine?: string;
-    reason_en?: string;
-  };
-  temporal?: {
-    briefed_at?: string;
-    collected_at?: string;
-    source_as_of?: string;
-    source_as_of_precision?: string;
-    source_as_of_evidence?: string;
-    freshness?: {
-      band?: string;
-      label_en?: string;
-      age_days?: number;
-      basis_en?: string;
-    };
-    forward_deadlines_en?: string[];
-  };
-  brief_quality?: {
-    level?: string;
-    label_en?: string;
-    missing?: string[];
-  };
-  info_triage?: {
-    primary_kind?: string;
-    kinds?: { kind?: string; label_zh?: string; score?: number; evidence?: string }[];
-    importance?: {
-      grade?: string;
-      label_zh?: string;
-      score_0_to_1?: number;
-      drivers?: string[];
-    };
-  };
-  canada_nexus?: {
-    level?: string;
-    label_zh?: string;
-    label_en?: string;
-    rationale?: string;
-    hits?: { level?: string; cue?: string; evidence?: string }[];
-  };
-  substance_cut?: {
-    band?: string;
-    label_zh?: string;
-    boilerplate_ratio_0_to_1?: number;
-    substance_score_0_to_1?: number;
-    nuggets?: { kind?: string; label_zh?: string; evidence?: string; value_en?: string }[];
-    boilerplate_hits?: { cue?: string; evidence?: string }[];
-    empty_calories?: string[];
-    analyst_prompt_zh?: string;
-    calibration?: string;
-  };
-  desk_section?: {
-    primary?: string;
-    label_zh?: string;
-    label_en?: string;
-    secondary?: string[];
-    evidence?: string[];
-    hot_themes?: { id?: string; label_en?: string; evidence?: string }[];
-    rationale?: string;
-  };
-  ontology_lite?: {
-    framing?: string;
-    desk_primary?: string;
-    calibration?: string;
-    hits?: {
-      id?: string;
-      type?: string;
-      desk?: string[];
-      tag?: string;
-      score?: number;
-      matched_keywords?: string[];
-      updated?: string;
-      sources?: string;
-    }[];
-  };
-  source_class?: {
-    class?: string;
-    label_zh?: string;
-    evidence?: string[];
-    rules?: string[];
-  };
-  corroboration?: {
-    score_0_to_3?: number;
-    label_zh?: string;
-    label_en?: string;
-    missing?: string[];
-    drivers?: string[];
-    shared_subjects?: string[];
-    cross_checked?: boolean;
-    distinct_source_count?: number;
-  };
-  confidence_factors?: {
-    level?: string;
-    score_0_to_1?: number;
-    caps_applied?: string[];
-    rationale?: string;
-    factors?: {
-      signaling_band?: string;
-      substance_band?: string;
-      corroboration_0_to_3?: number;
-      provenance?: string;
-      source_class?: string;
-      source_tier?: string;
-      source_tier_weight_0_to_1?: number;
-    };
-    source_tier?: {
-      tier?: string;
-      weight_0_to_1?: number;
-      label_zh?: string;
-      max_confidence?: string;
-      rationale_zh?: string;
-    };
-  };
-  canada_policy_link?: {
-    level?: string;
-    label_zh?: string;
-    disclaimer_zh?: string;
-    hits?: {
-      theme_zh?: string;
-      theme_en?: string;
-      public_refs?: { title?: string; url?: string; publisher?: string }[];
-      evidence?: string;
-      level?: string;
-    }[];
-  };
-  signaling_scorecard?: {
-    weighted_total?: number;
-    band?: string;
-    rules?: { category?: string; status?: string }[];
-  };
-  signaling_valves?: {
-    sequence?: { status?: string; observation?: string };
-    implementing_detail?: { status?: string; observation?: string };
-    press_placement?: { status?: string; observation?: string };
-    calibration?: string;
-  };
-  briefing_en?: {
-    what?: string;
-    context?: string;
-    so_what?: string;
-    confidence?: string;
-    sources_used?: string[];
-  };
-  policy_outlook?: {
-    horizon?: string;
-    scenarios?: {
-      label?: string;
-      likelihood?: string;
-      basis?: string;
-      trigger?: string;
-      horizon?: string;
-      alternative?: string;
-      falsifier?: string;
-    }[];
-    watchpoints?: string[];
-  };
-  open_questions?: string[];
-  content_analysis?: {
-    domain?: string;
-    domain_label_en?: string;
-    background?: string;
-    so_what?: string;
-    scenarios?: {
-      label?: string;
-      likelihood?: string;
-      basis?: string;
-      horizon?: string;
-      trigger?: string;
-      alternative?: string;
-      falsifier?: string;
-    }[];
-    watchpoints?: string[];
-    open_questions?: string[];
-  };
-  human_review?: {
-    id: "source_class" | "intake_gray" | "domain_profile";
-    question_en: string;
-    options: { value: string; label_en: string }[];
-    system_pick: string;
-    system_pick_label_en: string;
-    status: "open" | "resolved";
-    resolved_value?: string;
-  }[];
-};
-
-type ApiResult = {
-  mode: string;
-  offlineReason?: string;
-  llmConfigured?: boolean;
-  infoValue?: {
-    level: string;
-    label_zh: string;
-    next_zh: string[];
-  };
-  matchedCards: string[];
-  briefing: Briefing;
-  gate: { passed: boolean; findings: { severity: string; message: string; evidence: string }[] };
-  systemPromptChars: number;
-  sourceCount?: number;
-  relatedBriefs?: {
-    id: string;
-    label: string;
-    createdAt: string;
-    jsonFile: string;
-    shared_keys: string[];
-    desk?: string;
-    what_preview?: string;
-    corroboration_band?: string;
-    canada_nexus?: string;
-    note_en: string;
-  }[];
-};
 
 type SubRow = {
   id: string;
@@ -253,17 +24,6 @@ type OutboxRow = {
   jsonUrl: string;
   mdUrl: string;
 };
-
-function highlightSource(text: string, quote: string | null): { before: string; hit: string; after: string } | null {
-  if (!quote) return null;
-  const i = text.indexOf(quote);
-  if (i < 0) return null;
-  return {
-    before: text.slice(0, i),
-    hit: text.slice(i, i + quote.length),
-    after: text.slice(i + quote.length),
-  };
-}
 
 type DomainRow = {
   id: string;
@@ -295,8 +55,10 @@ function briefErrorMessage(status: number, serverError?: string): string {
 export function App() {
   const [sourceText, setSourceText] = useState(SAMPLE);
   const [label, setLabel] = useState("sample-xinhua-style-excerpt");
+  const [sourceUrl, setSourceUrl] = useState("");
   const [source2Text, setSource2Text] = useState("");
   const [source2Label, setSource2Label] = useState("second-public-source");
+  const [source2Url, setSource2Url] = useState("");
   const [sourcePublishedAt, setSourcePublishedAt] = useState("");
   const [markSocial, setMarkSocial] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -324,7 +86,7 @@ export function App() {
 
   // Group the fixture picker by desk channel so Hot topics packs are findable.
   const domainGroups = useMemo(() => {
-    const order = ["hot_topics", "economy_investment", "foreign_affairs", "defense_public", "social_governance"];
+    const order = ["hot_topics", "economy_investment", "industrial_tech", "foreign_affairs", "defense_public", "social_governance"];
     const groups = new Map<string, { label: string; rows: DomainRow[] }>();
     for (const d of domains) {
       const key = d.deskPrimary || "other";
@@ -414,12 +176,13 @@ export function App() {
         forcedIntakeLabel: reviewChoices.intake_gray || undefined,
         forcedDomainProfile: reviewChoices.domain_profile || undefined,
       };
+      const secondUrl = opts?.second ? undefined : source2Url.trim() || undefined;
       const payload =
         second.length >= 20
           ? {
               sources: [
-                { label, text: sourceText },
-                { label: secondLabel || "second-public-source", text: second },
+                { label, text: sourceText, url: sourceUrl.trim() || undefined },
+                { label: secondLabel || "second-public-source", text: second, url: secondUrl },
               ],
               sourcePublishedAt: sourcePublishedAt.trim() || undefined,
               ...overrides,
@@ -427,6 +190,7 @@ export function App() {
           : {
               sourceText,
               sourceLabel: label,
+              sourceUrl: sourceUrl.trim() || undefined,
               sourcePublishedAt: sourcePublishedAt.trim() || undefined,
               ...overrides,
             };
@@ -583,6 +347,8 @@ export function App() {
         </p>
         <span className="badge">Not an intelligence product · Public whitelist only · Human review required</span>
         <p className="meta" style={{ marginTop: "0.65rem" }}>
+          <a href="/">Reader</a>
+          <span> · </span>
           <a href="/portfolio">Portfolio</a>
           <span> · </span>
           <a href="/outbox/portfolio.md" target="_blank" rel="noreferrer">
@@ -670,6 +436,16 @@ export function App() {
             Source label
           </label>
           <input id="label" value={label} onChange={(e) => setLabel(e.target.value)} />
+          <label htmlFor="url" style={{ marginTop: "0.5rem" }}>
+            Source URL (optional) — makes the citation traceable instead of just a text label
+          </label>
+          <input
+            id="url"
+            type="url"
+            placeholder="https://..."
+            value={sourceUrl}
+            onChange={(e) => setSourceUrl(e.target.value)}
+          />
           <label htmlFor="src2" style={{ marginTop: "0.75rem" }}>
             Second public source (optional) — same subject, different issuer → real corroboration
           </label>
@@ -684,6 +460,16 @@ export function App() {
             Second source label
           </label>
           <input id="label2" value={source2Label} onChange={(e) => setSource2Label(e.target.value)} />
+          <label htmlFor="url2" style={{ marginTop: "0.5rem" }}>
+            Second source URL (optional)
+          </label>
+          <input
+            id="url2"
+            type="url"
+            placeholder="https://..."
+            value={source2Url}
+            onChange={(e) => setSource2Url(e.target.value)}
+          />
           <label htmlFor="pubdate" style={{ marginTop: "0.75rem" }}>
             Source date (optional, YYYY-MM-DD) — used when the paste has no dateline
           </label>
@@ -727,532 +513,25 @@ export function App() {
               Readable briefing appears here after generate. Click a source quote to highlight it on the left.
             </p>
           ) : (
-            <article className="brief-reader">
-              <header className="brief-status">
-                <p
-                  className={`verdict-line ${
-                    b.intake?.label === "defer" || b.adoption?.adopted === false ? "warn" : "ok"
-                  }`}
-                >
-                  {b.intake?.label === "defer"
-                    ? "Deferred — watch queue (no actionable hard detail yet)."
-                    : b.adoption?.adopted === false
-                      ? "Not adopted — no verifiable detail in this excerpt."
-                      : `Adopted${
-                          b.brief_quality?.label_en ? ` · ${b.brief_quality.label_en}` : ""
-                        }${
-                          b.temporal?.freshness?.label_en
-                            ? ` · ${b.temporal.freshness.label_en}`
-                            : ""
-                        }${
-                          b.confidence_factors?.level
-                            ? ` · confidence ${b.confidence_factors.level}`
-                            : ""
-                        }.`}
-                </p>
-                {b.brief_quality?.level === "partial" && result.relatedBriefs?.[0] ? (
-                  <p className="merge-cta">
-                    <button
-                      type="button"
-                      className="secondary"
-                      onClick={() => mergeRelatedAndRun(result.relatedBriefs![0].jsonFile)}
-                      disabled={loading}
-                    >
-                      Merge related brief &amp; re-run
-                    </button>{" "}
-                    <span className="meta">
-                      Uses "{result.relatedBriefs[0].label}" as a second source to test for
-                      complete.
-                    </span>
-                  </p>
-                ) : null}
-                <details className="qa-details">
-                  <summary>Analysis details (mode, gate, chips)</summary>
-                <div className="status-chips">
-                  <span
-                    className={`chip ${
-                      b.intake?.label === "defer"
-                        ? "chip-warn"
-                        : b.adoption?.adopted === false
-                          ? "chip-bad"
-                          : b.adoption?.adopted
-                            ? "chip-ok"
-                            : "chip-warn"
-                    }`}
-                  >
-                    {b.intake?.label === "defer"
-                      ? "Deferred (watch)"
-                      : b.intake?.label === "social_downweight"
-                        ? "Social down-weight"
-                        : b.adoption?.adopted === false
-                          ? "Not adopted"
-                          : b.adoption?.adopted
-                            ? "Adopted"
-                            : "Pending"}
-                  </span>
-                  {b.brief_quality?.level ? (
-                    <span
-                      className={`chip ${
-                        b.brief_quality.level === "complete"
-                          ? "chip-ok"
-                          : b.brief_quality.level === "partial"
-                            ? "chip-warn"
-                            : "chip-bad"
-                      }`}
-                      title={(b.brief_quality.missing || []).join(", ") || b.brief_quality.label_en}
-                    >
-                      {b.brief_quality.level === "complete"
-                        ? "Complete brief"
-                        : b.brief_quality.level === "partial"
-                          ? "Partial brief"
-                          : "Rejected brief"}
-                    </span>
-                  ) : null}
-                  <span className={`chip ${result.mode === "llm" ? "chip-ok" : "chip-warn"}`}>
-                    {result.mode === "llm" ? "LLM brief" : "Template brief"}
-                  </span>
-                  <span className={`chip ${result.gate.passed ? "chip-ok" : "chip-bad"}`}>
-                    Gate {result.gate.passed ? "pass" : "fail"}
-                  </span>
-                  {result.infoValue ? (
-                    <span className={`chip value-${result.infoValue.level}`}>
-                      Info value {result.infoValue.level}
-                    </span>
-                  ) : null}
-                  {b.temporal?.freshness?.label_en ? (
-                    <span
-                      className={`chip ${
-                        b.temporal.freshness.band === "fresh" || b.temporal.freshness.band === "recent"
-                          ? "chip-ok"
-                          : b.temporal.freshness.band === "unknown" || b.temporal.freshness.band === "weak"
-                            ? "chip-warn"
-                            : "chip-bad"
-                      }`}
-                    >
-                      {b.temporal.freshness.label_en}
-                    </span>
-                  ) : null}
-                  {b.confidence_factors?.level ? (
-                    <span className={`chip conf-${b.confidence_factors.level}`}>
-                      Confidence {b.confidence_factors.level}
-                    </span>
-                  ) : null}
-                  {b.desk_section?.label_en || b.desk_section?.label_zh ? (
-                    <span className="chip desk-badge">
-                      {b.desk_section.label_en || b.desk_section.label_zh}
-                    </span>
-                  ) : null}
-                  {(b.desk_section?.hot_themes || []).slice(0, 4).map((th) => (
-                    <span key={th.id || th.label_en} className="chip hot-theme-badge">
-                      {th.label_en || th.id}
-                    </span>
-                  ))}
-                  {b.canada_nexus && b.canada_nexus.level !== "none" ? (
-                    <span
-                      className={
-                        b.canada_nexus.level === "direct"
-                          ? "chip nexus-badge nexus-direct"
-                          : "chip nexus-badge nexus-possible"
-                      }
-                    >
-                      {b.canada_nexus.label_en ||
-                        (b.canada_nexus.level === "direct"
-                          ? "Canada nexus (named)"
-                          : "Canada nexus (possible)")}
-                    </span>
-                  ) : null}
-                </div>
-                {b.adoption?.adopted === false ? (
-                  <p className="status-note warn">
-                    <strong>{b.adoption.label_zh}</strong> — {b.adoption.reason_zh}
-                  </p>
-                ) : null}
-                {result.mode === "offline" && b.adoption?.adopted !== false ? (
-                  <p className="status-note">
-                    Template output
-                    {result.offlineReason?.startsWith("llm_error")
-                      ? " (LLM unavailable — fell back)"
-                      : result.offlineReason?.startsWith("force_offline")
-                        ? " (force offline checked)"
-                        : result.llmConfigured
-                          ? ""
-                          : " (no LLM configured)"}
-                    . Full brief: Digest → What → Context → Key facts → So what → Outlook → Watchpoints.
-                  </p>
-                ) : null}
-                {b.temporal ? (
-                  <p className="status-note">
-                    Time: briefed {b.temporal.briefed_at?.slice(0, 19) || "?"}
-                    {b.temporal.source_as_of
-                      ? ` · source as-of ${b.temporal.source_as_of} (${b.temporal.source_as_of_precision || "?"})`
-                      : " · source as-of unknown"}
-                    {b.temporal.source_as_of_evidence
-                      ? ` · cue “${b.temporal.source_as_of_evidence}”`
-                      : ""}
-                    {b.temporal.forward_deadlines_en?.length
-                      ? ` · forward: ${b.temporal.forward_deadlines_en.join("; ")}`
-                      : ""}
-                    {b.temporal.freshness?.basis_en ? ` — ${b.temporal.freshness.basis_en}` : ""}
-                  </p>
-                ) : null}
-                {b.content_analysis?.domain_label_en ? (
-                  <p className="status-note">
-                    Domain: {b.content_analysis.domain_label_en}
-                  </p>
-                ) : null}
-                </details>
-              </header>
-
-              {(b.human_review || []).some((p) => p.status === "open") ? (
-                <section className="read-block review-block">
-                  <h2>Needs your call</h2>
-                  <p className="meta">
-                    The layers below had to guess rather than detect with confidence. Pick an
-                    answer and re-run — nothing else about this draft changes.
-                  </p>
-                  {(b.human_review || [])
-                    .filter((p) => p.status === "open")
-                    .map((p) => (
-                      <div className="review-point" key={p.id}>
-                        <label htmlFor={`review-${p.id}`}>{p.question_en}</label>
-                        <select
-                          id={`review-${p.id}`}
-                          value={reviewChoices[p.id] ?? p.system_pick}
-                          onChange={(e) =>
-                            setReviewChoices((prev) => ({ ...prev, [p.id]: e.target.value }))
-                          }
-                        >
-                          {p.options.map((o) => (
-                            <option key={o.value} value={o.value}>
-                              {o.label_en}
-                              {o.value === p.system_pick ? " (system guess)" : ""}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    ))}
-                  <button type="button" className="secondary" onClick={() => run()} disabled={loading}>
-                    Apply &amp; re-run
-                  </button>
-                </section>
-              ) : null}
-              {(b.human_review || []).some((p) => p.status === "resolved") ? (
-                <p className="meta review-resolved-note">
-                  Confirmed by human review:{" "}
-                  {(b.human_review || [])
-                    .filter((p) => p.status === "resolved")
-                    .map(
-                      (p) =>
-                        `${p.id.replace("_", " ")} → ${
-                          p.options.find((o) => o.value === p.resolved_value)?.label_en ||
-                          p.resolved_value
-                        }`
-                    )
-                    .join("; ")}
-                </p>
-              ) : null}
-
-              {b.adoption?.adopted === false ? (
-                <section className="read-block reject-block">
-                  <h2>{b.intake?.label === "defer" ? "Deferred — watch queue" : "Not adopted"}</h2>
-                  <p className="prose">{b.briefing_en?.what || b.adoption.label_zh}</p>
-                  <p className="prose">{b.briefing_en?.so_what || b.adoption.reason_zh}</p>
-                  {b.intake?.reason_en ? <p className="meta">{b.intake.reason_en}</p> : null}
-                  {(b.policy_outlook?.watchpoints || []).length ? (
-                    <ul className="action-list">
-                      {(b.policy_outlook?.watchpoints || []).map((w, i) => (
-                        <li key={i}>{w}</li>
-                      ))}
-                    </ul>
-                  ) : null}
-                </section>
-              ) : (
-                <>
-              <div className="row" style={{ marginBottom: "0.75rem", gap: "0.5rem", flexWrap: "wrap" }}>
-                <button type="button" className="secondary" onClick={() => saveBrief()} disabled={savingBrief}>
-                  {savingBrief ? "Saving…" : savedBriefUrl ? "Saved — open again" : "Save final brief"}
-                </button>
-                <button type="button" className="secondary" onClick={() => copyBriefMarkdown()}>
-                  Copy brief markdown
-                </button>
-                {savedBriefUrl ? (
-                  <a href={savedBriefUrl} target="_blank" rel="noreferrer">
-                    Open saved .md
-                  </a>
-                ) : null}
-              </div>
-
-              {(b.source_digest_zh || []).length ? (
-                <section className="read-block">
-                  <h2>1. Source digest</h2>
-                  <ul className="digest-list">
-                    {(b.source_digest_zh || []).map((row, idx) => {
-                      const q = row.quote || "";
-                      const ok = Boolean(q && sourceText.includes(q));
-                      return (
-                        <li key={idx}>
-                          <button
-                            type="button"
-                            className={`digest-btn ${activeQuote === q ? "active" : ""} ${ok ? "" : "missing"}`}
-                            onClick={() => q && setActiveQuote(q)}
-                          >
-                            <span className="digest-point">{row.point}</span>
-                            {q ? <span className="digest-quote">「{q}」</span> : null}
-                            {row.source_label ? <span className="meta"> · {row.source_label}</span> : null}
-                          </button>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                </section>
-              ) : null}
-
-              <section className="read-block">
-                <h2>2. What</h2>
-                <p className="prose">{b.briefing_en?.what || "—"}</p>
-              </section>
-
-              <section className="read-block">
-                <h2>3. Context</h2>
-                <p className="prose">
-                  {b.briefing_en?.context ||
-                    (b.content_analysis
-                      ? `${b.content_analysis.domain_label_en} — ${b.content_analysis.background}`
-                      : "—")}
-                </p>
-              </section>
-
-              {(b.substance_cut?.nuggets || []).length ? (
-                <section className="read-block substance-panel">
-                  <h2>4. Key facts</h2>
-                  <ul className="nugget-list">
-                    {(b.substance_cut?.nuggets || []).slice(0, 10).map((n, i) => (
-                      <li key={i}>
-                        <span className="nugget-kind">{n.value_en || n.label_zh}</span>
-                        <span className="nugget-ev">{n.evidence}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </section>
-              ) : null}
-
-              <section className="read-block">
-                <h2>5. So what</h2>
-                <p className="prose">{b.briefing_en?.so_what || b.content_analysis?.so_what || "—"}</p>
-              </section>
-
-              {(b.policy_outlook?.scenarios || []).length ? (
-                <section className="read-block">
-                  <h2>
-                    6. Outlook (hypothesis)
-                    {b.brief_quality?.level === "partial"
-                      ? " — provisional (single source / undated)"
-                      : b.temporal?.freshness?.band === "aging" ||
-                          b.temporal?.freshness?.band === "stale"
-                        ? " — freshness risk"
-                        : ""}
-                  </h2>
-                  {b.brief_quality?.level === "partial" && (b.brief_quality.missing || []).length ? (
-                    <p className="meta">
-                      Missing for a complete brief: {(b.brief_quality.missing || []).join(", ")}
-                    </p>
-                  ) : null}
-                  <ol className="scenario-list">
-                    {(b.policy_outlook?.scenarios || []).map((s, i) => (
-                      <li key={i}>
-                        <span className={`likelihood likelihood-${s.likelihood || "low"}`}>
-                          {s.likelihood === "high"
-                            ? "more likely"
-                            : s.likelihood === "medium"
-                              ? "plausible"
-                              : "less likely"}
-                        </span>
-                        <div>
-                          <p className="prose">{s.label}</p>
-                          {s.horizon ? <p className="meta">Horizon: {s.horizon}</p> : null}
-                          {s.basis ? <p className="meta">Basis: {s.basis}</p> : null}
-                          {s.trigger ? <p className="meta">Trigger: {s.trigger}</p> : null}
-                          {s.alternative ? (
-                            <p className="meta">Alternative: {s.alternative}</p>
-                          ) : null}
-                          {s.falsifier ? <p className="meta">Falsifier: {s.falsifier}</p> : null}
-                        </div>
-                      </li>
-                    ))}
-                  </ol>
-                </section>
-              ) : null}
-
-              {(b.policy_outlook?.watchpoints || []).length ? (
-                <section className="read-block next-panel">
-                  <h2>7. Watchpoints</h2>
-                  <ul className="action-list">
-                    {(b.policy_outlook?.watchpoints || []).map((w, i) => (
-                      <li key={i}>{w}</li>
-                    ))}
-                  </ul>
-                </section>
-              ) : null}
-
-              {(b.open_questions || []).length ? (
-                <section className="read-block">
-                  <h2>8. Open questions</h2>
-                  <ul className="action-list">
-                    {(b.open_questions || []).map((q, i) => (
-                      <li key={i}>{q}</li>
-                    ))}
-                  </ul>
-                </section>
-              ) : null}
-
-              {b.corroboration ? (
-                <section className="read-block">
-                  <h2>9. Cross-source check</h2>
-                  <p className="prose">
-                    {corroborationLineEn({
-                      score: b.corroboration.score_0_to_3,
-                      labelEn: b.corroboration.label_en || b.corroboration.label_zh,
-                      drivers: b.corroboration.drivers,
-                    })}
-                  </p>
-                  {(b.corroboration.shared_subjects || []).length ? (
-                    <p className="meta">
-                      Shared subjects: {(b.corroboration.shared_subjects || []).join(", ")}
-                    </p>
-                  ) : null}
-                  {(b.corroboration.missing || []).length ? (
-                    <ul className="action-list">
-                      {(b.corroboration.missing || []).slice(0, 4).map((m, i) => (
-                        <li key={i}>{m}</li>
-                      ))}
-                    </ul>
-                  ) : null}
-                  {result.sourceCount != null ? (
-                    <p className="meta">Sources in this run: {result.sourceCount}</p>
-                  ) : null}
-                </section>
-              ) : null}
-
-              {(result.relatedBriefs || []).length ? (
-                <section className="read-block">
-                  <h2>Related briefs in outbox</h2>
-                  <p className="meta">
-                    Same-topic candidates only — not proof. Canada-relevant matches are ranked
-                    first. Load one as the second source and re-run to test corroboration.
-                  </p>
-                  <ul className="action-list">
-                    {(result.relatedBriefs || []).map((r) => (
-                      <li key={r.id}>
-                        {r.canada_nexus === "direct" ? (
-                          <span className="nexus-badge nexus-direct">CA</span>
-                        ) : r.canada_nexus === "possible" ? (
-                          <span className="nexus-badge nexus-possible">CA?</span>
-                        ) : null}{" "}
-                        <strong>{r.label}</strong>
-                        {r.desk ? ` · ${r.desk}` : ""}
-                        {r.shared_keys?.length ? ` · ${r.shared_keys.slice(0, 3).join(", ")}` : ""}
-                        <div className="row" style={{ marginTop: "0.35rem", gap: "0.5rem" }}>
-                          <button type="button" className="secondary" onClick={() => useRelatedAsSecondSource(r.jsonFile)}>
-                            Use as second source
-                          </button>
-                          <a href={`/outbox/briefs/${r.jsonFile}`} target="_blank" rel="noreferrer">
-                            Open JSON
-                          </a>
-                        </div>
-                        {r.what_preview ? <p className="meta">{r.what_preview}</p> : null}
-                      </li>
-                    ))}
-                  </ul>
-                </section>
-              ) : null}
-
-              {b.canada_policy_link && b.canada_policy_link.level !== "none" ? (
-                <section className="read-block policy-link-panel">
-                  <h2>Canada public-policy links (not legal advice)</h2>
-                  <ul className="action-list">
-                    {(b.canada_policy_link.hits || []).map((h, i) => (
-                      <li key={i}>
-                        <strong>{h.theme_en || h.theme_zh}</strong>
-                        <ul className="ref-links">
-                          {(h.public_refs || []).map((ref, j) =>
-                            ref.url ? (
-                              <li key={j}>
-                                <a href={ref.url} target="_blank" rel="noreferrer noopener">
-                                  {ref.title || ref.url}
-                                </a>
-                              </li>
-                            ) : null
-                          )}
-                        </ul>
-                      </li>
-                    ))}
-                  </ul>
-                </section>
-              ) : null}
-
-                </>
-              )}
-
-              {result.gate.findings.length > 0 ? (
-                <pre className="findings">
-                  {result.gate.findings
-                    .map((f) => `[${f.severity}] ${f.message}`)
-                    .join("\n")}
-                </pre>
-              ) : null}
-
-              <details className="meta-fold">
-                <summary>Analyst detail (method, triage, scorecard — not the briefing body)</summary>
-                {b.info_triage ? (
-                  <p className="meta">
-                    Kind {b.info_triage.primary_kind} · research priority{" "}
-                    {b.info_triage.importance?.grade} · signaling {b.signaling_scorecard?.band} (
-                    {signalingBasisEn(b.signaling_scorecard?.rules)})
-                  </p>
-                ) : null}
-                {b.substance_cut ? (
-                  <p className="meta">
-                    Substance band {b.substance_cut.band}:{" "}
-                    {substanceBasisEn(b.substance_cut.nuggets, b.substance_cut.band)}
-                  </p>
-                ) : null}
-                {(b.substance_cut?.empty_calories || []).length ? (
-                  <p className="meta">
-                    Formula-language notes: {(b.substance_cut?.empty_calories || []).slice(0, 3).join("; ")}
-                  </p>
-                ) : null}
-                {b.corroboration ? (
-                  <p className="meta">
-                    {corroborationLineEn({
-                      score: b.corroboration.score_0_to_3,
-                      labelEn: b.corroboration.label_en || b.corroboration.label_zh,
-                      drivers: b.corroboration.drivers,
-                    })}
-                  </p>
-                ) : null}
-                {b.confidence_factors ? (
-                  <p className="meta">{confidenceLineEn(b.confidence_factors)}</p>
-                ) : null}
-                {b.confidence_factors?.rationale ? (
-                  <p className="meta">{b.confidence_factors.rationale}</p>
-                ) : null}
-                {(result.infoValue?.next_zh || []).length ? (
-                  <p className="meta">Method next: {(result.infoValue?.next_zh || []).join("; ")}</p>
-                ) : null}
-                {b.ontology_lite?.hits?.length ? (
-                  <p className="meta">
-                    Context cards: {b.ontology_lite.hits.map((h) => h.id).join(", ")}
-                  </p>
-                ) : null}
-                {result.offlineReason ? <p className="meta">offline: {result.offlineReason}</p> : null}
-                <p className="meta">cards={result.matchedCards.join(", ") || "(none)"}</p>
-              </details>
-
-              <button type="button" className="secondary" onClick={() => setShowRaw((v) => !v)}>
-                {showRaw ? "Hide JSON" : "Raw JSON"}
-              </button>
-              {showRaw ? <pre>{JSON.stringify(result, null, 2)}</pre> : null}
-            </article>
+            <>
+              <BriefingNote
+                result={result}
+                sourceText={sourceText}
+                activeQuote={activeQuote}
+                onQuoteClick={setActiveQuote}
+                reviewChoices={reviewChoices}
+                onReviewChange={(id, value) => setReviewChoices((prev) => ({ ...prev, [id]: value }))}
+                onApplyReview={() => run()}
+                loading={loading}
+                savingBrief={savingBrief}
+                savedBriefUrl={savedBriefUrl}
+                onSaveBrief={() => saveBrief()}
+                onCopyMarkdown={() => copyBriefMarkdown()}
+                onUseRelated={(jsonFile) => useRelatedAsSecondSource(jsonFile)}
+                onMergeRerun={(jsonFile) => mergeRelatedAndRun(jsonFile)}
+              />
+              <AnalystAppendix result={result} showRaw={showRaw} onToggleRaw={() => setShowRaw((v) => !v)} />
+            </>
           )}
         </section>
       </div>
