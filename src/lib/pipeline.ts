@@ -15,7 +15,7 @@ import { CHANNEL_TIER_IDS, resolveChannelTier, type ChannelTierId } from "./sour
 import { detectAbsenceSignal } from "./absence-signal.js";
 import { evaluateAdoption, filterDigestByHardNuggets } from "./adoption.js";
 import { appendGateAudit } from "./audit-log.js";
-import { searchConfigured, buildSearchQuery, fetchSearchContext, formatSearchContextBlock } from "./search-context.js";
+import { searchConfigured, fetchMultiAngleSearchContext } from "./search-context.js";
 import {
   composeDigestRows,
   composeHeadlineEn,
@@ -296,16 +296,15 @@ export async function runBriefingPipeline(req: BriefRequest): Promise<BriefRespo
   } else if (allowLlm) {
     // Optional live-search enrichment (src/lib/search-context.ts) — only
     // spent on excerpts that are actually reaching the LLM (post-intake),
-    // never on content that's about to be rejected/deferred. A fixed,
-    // code-driven query derived from the excerpt's own extracted facts,
-    // not agentic tool-use — see that file's docstring for why.
+    // never on content that's about to be rejected/deferred. Three fixed
+    // angles (background, critical/comparative, category-specific), not
+    // agentic tool-use or an adaptive multi-round loop — see that file's
+    // docstring for why (user-agreed compromise, 2026-09-23).
     let searchBlock: string | undefined;
     if (searchConfigured()) {
       try {
         const earlyFacts = extractFacts(joined);
-        const query = buildSearchQuery(joined, earlyFacts);
-        const hits = await fetchSearchContext(query);
-        if (hits) searchBlock = formatSearchContextBlock(query, hits);
+        searchBlock = await fetchMultiAngleSearchContext(joined, earlyFacts, substanceEarly.nuggets);
       } catch {
         /* fail-open — no search context this round */
       }
