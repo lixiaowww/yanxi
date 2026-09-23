@@ -42,6 +42,8 @@
      - `LLM_BASE_URL=https://api.groq.com/openai/v1`  
      - `LLM_MODEL=openai/gpt-oss-20b`  
        （Groq：勿用已下线的 `llama-3.3-70b-versatile`；也可用 `openai/gpt-oss-120b`）  
+   - 可选联网搜索上下文（F33，未配则整段跳过，管线行为不变）：`TAVILY_API_KEY`（tavily.com 注册）  
+   - 可选 outbox 免费持久化"方案B"（F32，未配则只是跳过归档，恢复仍可用）：`GITHUB_ARCHIVE_TOKEN`（GitHub PAT，需 `contents:write` 权限）  
 4. 部署完成后打开：  
    - `https://<name>.onrender.com/` — 简报工作台  
    - `https://<name>.onrender.com/portfolio` — Portfolio  

@@ -54,6 +54,10 @@
 - [x] F28 "细节"定义扩大 + 优先级排序纠正（`docs/DP-V2.md` §1 2026-09-23 修订）：采纳门禁新增 `official_action`/`named_campaign`，`public-live-collect` 采纳率 1/15→8-9/15；外交侨务/一带一路 > 外贸投资 > 台海 加权，省市级人事任免降权；修正"政协"误判央级会议 bug；标题生成器扩展；`/api/outbox` 默认隐藏 not-adopted
 - [x] F29 Reader 置信度显示简化（Analysis 无标签，Forecast 收窄到 high/moderate likelihood 两档）+ `skills/briefing-writer/SKILL.md` 新增真实样本归纳的领域深度追问清单，避免流水账；`falsifier`/`open_questions` 要求给出具体搜索建议（不联网）
 - [x] F30 Render 免费档磁盘不持久缓解：生产启动时检测 outbox 无 live 记录则后台自动补一次采集，配合既有 `.github/workflows/collect-cron.yml` 定时任务，缩短"重启到有内容"窗口（非真正持久化，真正修复需付费 Persistent Disk）
+- [x] F31 省市级人事任免默认从 Reader 过滤（仍采纳、仍存数据，只是默认不展示）
+- [x] F32 Outbox 免费持久化"方案B"：真实采集后快照到 GitHub，生产启动时优先从归档快照恢复，比重新采集更快更省
+- [x] F33 联网搜索上下文：LLM 调用前跑 3 个固定角度（背景/批判对比/类型定制）搜索，结果作为可溯源的 `background` 上下文注入 prompt；SKILL.md 新增"发射/科技成就"清单 + "剥离宣传夸大"跨类别指令
+- [ ] F34（规划中）精品化——每天只深度处理 1-3 条最重要的简报，而非把深挖预算摊到当天所有采纳条目；需要在采集管线加一道零成本排序/筛选关卡，先打分再决定谁进入 F33 的全套流程
 
 ## Next（产品）
 
