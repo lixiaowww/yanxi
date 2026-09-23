@@ -7,6 +7,7 @@ import { runBriefingPipeline } from "./src/lib/pipeline.js";
 import { loadSubscriptions } from "./src/lib/subscriptions.js";
 import { runAllActiveSubscriptions } from "./src/lib/collector.js";
 import { listOutboxBriefs, writePasteBrief } from "./src/lib/outbox.js";
+import { archiveLiveOutboxToGitHub, restoreOutboxFromGitHub, archiveConfigured } from "./src/lib/outbox-archive.js";
 import { formatBriefResponseMarkdown } from "./src/lib/brief-markdown.js";
 import { loadWhitelistPublic } from "./src/lib/public-fetch.js";
 import { listDomainFixtures } from "./src/lib/domains.js";
@@ -291,6 +292,13 @@ async function main() {
         publicBaseUrl: PUBLIC_BASE_URL,
       });
       res.json({ ok: true, results });
+      // Archive after responding -- don't make the caller (including the
+      // GitHub Actions cron, which has its own timeout) wait on a GitHub
+      // API round-trip. Fail-open: no GITHUB_ARCHIVE_TOKEN or a failed
+      // call just means no snapshot this round, never blocks collect.
+      archiveLiveOutboxToGitHub()
+        .then((r) => r && console.log(`[outbox-archive] archived ${r.archived} record(s)`))
+        .catch((e) => console.error("[outbox-archive] failed:", e));
     } catch (e) {
       sendApiError(res, e);
     }
@@ -441,6 +449,22 @@ async function main() {
   // shouldn't recollect -- this still doesn't survive restarts by itself,
   // it just closes the gap between a restart and the next cron run).
   if (isProd) {
+    console.log(
+      archiveConfigured()
+        ? "[outbox-archive] GITHUB_ARCHIVE_TOKEN configured -- will archive after each collect"
+        : "[outbox-archive] GITHUB_ARCHIVE_TOKEN not set -- archiving disabled, restore-from-archive still works (public repo)"
+    );
+    // Try the GitHub archive first (src/lib/outbox-archive.ts) -- one fast,
+    // unauthenticated GET against the public repo, so it's worth awaiting
+    // before app.listen() rather than firing in the background: a
+    // successful restore means the Reader has real content from the
+    // moment the server starts answering requests, not ~1 minute later.
+    try {
+      const restored = await restoreOutboxFromGitHub();
+      if (restored) console.log(`[outbox-archive] restored ${restored} record(s) from GitHub`);
+    } catch (e) {
+      console.error("[outbox-archive] restore failed:", e);
+    }
     const hasLive = listOutboxBriefs().some((r) => r.provenance === "live");
     if (!hasLive) {
       console.log("[boot-collect] no live outbox records found -- triggering one background collect run");
@@ -448,7 +472,9 @@ async function main() {
         .then((results) => {
           const written = results.reduce((n, r) => n + r.written.length, 0);
           console.log(`[boot-collect] done: collected ${written} item(s)`);
+          return archiveLiveOutboxToGitHub();
         })
+        .then((r) => r && console.log(`[outbox-archive] archived ${r.archived} record(s)`))
         .catch((e) => console.error("[boot-collect] failed:", e));
     }
   }
