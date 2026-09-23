@@ -651,6 +651,13 @@ pre {
   margin: 0.2rem 0;
 }
 .note-list { margin: 0.3rem 0 0 1.2rem; padding: 0; }
+.research-lead-link {
+  display: inline-block;
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px dotted var(--accent);
+}
+.research-lead-link:hover { border-bottom-style: solid; }
 .note-actions {
   display: flex;
   gap: 0.5rem;

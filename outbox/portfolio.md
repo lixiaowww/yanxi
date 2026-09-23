@@ -53,10 +53,15 @@ Aggregated public hot themes: Taiwan Strait, EVs, China AI, semiconductors, crit
 
 Fiscal/monetary, industrial investment, special funds, local debt/property, meeting→instrument detail (excl. hot-theme AI/EV/chips which route to Hot topics) · items 4 · strongest corroboration weak
 
-- `dual-circulation` · dual_circulation/P3 · corroboration minimal · confidence low · verifiable detail thin (no numbers, deadlines, named notices or responsible bodies detected)
+- `dual-circulation` · dual_circulation/P3 · corroboration minimal · confidence low · verifiable detail mixed (cue words matched, but no hard detail survived the adoption filter)
   - Not adopted — this excerpt carries no verifiable detail. Named in the paste: subject (dual circulation and the unified n…
 - `finance-risk` · finance_risk/P3 · corroboration minimal · confidence low · verifiable detail mixed (bans or red lines and named sectors detected)
   - Not adopted — this excerpt carries no verifiable detail. Named in the paste: acting party (an unnamed meeting) and subje…
+
+### Tech & industry
+
+Industrial/tech policy, self-reliance, manufacturing upgrade — chips/AI/EV specifics still route to Hot topics when they hit a hot-theme cue · items 0 · strongest corroboration minimal
+
 
 ### Foreign affairs
 
@@ -64,7 +69,7 @@ Diplomatic discourse, bilateral ties, Belt and Road, sanctions/cooperation in op
 
 - `canada-nexus` · foreign_affairs/P2 · corroboration minimal · confidence low · verifiable detail mixed (responsible bodies and named sectors detected)
   - Not adopted — this excerpt carries no verifiable detail. Named in the paste: acting party (the Ministry of Commerce offi…
-- `foreign-affairs` · foreign_affairs/P3 · corroboration minimal · confidence low · verifiable detail thin (no numbers, deadlines, named notices or responsible bodies detected)
+- `foreign-affairs` · foreign_affairs/P3 · corroboration minimal · confidence low · verifiable detail mixed (responsible bodies and named sectors detected)
   - Not adopted — this excerpt carries no verifiable detail. Named in the paste: acting party (the Ministry of Foreign Affai…
 
 ### Defense — public discourse only
@@ -76,7 +81,7 @@ Open defense/military/industry reporting and white-paper style language; not ope
 
 ### Social governance
 
-Livelihood, grassroots governance, public opinion, common prosperity, party education — open social-governance language · items 3 · strongest corroboration minimal
+Livelihood, grassroots governance, education, public opinion, common prosperity, party education — open social-governance language · items 3 · strongest corroboration minimal
 
 - `ideology-party` · ideology_party/P3 · corroboration minimal · confidence low · verifiable detail thin (no numbers, deadlines, named notices or responsible bodies detected)
   - Not adopted — this excerpt carries no verifiable detail. Named in the paste: acting party (unnamed local authorities and…
@@ -106,7 +111,7 @@ Desk-first cards · background/hypothesis only · see `docs/ONTOLOGY-LITE.md`
 - `foreign-policy-discourse` · lexicon/background · desk=foreign_affairs · Background on public PRC foreign-policy discourse terms — not classified analysis.
 - `historical-analogy-discipline` · history_frame/hypothesis · desk=all · How to use historical analogies without overclaiming.
 - `ideology-education-lexicon` · lexicon/background · desk=social_governance · Background gloss for ideology / Party education / discipline vocabulary in public texts.
-- `industrial-tech-policy` · lexicon/background · desk=hot_topics|economy_investment · Background glosses for industrial and tech-policy vocabulary in public PRC sources.
+- `industrial-tech-policy` · lexicon/background · desk=hot_topics|industrial_tech · Background glosses for industrial and tech-policy vocabulary in public PRC sources.
 - `macro-policy-cycle` · institution/background · desk=economy_investment · Background on PRC macro policy-cycle vocabulary and cautious outlook discipline.
 - `party-state-lexicon` · lexicon/background · desk=all · Lexicon for common PRC political terms — background only.
 - `policy-signaling-valves` · method/hypothesis · desk=all · Enumerated public PRC media heuristics with weights — civilian research calibrators (not secrets).

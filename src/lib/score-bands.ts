@@ -299,3 +299,22 @@ export function buildVerdictLine(b?: {
   ].filter(Boolean);
   return { tone: "ok", text: `${parts.join(" · ")}.` };
 }
+
+/**
+ * Extracts a `[search: <query>]` marker from an open_questions string
+ * (skills/briefing-writer/SKILL.md requires the model to end every
+ * research-gap entry with one). Returns the display text with the marker
+ * stripped, plus the query if one was found — callers render the query as
+ * a clickable search link. No marker (a purely internal-ambiguity
+ * question, or older/non-compliant model output) just means no link.
+ */
+export function parseResearchLead(entry: string): { text: string; query?: string } {
+  const m = entry.match(/\s*\[search:\s*([^\]]+)\]\s*$/i);
+  if (!m) return { text: entry };
+  return { text: entry.slice(0, m.index).trim(), query: m[1].trim() };
+}
+
+/** Google search URL for a research-lead query — same query, any language. */
+export function googleSearchUrl(query: string): string {
+  return `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+}

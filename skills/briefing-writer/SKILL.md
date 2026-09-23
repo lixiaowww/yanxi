@@ -33,15 +33,21 @@ turn **public Mandarin text** into a clear **English briefing note**.
    `alternative` (competing reading), `falsifier` (public observation that kills the path).
    When the `falsifier` needs a fact this project has no live search for (a historical
    baseline, a prior edition/response, an official figure not in the paste), name **where
-   a human would go look** — a concrete search query or the specific document type to find
-   — not just "unclear". E.g. not "check if this happened before" but "search 全球数字贸易博览会
-   历届 举办地 主宾国 to check whether this is the first head-of-government-level meeting at
-   this venue". This project does not call a search API — it tells the human reviewer what
-   to search, the same way it already tells them what a second source would need to show.
+   a human would go look** — not just "unclear". This project does not call a search API —
+   it tells the human reviewer what to search, the same way it already tells them what a
+   second source would need to show.
 9. List `open_questions` for unclear scorecard rows, missing 细则/版面, and every background-
    knowledge gap the domain checklist below surfaced (historical baseline, prior commitments,
-   a deflator, doctrine history, ...). Same rule as the falsifier above: phrase each one as an
-   actionable research step with a concrete search query, not a vague "this needs verification".
+   a deflator, doctrine history, ...). The Reader shows these to the reader by default as
+   clickable searches, so **every `open_questions` entry that names a real research gap must
+   end with a literal `[search: <query>]` marker** — the exact string to search, in whichever
+   language (Chinese/English) actually returns useful results, not a vague "this needs
+   verification" with no marker. One entry, one gap, one query. Format:
+   `"<what's unresolved and why it matters> [search: <query>]"`. Example: `"No deflator is
+   given — the ~4x nominal rise may overstate real purchasing-power growth [search: 中国居民消费价格指数
+   2012-2025 累计涨幅]"`. An `open_questions` entry that is purely about the paste's own internal
+   ambiguity (not a research gap — e.g. "unclear which body this quote attributes to") may omit
+   the marker.
 10. Prefer **≥2 distinct public excerpts** on the same subject before treating the draft
     as a complete brief; a single undated paste is a **partial** research note.
 
@@ -55,14 +61,14 @@ Restating a translated fact is a **流水账** (a running log), not analysis. Fo
   1. Nominal vs. real: does the figure need an inflation/purchasing-power deflator to mean anything? If the excerpt gives no deflator, say so — don't compute one from outside knowledge, flag it as unresolved.
   2. Mean vs. distribution: is "per-capita"/"average" masking a skew (a minority pulling the mean up while the typical case lags)? The excerpt rarely has median/decile data — name that gap as an `open_question`, don't assume either reading.
   3. What's actually driving the number: organic activity, or a specific policy/investment mechanism (subsidy, transfer payment, resettlement program)? If the mechanism has a plausible non-economic motive (e.g. stability/control spending dressed as development spending), say so as a hedged hypothesis with an alternative (genuine broad-based growth), not a flat claim.
-  - Worked example: Tibet rural per-capita income 5,698→23,184 yuan (2012→2025, 11.4%/yr) — real question isn't "did it grow" but "grown for whom, in real terms, driven by what." `open_questions`: "No deflator given — search 中国居民消费价格指数 2012-2025 累计涨幅 (China CPI cumulative 2012-2025) to convert this to a real-terms figure before treating the multiple as meaningful."
+  - Worked example: Tibet rural per-capita income 5,698→23,184 yuan (2012→2025, 11.4%/yr) — real question isn't "did it grow" but "grown for whom, in real terms, driven by what." `open_questions`: "No deflator given, so the ~4x nominal rise may overstate real purchasing-power growth [search: 中国居民消费价格指数 2012-2025 累计涨幅]"
 
 - **official_action: 外交/会见 or 表态 (diplomatic meetings and statements)**
   1. Format tells you the intensity: a meeting vs. a phone call vs. a statement vs. a formal counter-report are different escalation levels — note which one was chosen, not just what was said.
   2. Protocol/sequencing detail (who's named first, who hosted, presence/absence of a joint statement) carries rank/warmth signal independent of the words used.
   3. Compare to the same relationship's/series' own precedent (see cross-cutting method) — is this response milder or sharper than the last one on the same topic? Is this meeting's level (head-of-government vs. lower) a first for this venue/relationship?
   4. For a rebuke/protest-style statement specifically: does it engage the other side's specific claims, or answer with generic language only ("respect facts", "stop interfering")? Generic-only response is itself informative (routine ritual, not real pressure) — but only relative to precedent, not on its own.
-  - Worked examples: Li Qiang meeting Kyrgyzstan's PM at the Hangzhou digital-trade expo — `open_questions`: "Whether this is the first head-of-government-level meeting at this expo is unverified from the excerpt — search 全球数字贸易博览会 历届 举办地 主宾国 元首 to check past editions' venues and guest-country/attendee level." China's EU delegation response to the EU's annual Hong Kong/Macau report (statement, not a counter-report — a deliberately low escalation choice) — `open_questions`: "Whether this response is milder than usual needs a baseline — search 中国驻欧盟使团 回应 欧盟 涉港澳 报告 [previous years] to compare this year's wording against prior years'."
+  - Worked examples: Li Qiang meeting Kyrgyzstan's PM at the Hangzhou digital-trade expo — `open_questions`: "Whether this is the first head-of-government-level meeting at this expo is unverified from the excerpt [search: 全球数字贸易博览会 历届 举办地 主宾国 元首]". China's EU delegation response to the EU's annual Hong Kong/Macau report (statement, not a counter-report — a deliberately low escalation choice) — `open_questions`: "Whether this response is milder than usual needs a prior-year baseline to compare against [search: 中国驻欧盟使团 回应 欧盟 涉港澳报告 历年]"
 
 - **implementing_instrument / macro_policy (notices, plans, measures)**
   1. Is this instrument itself executable, or an instruction to produce a *future* instrument ("draft an implementation plan", "issue supporting measures at an appropriate time")? No funding/deadline/named scope in *this* text = not yet operative — say that plainly, don't read the aspiration as the delivery.

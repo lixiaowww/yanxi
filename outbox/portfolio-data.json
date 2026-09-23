@@ -190,8 +190,8 @@
           "fixtureId": "dual-circulation",
           "kind": "dual_circulation",
           "importance": "P3",
-          "substance": "thin",
-          "substanceBasis": "no numbers, deadlines, named notices or responsible bodies detected",
+          "substance": "mixed",
+          "substanceBasis": "cue words matched, but no hard detail survived the adoption filter",
           "corrBand": "minimal",
           "corr": 0,
           "conf": "low",
@@ -263,6 +263,18 @@
       ]
     },
     {
+      "id": "industrial_tech",
+      "label_zh": "Tech & industry",
+      "label_en": "Tech & industry",
+      "blurb_zh": "Industrial/tech policy, self-reliance, manufacturing upgrade — chips/AI/EV specifics still route to Hot topics when they hit a hot-theme cue",
+      "itemCount": 0,
+      "maxCorrBand": "minimal",
+      "items": [],
+      "next_steps_zh": [
+        "No items in this column yet — add a public excerpt or whitelist feed"
+      ]
+    },
+    {
       "id": "foreign_affairs",
       "label_zh": "Foreign affairs",
       "label_en": "Foreign affairs",
@@ -289,21 +301,20 @@
           "fixtureId": "foreign-affairs",
           "kind": "foreign_affairs",
           "importance": "P3",
-          "substance": "thin",
-          "substanceBasis": "no numbers, deadlines, named notices or responsible bodies detected",
+          "substance": "mixed",
+          "substanceBasis": "responsible bodies and named sectors detected",
           "corrBand": "minimal",
           "corr": 0,
           "conf": "low",
           "what": "Not adopted — this excerpt carries no verifiable detail. Named in the paste: acting party (the Ministry of Foreign Affairs spokesperson) and subject (the Belt and Road Initiative). Missing: a named instrument, a funding line, a deadline or time marker, a quantified target and a pilot or scope boundary.",
-          "soWhat": "Analysis needs at least one of: the document to be issued and by whom, the amount and funding channel, the deadline, the pilot or geographic scope, or a quantified target. In this excerpt no document or measure is named, no amount or funding channel appears, no date is given, no ",
+          "soWhat": "Watch for a later public notice, funded line, or deadline-tied instrument. Local gray heuristic: watch-worthy without actionable hard detail — defer. In this excerpt no document or measure is named, no amount or funding channel appears, no date is given, no pilot or geographic sc",
           "canada": "none",
           "canadaPolicy": "topical",
           "outlook": []
         }
       ],
       "next_steps_zh": [
-        "Corroboration weak/minimal — pair direction+instrument, or add a second public source",
-        "Has substance=thin items: prefer public excerpts with numbers/deadlines/responsible bodies"
+        "Corroboration weak/minimal — pair direction+instrument, or add a second public source"
       ]
     },
     {
@@ -339,7 +350,7 @@
       "id": "social_governance",
       "label_zh": "Social governance",
       "label_en": "Social governance",
-      "blurb_zh": "Livelihood, grassroots governance, public opinion, common prosperity, party education — open social-governance language",
+      "blurb_zh": "Livelihood, grassroots governance, education, public opinion, common prosperity, party education — open social-governance language",
       "itemCount": 3,
       "maxCorrBand": "minimal",
       "items": [
@@ -423,7 +434,7 @@
     "cases": 8,
     "stages": 11,
     "failed": 0,
-    "stamp": "2026-09-22-18-47-54",
+    "stamp": "2026-09-23-18-09-29",
     "highlights": [
       "会议单独 → 弱印证；会议+细则 → 印证上升",
       "八股+干货 → substance 升档",
@@ -715,7 +726,7 @@
       "type": "lexicon",
       "desk": [
         "hot_topics",
-        "economy_investment"
+        "industrial_tech"
       ],
       "tag": "background",
       "description": "Background glosses for industrial and tech-policy vocabulary in public PRC sources.",
@@ -798,5 +809,5 @@
     "UI is English; Chinese appears only in source paste and quoted excerpts",
     "Substance / corroboration / confidence / source tier are hand-set rule heuristics shown as bands — no labelled corpus, no validation set, so no scores are reported"
   ],
-  "generatedAt": "2026-09-22T18:48:42.107Z"
+  "generatedAt": "2026-09-23T18:09:54.716Z"
 }

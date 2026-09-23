@@ -1,4 +1,4 @@
-import { buildVerdictLine, readerLikelihoodWord } from "../lib/score-bands";
+import { readerLikelihoodWord, parseResearchLead, googleSearchUrl } from "../lib/score-bands";
 import type { ApiResult } from "../lib/briefing-types";
 
 /**
@@ -41,24 +41,24 @@ function scenarioHedgeLine(alternative?: string, falsifier?: string): string {
  * The Reader's default detail view — deliberately narrower than
  * BriefingNote (which stays the full interactive spine for /compose).
  * Per the user's 2026-09-22 spec: no visible "What" / "Context" / "So
- * what" / "Outlook" pipeline-stage labels. Just two things, each with its
- * own confidence — Analysis and Forecast — plus the one-line verdict.
- * Everything else (source digest, watchpoints, open questions,
- * corroboration, related briefs, canada policy links, raw internals) moves
- * to ReaderMore + AnalystAppendix, both gated behind the Settings toggle
- * in Reader.tsx.
+ * what" / "Outlook" pipeline-stage labels — just Analysis and Forecast.
+ * The 2026-09-23 revisions removed the quality/confidence meta-line
+ * entirely (adoption/brief_quality/freshness/confidence — "这些注解无价值")
+ * and promoted `open_questions` out of Settings into a default-visible
+ * "What to search next" section, each rendered as a clickable Google
+ * search link when the model supplied a `[search: ...]` marker
+ * (skills/briefing-writer/SKILL.md, src/lib/score-bands.ts
+ * parseResearchLead/googleSearchUrl). Everything else (source digest,
+ * watchpoints, corroboration, related briefs, canada policy links, raw
+ * internals) still moves to ReaderMore + AnalystAppendix, gated behind the
+ * Settings toggle in Reader.tsx.
  */
 export function ReaderBrief({ result }: { result: ApiResult }) {
   const b = result.briefing;
   const adopted = b.adoption?.adopted !== false;
   const deferred = b.intake?.label === "defer";
-  const { tone: verdictTone, text: verdictText } = buildVerdictLine(b);
 
-  // Confidence display is forecast-only now (user, 2026-09-23) — analysis
-  // no longer shows a confidence tag, per bullet or in the masthead.
-  // source_credibility stays (a different concept: source reliability, not
-  // analytical confidence) unless told otherwise.
-  const sourceCredibility = b.source_credibility?.level;
+  const researchLeads = (b.open_questions || []).map(parseResearchLead);
 
   const analysisText =
     b.briefing_en?.context ||
@@ -89,12 +89,6 @@ export function ReaderBrief({ result }: { result: ApiResult }) {
             </>
           ) : null}
         </div>
-        <p className={`bluf bluf-${verdictTone}`}>{verdictText}</p>
-        {adopted && sourceCredibility ? (
-          <div className="reader-confidence-badges">
-            <span className={`confidence-badge confidence-${sourceCredibility}`}>Source credibility: {sourceCredibility}</span>
-          </div>
-        ) : null}
         {b.temporal?.source_as_of ? (
           <p className="note-timestamp">
             source as-of {b.temporal.source_as_of} ({b.temporal.source_as_of_precision || "?"})
@@ -126,14 +120,7 @@ export function ReaderBrief({ result }: { result: ApiResult }) {
 
           {scenarios.length ? (
             <section className="note-block">
-              <h2>
-                Forecast
-                {b.brief_quality?.level === "partial"
-                  ? " — provisional (single source / undated)"
-                  : b.temporal?.freshness?.band === "aging" || b.temporal?.freshness?.band === "stale"
-                    ? " — freshness risk"
-                    : ""}
-              </h2>
+              <h2>Forecast</h2>
               <ol className="scenario-list">
                 {scenarios.map((s, i) => (
                   <li key={i}>
@@ -148,6 +135,24 @@ export function ReaderBrief({ result }: { result: ApiResult }) {
                   </li>
                 ))}
               </ol>
+            </section>
+          ) : null}
+
+          {researchLeads.length ? (
+            <section className="note-block">
+              <h2>What to search next</h2>
+              <ul className="scenario-list">
+                {researchLeads.map((lead, i) => (
+                  <li key={i}>
+                    <p className="note-body">{lead.text}</p>
+                    {lead.query ? (
+                      <a className="note-sub research-lead-link" href={googleSearchUrl(lead.query)} target="_blank" rel="noreferrer">
+                        Search: {lead.query} ↗
+                      </a>
+                    ) : null}
+                  </li>
+                ))}
+              </ul>
             </section>
           ) : null}
         </>

@@ -105,7 +105,7 @@ Return ONLY valid JSON with this shape:
     ],
     "watchpoints": ["observable public signal..."]
   },
-  "open_questions": ["a background-knowledge gap the excerpt can't resolve, phrased as an actionable search step: what to search for or what document type to find — not just 'this needs verification'"]
+  "open_questions": ["a background-knowledge gap the excerpt can't resolve, ending with a literal [search: <query>] marker naming the exact search to run — not just 'this needs verification'"]
 }
 
 Rules:

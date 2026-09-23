@@ -55,17 +55,6 @@ export function ReaderMore({ result }: { result: ApiResult }) {
         </div>
       ) : null}
 
-      {(b.open_questions || []).length ? (
-        <div className="note-block">
-          <h3>Open questions</h3>
-          <ul className="note-list">
-            {(b.open_questions || []).map((q, i) => (
-              <li key={i}>{q}</li>
-            ))}
-          </ul>
-        </div>
-      ) : null}
-
       {b.corroboration ? (
         <div className="note-block">
           <h3>Cross-source check</h3>
