@@ -5,6 +5,16 @@ import { formatBriefResponseMarkdown } from "./brief-markdown.js";
 import type { CollectedItem } from "./public-fetch.js";
 import type { Subscription } from "./subscriptions.js";
 
+/**
+ * docs/DP-V2.md §2 (provenance) — distinguishes real content (a live paste,
+ * or a real fetch from a `type: "url"` whitelist entry) from demo/test
+ * fixtures (`type: "local_json"` sample text, e.g. domain-* excerpts used
+ * to exercise the pipeline across desk profiles). Lets the Reader default
+ * to real content only, instead of mixing repeated fixture reruns into
+ * what looks like a live feed.
+ */
+export type OutboxProvenance = "live" | "fixture_demo";
+
 export type OutboxRecord = {
   id: string;
   subscriptionId: string;
@@ -14,7 +24,13 @@ export type OutboxRecord = {
   result: BriefResponse;
   markdownPath: string;
   jsonPath: string;
+  provenance: OutboxProvenance;
 };
+
+/** Old records written before provenance existed have no stored field — infer it the same way new writes decide it: a real `url`-type fetch always carries `source.url`, a `local_json` fixture never does. */
+function inferProvenance(source: CollectedItem): OutboxProvenance {
+  return source.url ? "live" : "fixture_demo";
+}
 
 function ensureDir(d: string) {
   fs.mkdirSync(d, { recursive: true });
@@ -43,7 +59,8 @@ export function writeOutboxBrief(
   subscription: Subscription,
   source: CollectedItem,
   result: BriefResponse,
-  root = process.cwd()
+  root = process.cwd(),
+  provenance: OutboxProvenance = inferProvenance(source)
 ): OutboxRecord {
   const briefsDir = path.join(root, "outbox", "briefs");
   ensureDir(briefsDir);
@@ -58,6 +75,7 @@ export function writeOutboxBrief(
     createdAt,
     source,
     result,
+    provenance,
   };
   const jsonPath = path.join(briefsDir, `${id}.json`);
   const markdownPath = path.join(briefsDir, `${id}.md`);
@@ -93,7 +111,7 @@ export function writePasteBrief(
     collectedAt: new Date().toISOString(),
     url: source.url,
   };
-  return writeOutboxBrief(pasteSub, item, result, root);
+  return writeOutboxBrief(pasteSub, item, result, root, "live");
 }
 
 export function listOutboxBriefs(subscriptionId?: string, root = process.cwd()): OutboxRecord[] {
@@ -105,6 +123,7 @@ export function listOutboxBriefs(subscriptionId?: string, root = process.cwd()):
     try {
       const rec = JSON.parse(fs.readFileSync(path.join(briefsDir, f), "utf8")) as OutboxRecord;
       if (subscriptionId && rec.subscriptionId !== subscriptionId) continue;
+      if (!rec.provenance) rec.provenance = inferProvenance(rec.source);
       rows.push(rec);
     } catch {
       /* skip */

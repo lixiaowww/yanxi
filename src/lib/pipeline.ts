@@ -10,11 +10,14 @@ import { buildSubstanceCut, type SubstanceNugget } from "./substance.js";
 import { assignDeskSection } from "./briefing-desk.js";
 import { matchOntologyLite } from "./ontology-lite.js";
 import { detectSourceClass, SOURCE_CLASSES, type SourceClass } from "./source-class.js";
-import { buildConfidenceFactors, buildCorroboration } from "./confidence.js";
+import { buildSourceCredibility, buildAnalysisConfidence, buildCorroboration } from "./confidence.js";
+import { CHANNEL_TIER_IDS, resolveChannelTier, type ChannelTierId } from "./source-channel-tier.js";
+import { detectAbsenceSignal } from "./absence-signal.js";
 import { evaluateAdoption, filterDigestByHardNuggets } from "./adoption.js";
 import { appendGateAudit } from "./audit-log.js";
 import {
   composeDigestRows,
+  composeHeadlineEn,
   composeRejectionWhat,
   composeWhatEn,
   extractFacts,
@@ -35,12 +38,20 @@ import {
 export type SourceInput = {
   label: string;
   text: string;
+  /** Real citable URL when the operator has one — makes the digest citation traceable, not just a text label. */
+  url?: string;
+  /** Whitelist channel classification, when this source came through collect (docs/DP-V3.md §2). */
+  channelTier?: ChannelTierId;
 };
 
 export type BriefRequest = {
   /** Single-source convenience (still supported). */
   sourceText?: string;
   sourceLabel?: string;
+  /** Real citable URL for the single-source path (see SourceInput.url). */
+  sourceUrl?: string;
+  /** Whitelist channel classification for the single-source path (see SourceInput.channelTier). */
+  sourceChannelTier?: string;
   /** Multi-source merge — preferred when collect combines items. */
   sources?: SourceInput[];
   forceOffline?: boolean;
@@ -165,14 +176,61 @@ function buildInfoValue(
 export function normalizeSources(req: BriefRequest): SourceInput[] {
   if (req.sources?.length) {
     return req.sources
-      .map((s) => ({ label: (s.label || "source").trim(), text: (s.text || "").trim() }))
+      .map((s) => ({
+        label: (s.label || "source").trim(),
+        text: (s.text || "").trim(),
+        url: s.url?.trim() || undefined,
+        channelTier: isChannelTierId(s.channelTier) ? s.channelTier : undefined,
+      }))
       .filter((s) => s.text.length >= 20);
   }
   const text = (req.sourceText || "").trim();
   if (text.length >= 20) {
-    return [{ label: req.sourceLabel || "paste-1", text }];
+    return [
+      {
+        label: req.sourceLabel || "paste-1",
+        text,
+        url: req.sourceUrl?.trim() || undefined,
+        channelTier: isChannelTierId(req.sourceChannelTier) ? req.sourceChannelTier : undefined,
+      },
+    ];
   }
   return [];
+}
+
+function isChannelTierId(v: unknown): v is ChannelTierId {
+  return typeof v === "string" && (CHANNEL_TIER_IDS as readonly string[]).includes(v);
+}
+
+/**
+ * The system prompt's JSON schema example shows source_label: "paste-1" as
+ * a placeholder (skills.ts). Models occasionally echo that literal token
+ * not just in source_digest_zh.source_label (handled separately below by
+ * position) but anywhere in their free-text prose — e.g. a scenario's
+ * `basis` field literally saying "paste-2 already names...". Patching each
+ * field one at a time is whack-a-mole; sweep every string in the parsed
+ * LLM response instead and replace any "paste-N" substring with the real
+ * source label by position. No-op for offline output, which never echoes
+ * the schema placeholder in the first place.
+ */
+function sanitizePasteholders<T>(value: T, sources: SourceInput[]): T {
+  if (typeof value === "string") {
+    return value.replace(/paste-(\d+)\b/g, (match, n: string) => {
+      const idx = Number(n) - 1;
+      return sources[idx]?.label || match;
+    }) as unknown as T;
+  }
+  if (Array.isArray(value)) {
+    return value.map((v) => sanitizePasteholders(v, sources)) as unknown as T;
+  }
+  if (value && typeof value === "object") {
+    const out: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
+      out[k] = sanitizePasteholders(v, sources);
+    }
+    return out as T;
+  }
+  return value;
 }
 
 export async function runBriefingPipeline(req: BriefRequest): Promise<BriefResponse> {
@@ -237,7 +295,7 @@ export async function runBriefingPipeline(req: BriefRequest): Promise<BriefRespo
   } else if (allowLlm) {
     try {
       const called = await callLlmJsonWithFallback(prompt, userMessage(sources));
-      briefing = called.data;
+      briefing = sanitizePasteholders(called.data, sources);
       mode = "llm";
       llmProvider = called.provider;
       offlineReason = undefined;
@@ -272,6 +330,26 @@ export async function runBriefingPipeline(req: BriefRequest): Promise<BriefRespo
       .filter((id): id is string => Boolean(id)) ?? matchedCards;
   if (briefing.briefing_en) {
     briefing.briefing_en.sources_used = sources.map((s) => s.label);
+  }
+  // The system prompt's JSON schema example shows source_label: "paste-1" as
+  // a placeholder — models occasionally echo that literal string instead of
+  // substituting the real label they were given. Deterministically remap any
+  // literal "paste-N" back to the actual source label by position rather
+  // than relying on prompt wording alone.
+  if (briefing.source_digest_zh?.length) {
+    for (const row of briefing.source_digest_zh) {
+      const m = row.source_label?.match(/^paste-(\d+)$/);
+      if (m) {
+        const idx = Number(m[1]) - 1;
+        if (sources[idx]) row.source_label = sources[idx].label;
+      }
+      // Attach a real citable URL when the operator gave one for this
+      // source — makes the digest a traceable citation instead of just a
+      // text label (docs/RELIABILITY.md — prefer authoritative, traceable
+      // public sources over unattributed excerpts).
+      const matched = sources.find((s) => s.label === row.source_label);
+      if (matched?.url) row.source_url = matched.url;
+    }
   }
 
   // Optional — F13 alternative/falsifier enrichment (ACH-style: every
@@ -382,13 +460,26 @@ function applyDeterministicLayers(
     substance: substance_cut,
     sources: ctx.sources,
   });
-  const confidence_factors = buildConfidenceFactors({
-    scorecard,
-    substance: substance_cut,
-    corroboration,
+  // Overall source credibility is bounded by the weakest-credentialed source
+  // in the set — one strong outlet shouldn't paper over a weak one.
+  const channelTierIds = (ctx.sources || [])
+    .map((s) => s.channelTier)
+    .filter((t): t is ChannelTierId => Boolean(t));
+  const weakestChannelTier = channelTierIds.length
+    ? channelTierIds.reduce((worst, id) =>
+        resolveChannelTier(id).authority_weight < resolveChannelTier(worst).authority_weight ? id : worst
+      )
+    : undefined;
+  const source_credibility = buildSourceCredibility({
     sourceClass: source_class.class,
     sourceLabels: ctx.sourceLabels,
     sourceText,
+    channelTierId: weakestChannelTier,
+  });
+  const analysis_confidence = buildAnalysisConfidence({
+    scorecard,
+    substance: substance_cut,
+    corroboration,
   });
   const info_triage = buildInfoTriage(sourceText, {
     scorecardBand: scorecard.band,
@@ -427,8 +518,14 @@ function applyDeterministicLayers(
     ontology_lite,
     source_class,
     corroboration,
-    confidence_factors,
+    source_credibility,
+    analysis_confidence,
   };
+  next.absence_signal = detectAbsenceSignal({
+    briefing: next,
+    sourceText,
+    substanceBand: substance_cut.band,
+  });
 
   let adoption = evaluateAdoption(substance_cut);
   if (ctx.forcedAdopt && !adoption.adopted) {
@@ -575,6 +672,12 @@ function applyDeterministicLayers(
     const domainForced = Boolean(ctx.forcedDomainProfile);
     next.briefing_en = {
       ...base,
+      // Prefer the LLM's own headline — it has read the whole excerpt,
+      // while composeHeadlineEn is a regex extractor that can only name an
+      // instrument/amount/deadline/prohibition if the text states one in a
+      // pattern it recognizes, and falls back to a near-empty generic line
+      // otherwise. Offline mode (no LLM `base`) still needs the fallback.
+      headline: base?.headline || composeHeadlineEn(facts),
       what:
         base?.what ||
         composeWhatEn(facts, { sourceCount: ctx.sourceCount, sourceLabels: ctx.sourceLabels }),
@@ -582,7 +685,7 @@ function applyDeterministicLayers(
         !domainForced && base?.context
           ? base.context
           : `${analysis.domain_label_en} — ${analysis.background}`,
-      confidence: confidence_factors.level,
+      confidence: analysis_confidence.level,
       so_what: `${socialNote}${domainForced ? analysis.so_what : base?.so_what || analysis.so_what}`.trim(),
     };
     // Same reasoning as content_analysis above: a forced domain must
@@ -599,15 +702,15 @@ function applyDeterministicLayers(
     }
   }
 
-  if (!adoption.adopted && next.confidence_factors) {
-    next.confidence_factors = {
-      ...next.confidence_factors,
+  if (!adoption.adopted && next.analysis_confidence) {
+    next.analysis_confidence = {
+      ...next.analysis_confidence,
       level: "low",
       caps_applied: [
-        ...(next.confidence_factors.caps_applied || []),
+        ...(next.analysis_confidence.caps_applied || []),
         "adoption_reject_no_hard_detail",
       ],
-      rationale: `${next.confidence_factors.rationale} Adoption=reject (no hard detail/data).`,
+      rationale: `${next.analysis_confidence.rationale} Adoption=reject (no hard detail/data).`,
     };
   }
 

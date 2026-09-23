@@ -103,6 +103,20 @@
       "maxItemsPerRun": 4,
       "mergeMode": "combined",
       "active": true
+    },
+    {
+      "id": "public-live-collect",
+      "title": "Live public collect — CCTV / NDRC / China News Service RSS",
+      "description": "Real fetches from the enabled URL + RSS whitelist entries (docs/DP-V3.md §7 open question #2 starter set) — one brief per item, not merged. gov.cn/mofcom homepage entries dropped 2026-09-22 (index-page incoherence — see their whitelist notes); the 3 chinanews.com.cn RSS feeds are the real per-article source now.",
+      "keywords": [],
+      "sourceIds": ["ndrc-policy", "cctv-finance", "cctv-defense", "chinanews-politics-rss", "chinanews-finance-rss", "chinanews-scroll-rss"],
+      "scheduleCron": "0 7 * * 1-5",
+      "scheduleHuman": "Weekdays 07:00 local",
+      "delivery": ["outbox", "rss"],
+      "forceOffline": false,
+      "maxItemsPerRun": 15,
+      "mergeMode": "per-item",
+      "active": true
     }
   ]
 }

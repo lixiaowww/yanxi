@@ -83,6 +83,7 @@ Return ONLY valid JSON with this shape:
     "calibration": "roll-up of scorecard"
   },
   "briefing_en": {
+    "headline": "one short declarative sentence stating the specific claim (who did what) — not a description of the document type or a generic 'X issued a notice'",
     "what": "...",
     "context": "...",
     "so_what": "...",
@@ -118,6 +119,7 @@ Rules:
 - signaling_valves are category roll-ups of sequence / implementing_detail / press_placement.
 - The runtime may replace signaling_scorecard, info_triage, and ontology_lite with deterministic scorers — still fill them honestly.
 - policy_outlook preferred for policy sources; every scenario tag MUST be "hypothesis".
+- Scale the NUMBER of scenarios to how much hard detail the excerpt actually carries — do not pad to a fixed count. A routine "meeting language → follow-on notice, no numbers/deadline/scope yet" excerpt earns exactly ONE scenario ("continuity, wait for implementing detail"), not three near-duplicate ones. Only produce 2-3 scenarios when there are 2-3 genuinely distinct hard signals (named instrument, funding, deadline, quantified target, pilot scope) to branch on.
 - Each scenario should include alternative + falsifier (competing reading + public kill-condition).
 - Use may/could/if-then — never will-definitely / guaranteed / secretly-plans.
 - If unsure, lower confidence and add open_questions.`;

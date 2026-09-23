@@ -6,7 +6,12 @@
     "www.gov.cn",
     "english.news.cn",
     "www.news.cn",
-    "www.xinhuanet.com"
+    "www.xinhuanet.com",
+    "www.mofcom.gov.cn",
+    "www.ndrc.gov.cn",
+    "jingji.cctv.com",
+    "tv.cctv.com",
+    "www.chinanews.com.cn"
   ],
   "entries": [
     {
@@ -14,121 +19,297 @@
       "type": "local_json",
       "path": "examples/domains/macro-cewc.json",
       "label": "domain-macro-cewc",
-      "topics": ["macro_policy", "leadership_meeting"]
+      "topics": [
+        "macro_policy",
+        "leadership_meeting"
+      ],
+      "tier": "central_wire",
+      "channel_type": "wire",
+      "authority_weight": 0.92
     },
     {
       "id": "domain-macro-instrument",
       "type": "local_json",
       "path": "examples/domains/macro-instrument.json",
       "label": "domain-macro-instrument",
-      "topics": ["implementing_instrument", "macro_policy"]
+      "topics": [
+        "implementing_instrument",
+        "macro_policy"
+      ],
+      "tier": "ministry_official",
+      "channel_type": "official_site",
+      "authority_weight": 0.8
     },
     {
       "id": "domain-foreign-affairs",
       "type": "local_json",
       "path": "examples/domains/foreign-affairs.json",
       "label": "domain-foreign-bri",
-      "topics": ["foreign_affairs"]
+      "topics": [
+        "foreign_affairs"
+      ],
+      "tier": "ministry_official",
+      "channel_type": "official_site",
+      "authority_weight": 0.8
     },
     {
       "id": "domain-industrial-tech",
       "type": "local_json",
       "path": "examples/domains/industrial-tech.json",
       "label": "domain-tech-chips",
-      "topics": ["industrial_tech_policy"]
+      "topics": [
+        "industrial_tech_policy"
+      ],
+      "tier": "ministry_official",
+      "channel_type": "official_site",
+      "authority_weight": 0.8
     },
     {
       "id": "domain-finance-risk",
       "type": "local_json",
       "path": "examples/domains/finance-risk.json",
       "label": "domain-finance-property",
-      "topics": ["finance_risk"]
+      "topics": [
+        "finance_risk"
+      ],
+      "tier": "unknown",
+      "authority_weight": 0.3
     },
     {
       "id": "domain-rural-food",
       "type": "local_json",
       "path": "examples/domains/rural-food.json",
       "label": "domain-rural-food",
-      "topics": ["rural_revitalization"]
+      "topics": [
+        "rural_revitalization"
+      ],
+      "tier": "unknown",
+      "authority_weight": 0.3
     },
     {
       "id": "domain-ideology-party",
       "type": "local_json",
       "path": "examples/domains/ideology-party.json",
       "label": "domain-ideology-study",
-      "topics": ["ideology_party"]
+      "topics": [
+        "ideology_party"
+      ],
+      "tier": "unknown",
+      "authority_weight": 0.3
     },
     {
       "id": "domain-dual-circulation",
       "type": "local_json",
       "path": "examples/domains/dual-circulation.json",
       "label": "domain-dual-circulation",
-      "topics": ["dual_circulation"]
+      "topics": [
+        "dual_circulation"
+      ],
+      "tier": "unknown",
+      "authority_weight": 0.3
     },
     {
       "id": "domain-social-governance",
       "type": "local_json",
       "path": "examples/domains/social-governance.json",
       "label": "domain-social-stability",
-      "topics": ["social_governance"]
+      "topics": [
+        "social_governance"
+      ],
+      "tier": "unknown",
+      "authority_weight": 0.3
     },
     {
       "id": "domain-defense-public",
       "type": "local_json",
       "path": "examples/domains/defense-public.json",
       "label": "domain-defense-public",
-      "topics": ["defense_public"]
+      "topics": [
+        "defense_public"
+      ],
+      "tier": "ministry_official",
+      "channel_type": "official_site",
+      "authority_weight": 0.8
     },
     {
       "id": "domain-canada-nexus",
       "type": "local_json",
       "path": "examples/domains/canada-nexus.json",
       "label": "domain-canada-canola",
-      "topics": ["foreign_affairs", "canada_nexus"]
+      "topics": [
+        "foreign_affairs",
+        "canada_nexus"
+      ],
+      "tier": "ministry_official",
+      "channel_type": "official_site",
+      "authority_weight": 0.8
     },
     {
       "id": "domain-hot-taiwan-strait",
       "type": "local_json",
       "path": "examples/domains/hot-taiwan-strait.json",
       "label": "domain-hot-taiwan",
-      "topics": ["hot_topics", "taiwan_strait", "foreign_affairs"]
+      "topics": [
+        "hot_topics",
+        "taiwan_strait",
+        "foreign_affairs"
+      ],
+      "tier": "unknown",
+      "authority_weight": 0.3
     },
     {
       "id": "domain-hot-electric-vehicles",
       "type": "local_json",
       "path": "examples/domains/hot-electric-vehicles.json",
       "label": "domain-hot-ev",
-      "topics": ["hot_topics", "electric_vehicles", "industrial_tech_policy"]
+      "topics": [
+        "hot_topics",
+        "electric_vehicles",
+        "industrial_tech_policy"
+      ],
+      "tier": "unknown",
+      "authority_weight": 0.3
     },
     {
       "id": "domain-hot-china-ai",
       "type": "local_json",
       "path": "examples/domains/hot-china-ai.json",
       "label": "domain-hot-ai",
-      "topics": ["hot_topics", "china_ai", "industrial_tech_policy"]
+      "topics": [
+        "hot_topics",
+        "china_ai",
+        "industrial_tech_policy"
+      ],
+      "tier": "unknown",
+      "authority_weight": 0.3
     },
     {
       "id": "sample-xinhua-local",
       "type": "local_json",
       "path": "examples/sample-input.json",
       "label": "sample-xinhua-style-excerpt",
-      "topics": ["macro_policy", "leadership_meeting"]
+      "topics": [
+        "macro_policy",
+        "leadership_meeting"
+      ],
+      "tier": "central_wire",
+      "channel_type": "wire",
+      "authority_weight": 0.92
     },
     {
       "id": "sample-instrument-local",
       "type": "local_json",
       "path": "examples/sample-instrument.json",
       "label": "sample-policy-instrument-excerpt",
-      "topics": ["implementing_instrument", "macro_policy"]
+      "topics": [
+        "implementing_instrument",
+        "macro_policy"
+      ],
+      "tier": "ministry_official",
+      "channel_type": "official_site",
+      "authority_weight": 0.8
     },
     {
       "id": "govcn-policy-index",
       "type": "url",
       "url": "https://www.gov.cn/zhengce/zuixin/",
       "label": "gov.cn-latest-policies",
-      "topics": ["macro_policy", "implementing_instrument"],
+      "topics": [
+        "macro_policy",
+        "implementing_instrument"
+      ],
       "enabled": false,
-      "note": "Disabled by default — enable only when you accept live public fetch."
+      "note": "Tried live 2026-09-22: this is a listing/nav page, not an article — extracted text is almost entirely site-navigation chrome, correctly deferred every time but produces no usable brief. Disabled again in favor of the chinanews.com.cn RSS entries below (real single-topic items, not a page to summarize). Re-enable only if pointed at an actual article URL.",
+      "tier": "ministry_official",
+      "channel_type": "official_site",
+      "authority_weight": 0.8
+    },
+    {
+      "id": "mofcom-home",
+      "type": "url",
+      "url": "https://www.mofcom.gov.cn/",
+      "label": "mofcom.gov.cn",
+      "topics": ["foreign_affairs", "macro_policy"],
+      "enabled": false,
+      "note": "Tried live 2026-09-22: homepage is a multi-topic news index (dozens of unrelated headlines); the pipeline is built to analyze one article, so it stitched one real fact into a domain-template narrative that had nothing to do with that fact — technically not fabricated (the pulled number was real) but incoherent. Disabled in favor of the chinanews.com.cn RSS entries below. Re-enable only if pointed at a specific article URL, per the original note.",
+      "tier": "ministry_official",
+      "channel_type": "official_site",
+      "authority_weight": 0.8
+    },
+    {
+      "id": "ndrc-policy",
+      "type": "url",
+      "url": "https://www.ndrc.gov.cn/xxgk/zcfb/",
+      "label": "ndrc.gov.cn-policy-release",
+      "topics": ["macro_policy", "implementing_instrument"],
+      "enabled": true,
+      "note": "Tried live 2026-09-22: returns ~54 bytes (likely a JS-rendered shell or a soft block on this client) — fetchWhitelistedText's 20-char minimum drops it silently, no bad output, just nothing collected. Left enabled since it's harmless; revisit if a better subpage/approach is found.",
+      "tier": "ministry_official",
+      "channel_type": "official_site",
+      "authority_weight": 0.8
+    },
+    {
+      "id": "cctv-finance",
+      "type": "url",
+      "url": "https://jingji.cctv.com/",
+      "label": "CCTV-2 finance channel (text)",
+      "topics": ["macro_policy", "finance_risk", "industrial_tech_policy"],
+      "enabled": true,
+      "note": "Tried live 2026-09-22: fetches real content and is correctly deferred/rejected as thin by the pipeline (short consumer-lifestyle blurb, not policy substance) — honest behavior, left enabled. Text/article content only — broadcast video is out of scope (docs/DP-V3.md §2).",
+      "tier": "specialized_channel",
+      "channel_type": "tv",
+      "authority_weight": 0.6
+    },
+    {
+      "id": "cctv-defense",
+      "type": "url",
+      "url": "https://tv.cctv.com/cctv7/",
+      "label": "CCTV-7 defense/military channel (text)",
+      "topics": ["defense_public"],
+      "enabled": true,
+      "note": "Tried live 2026-09-22: fetches real content and is correctly deferred/rejected as thin (channel-description boilerplate, no article substance) — honest behavior, left enabled. Text/article content only — broadcast video is out of scope (docs/DP-V3.md §2).",
+      "tier": "specialized_channel",
+      "channel_type": "tv",
+      "authority_weight": 0.6
+    },
+    {
+      "id": "chinanews-politics-rss",
+      "type": "rss",
+      "url": "https://www.chinanews.com.cn/rss/china.xml",
+      "label": "China News Service — domestic/politics RSS",
+      "topics": ["macro_policy", "social_governance", "foreign_affairs"],
+      "enabled": true,
+      "maxItems": 5,
+      "note": "Verified live 2026-09-22 (items dated same-day). Each RSS <item> is one article — solves the index-page incoherence problem the url-type entries above hit. Channel tier deliberately left \"unknown\": China News Service (中新社) has been under the United Front Work Department since the 2018 institutional reform, distinct from and junior to Xinhua — no citable source found yet for its precise institutional rank, so not force-fit into central_wire.",
+      "tier": "unknown",
+      "channel_type": "wire",
+      "authority_weight": 0.5
+    },
+    {
+      "id": "chinanews-finance-rss",
+      "type": "rss",
+      "url": "https://www.chinanews.com.cn/rss/finance.xml",
+      "label": "China News Service — finance RSS",
+      "topics": ["macro_policy", "finance_risk", "industrial_tech_policy"],
+      "enabled": true,
+      "maxItems": 5,
+      "note": "Verified live 2026-09-22 (items dated same-day). See chinanews-politics-rss for tier rationale.",
+      "tier": "unknown",
+      "channel_type": "wire",
+      "authority_weight": 0.5
+    },
+    {
+      "id": "chinanews-scroll-rss",
+      "type": "rss",
+      "url": "https://www.chinanews.com.cn/rss/scroll-news.xml",
+      "label": "China News Service — rolling news RSS",
+      "topics": ["macro_policy", "social_governance", "foreign_affairs", "finance_risk"],
+      "enabled": true,
+      "maxItems": 8,
+      "note": "Verified live 2026-09-22 (items updating same-day, minutes apart) — highest-frequency of the three chinanews.com.cn feeds, mixed topics. See chinanews-politics-rss for tier rationale.",
+      "tier": "unknown",
+      "channel_type": "wire",
+      "authority_weight": 0.5
     }
   ]
 }

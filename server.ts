@@ -117,7 +117,7 @@ async function main() {
   app.get("/api/domains", (_req, res) => {
     res.json({
       framing: "civilian-job-fit-domain-fixtures",
-      deskSections: DESK_CATALOG.map((s) => ({ id: s.id, label_en: s.label_en })),
+      deskSections: DESK_CATALOG.map((s) => ({ id: s.id, label_en: s.label_en, blurb_zh: s.blurb_zh })),
       hotThemeCatalog: HOT_THEME_CATALOG.map((t) => ({ id: t.id, label_en: t.label_en })),
       domains: listDomainFixtures().map((d) => {
         const desk = assignDeskSection(d.sourceText);
@@ -197,26 +197,64 @@ async function main() {
         topics: e.topics,
         url: e.type === "url" ? e.url : undefined,
         path: e.type === "local_json" ? e.path : undefined,
+        tier: e.tier,
+        channelType: e.channel_type,
+        authorityWeight: e.authority_weight,
       })),
     });
   });
 
   app.get("/api/outbox", (req, res) => {
     const sub = req.query.subscriptionId ? String(req.query.subscriptionId) : undefined;
-    const rows = listOutboxBriefs(sub).map((r) => ({
-      id: r.id,
-      subscriptionId: r.subscriptionId,
-      createdAt: r.createdAt,
-      sourceLabel: r.source.label,
-      gatePassed: r.result.gate.passed,
-      triage: r.result.briefing.info_triage,
-      what: r.result.briefing.briefing_en?.what,
-      // Core ranking parameter — listOutboxBriefs() already sorts direct >
-      // possible > none first; surface the level so the UI shows *why*.
-      canadaNexus: r.result.briefing.canada_nexus?.level,
-      jsonUrl: `/outbox/briefs/${path.basename(r.jsonPath)}`,
-      mdUrl: `/outbox/briefs/${path.basename(r.markdownPath)}`,
-    }));
+    const deskFilter = req.query.desk ? String(req.query.desk) : undefined;
+    const includeFixtures = req.query.includeFixtures === "true";
+    let records = listOutboxBriefs(sub);
+    // docs/DP-V2.md §2 (provenance) — the Reader is a reading product, not a
+    // pipeline test harness; demo/fixture reruns (local_json sample text,
+    // not a real fetch or a real paste) default to hidden so they never
+    // masquerade as a live feed. Opt in with ?includeFixtures=true for
+    // debugging/demoing the pipeline itself.
+    if (!includeFixtures) {
+      records = records.filter((r) => r.provenance !== "fixture_demo");
+    }
+    if (deskFilter) {
+      records = records.filter((r) => r.result.briefing.desk_section?.primary === deskFilter);
+      // Reader list view (docs/DP-V3.md follow-up): date + importance, not
+      // the Canada-first global ranking listOutboxBriefs() otherwise uses
+      // (that ranking is still the default for the unfiltered/legacy call).
+      const gradeRank = (g?: string) => (g === "P1" ? 3 : g === "P2" ? 2 : g === "P3" ? 1 : 0);
+      records = [...records].sort((a, b) => {
+        const d = gradeRank(b.result.briefing.info_triage?.importance?.grade) -
+          gradeRank(a.result.briefing.info_triage?.importance?.grade);
+        if (d !== 0) return d;
+        return b.createdAt.localeCompare(a.createdAt);
+      });
+    }
+    const rows = records.map((r) => {
+      const b = r.result.briefing;
+      return {
+        id: r.id,
+        subscriptionId: r.subscriptionId,
+        createdAt: r.createdAt,
+        sourceLabel: r.source.label,
+        gatePassed: r.result.gate.passed,
+        triage: b.info_triage,
+        headline: b.briefing_en?.headline,
+        what: b.briefing_en?.what,
+        desk: b.desk_section ? { id: b.desk_section.primary, label_en: b.desk_section.label_en } : undefined,
+        briefQuality: b.brief_quality?.level,
+        analysisConfidence: b.analysis_confidence?.level,
+        sourceCredibility: b.source_credibility?.level,
+        adopted: b.adoption?.adopted !== false,
+        deferred: b.intake?.label === "defer",
+        // Core ranking parameter — listOutboxBriefs() already sorts direct >
+        // possible > none first; surface the level so the UI shows *why*.
+        canadaNexus: b.canada_nexus?.level,
+        provenance: r.provenance,
+        jsonUrl: `/outbox/briefs/${path.basename(r.jsonPath)}`,
+        mdUrl: `/outbox/briefs/${path.basename(r.markdownPath)}`,
+      };
+    });
     res.json({ briefs: rows });
   });
 

@@ -24,7 +24,8 @@ turn **public Mandarin text** into a clear **English briefing note**.
    (numbers, timelines, named instruments, responsible bodies, pilots, bans, funding,
    named sectors, priority-shift cues). If the cut is `thin`, lead `so_what` with that
    warning and do not treat slogans as operational facts.
-7. Write English `what` / `context` / `so_what` — **lead with nuggets**, not with ritual praise.
+7. Write English `headline` / `what` / `context` / `so_what` — **lead with nuggets**, not with ritual praise.
+   `headline`: one short declarative sentence naming the specific claim (who did what — an instrument, an amount, a deadline, a finding). Never a description of the document type ("X issued a notice") or a generic placeholder — if the source genuinely names nothing specific, say what it *is* about in one concrete clause rather than falling back to an empty label.
    Reader spine (deliverable): Source digest → What → Context → Key facts → So what → Outlook → Watchpoints → Open questions.
 8. Add `policy_outlook` scenarios (`tag: "hypothesis"`) + `watchpoints` when policy-related.
    Each scenario should carry the **four-piece pack**: `label`, `basis`, `trigger`,
@@ -38,6 +39,7 @@ turn **public Mandarin text** into a clear **English briefing note**.
 - 「潜规则」= **public media heuristics**, not secret knowledge.
 - `info_triage` = **kinds + P1–P4 priority**, not secrecy classification.
 - Prefer may/could/if-then; never will-definitely / guaranteed / secretly-plans.
+- Outlook likelihood words follow ICD 203 (Analytic Standards) rule e(2)(a)'s standard vocabulary — one row only, never invented terms: `likely` (high) / `roughly even odds` (medium) / `unlikely` (low). Rule e(2)(b): never combine a likelihood word and a confidence-level word ("high confidence") in the same sentence — they answer different questions (probability of the event vs. how solid the basis for the judgment is) and must stay visually/grammatically separate. See `src/lib/score-bands.ts` `likelihoodWord()`.
 - Formulaic party-speak is **atmosphere / agenda cue**, not proof of secret plans or “brainwashing success”.
 - Factorize confidence (signaling × substance × corroboration × provenance × source_class). Social commentary cannot alone reach high confidence or corroborate official claims.
 - Scorecard weights and thresholds are **hand-set editorial priors** — no labelled corpus, no validation set. In prose written for a reader, report the **band** (`thin`/`mixed`/`dense`, `low`/`medium`/`high`, tier `A`–`U`, corroboration `minimal`→`strong`) plus one clause naming what produced it. Never quote `weighted_total`, a `0–1` score, or an `x/3` figure as if it were measured.
