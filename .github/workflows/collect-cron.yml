@@ -1,0 +1,34 @@
+name: Trigger live RSS collect
+
+# Render's free web service has no scheduler of its own and no persistent
+# disk (docs/DEPLOY.md) -- without an external nudge, outbox/briefs stays
+# empty. This just calls the already-open, IP-rate-limited
+# POST /api/collect/run endpoint on a schedule so the deployed Reader has
+# something in it. It does not make anything persistent: a Render restart
+# or sleep/wake still clears outbox/briefs, same as before.
+on:
+  schedule:
+    # 12:00 UTC, weekdays -- approximates the public-live-collect
+    # subscription's "weekdays 07:00 local" hint (config/subscriptions.json).
+    # GitHub Actions cron is UTC-only and best-effort (can run late under load).
+    - cron: "0 12 * * 1-5"
+  workflow_dispatch: {}
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    steps:
+      - name: POST /api/collect/run
+        env:
+          YANXI_BASE_URL: ${{ vars.YANXI_BASE_URL }}
+        run: |
+          set -euo pipefail
+          BASE_URL="${YANXI_BASE_URL:-https://yanxi-dwrf.onrender.com}"
+          echo "Triggering collect on ${BASE_URL}"
+          # Render free instances sleep after ~15min idle and take ~1min to
+          # wake; give the request enough time and one retry.
+          curl --fail --show-error --silent \
+            --max-time 120 --retry 1 --retry-delay 10 \
+            -X POST "${BASE_URL%/}/api/collect/run" \
+            -H "Content-Type: application/json" \
+            -d '{"subscriptionId":"public-live-collect"}'

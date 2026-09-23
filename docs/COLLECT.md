@@ -45,6 +45,19 @@ COLLECT_INTERVAL_MINUTES=60 npm run collect:daemon
 0 9 * * 1 cd /path/to/yanxi && npm run collect >> /tmp/yanxi-collect.log 2>&1
 ```
 
+## Production trigger (Render free tier)
+
+Render's free web service has **no scheduler and no persistent disk** (`docs/DEPLOY.md`) --
+`collect-daemon.ts`/`collect:daemon` is not started by `render.yaml` (it only runs `npm start`),
+so nothing calls `POST /api/collect/run` on its own. `.github/workflows/collect-cron.yml` closes
+that gap: a GitHub Actions schedule (`0 12 * * 1-5` UTC, ~weekday mornings) POSTs to the deployed
+site's already-open `/api/collect/run` (`subscriptionId: "public-live-collect"`, the 3 real
+`chinanews.com.cn` RSS feeds). Configure the target with the repo variable `YANXI_BASE_URL`
+(Settings → Secrets and variables → Actions → Variables); defaults to
+`https://yanxi-dwrf.onrender.com` if unset. This does **not** make outbox content persistent --
+a Render restart or sleep/wake still clears `outbox/briefs` — it only keeps the Reader populated
+between those resets. Trigger manually anytime via the workflow's "Run workflow" button.
+
 While `npm run dev` is up:
 
 - `GET /api/subscriptions` — list + feed URLs  

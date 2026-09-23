@@ -7,6 +7,7 @@
 - 约 15 分钟无流量后休眠；唤醒约 1 分钟  
 - 磁盘**不持久**：`outbox/briefs` 重启会丢（演示以粘贴简报 + 预生成 portfolio 为主）  
 - `POST /api/brief` 与 `POST /api/collect/run` 在公开演示上**开放**（靠 IP 限流，不要求 access token）
+- 服务本身**没有定时器**：`render.yaml` 只起 `npm start`（web 服务），不起 `collect:daemon`；`.github/workflows/collect-cron.yml` 用 GitHub Actions 按工作日定时 `POST /api/collect/run` 补上这一环——仍不解决磁盘不持久，只是让 Reader 在两次重启之间有内容，见 `docs/COLLECT.md` §生产触发
 
 ## 公开演示的访问模型
 
