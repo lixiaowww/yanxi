@@ -209,6 +209,7 @@ async function main() {
     const deskFilter = req.query.desk ? String(req.query.desk) : undefined;
     const includeFixtures = req.query.includeFixtures === "true";
     const includeNotAdopted = req.query.includeNotAdopted === "true";
+    const includeSubnationalPersonnel = req.query.includeSubnationalPersonnel === "true";
     let records = listOutboxBriefs(sub);
     // docs/DP-V2.md §2 (provenance) — the Reader is a reading product, not a
     // pipeline test harness; demo/fixture reruns (local_json sample text,
@@ -226,6 +227,18 @@ async function main() {
     // gate is discarding (e.g. while tuning collect sources).
     if (!includeNotAdopted) {
       records = records.filter((r) => r.result.briefing.adoption?.adopted !== false);
+    }
+    // User (2026-09-23): "国家级以下（省市级别）人事任免意义不大" — filter these
+    // out of the Reader entirely, not just downrank them. src/lib/info-triage.ts
+    // already tags this exact pattern (sub-national personnel/discipline action,
+    // no national-leadership/macro/instrument/foreign-affairs/defense/finance
+    // signal) with the "subnational_personnel_low_priority" driver — still
+    // adoptable detail (docs/DP-V2.md "detail redefinition"), just not
+    // reader-worthy on its own. Opt in with ?includeSubnationalPersonnel=true.
+    if (!includeSubnationalPersonnel) {
+      records = records.filter(
+        (r) => !r.result.briefing.info_triage?.importance?.drivers?.includes("subnational_personnel_low_priority")
+      );
     }
     if (deskFilter) {
       records = records.filter((r) => r.result.briefing.desk_section?.primary === deskFilter);
