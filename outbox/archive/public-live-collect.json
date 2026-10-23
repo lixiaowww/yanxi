@@ -1,5 +1,5 @@
 {
-  "archivedAt": "2026-10-23T16:51:53.674Z",
+  "archivedAt": "2026-10-23T16:52:19.469Z",
   "records": [
     {
       "id": "2026-09-29_public-live-collect_chinanews-finance-rss-2_9ir3",
@@ -659,6 +659,1643 @@
       },
       "provenance": "live",
       "markdown": "# [CA] Live public collect — China News Service RSS\n\n**Not adopted — no verifiable detail in this excerpt.**\n\nSource: 内蒙古自贸试验区企业首次引进种质资源 · https://www.chinanews.com.cn/cj/2026/09-29/10705909.shtml  \nBriefed 2026-09-29T17:56:06 · source as-of unknown (none)\n\n## Not adopted\n\nNot adopted — this excerpt carries no verifiable detail. Named in the paste: subject (Canada). Missing: a named instrument, a funding line, a deadline or time marker, a quantified target and a pilot or scope boundary.\n\nAnalysis needs at least one of: the document to be issued and by whom, the amount and funding channel, the deadline, the pilot or geographic scope, or a quantified target. In this excerpt no document or measure is named, no amount or funding channel appears, no date is given, no pilot or geographic scope is set.\n\nFirst cut reject_thin; no gray watch cues — discard for intake.\n\n<details>\n<summary>Analysis details (id, mode, triage, confidence factors — not the briefing body)</summary>\n\n- id: 2026-09-29_public-live-collect_chinanews-finance-rss-2_9ir3\n- created: 2026-09-29T17:56:06.830Z\n- mode: offline\n- sources in run: 1\n- desk: Foreign affairs\n- triage: other_public_text / P2\n- intake: reject_thin\n- brief quality: rejected (missing: actionable_hard_detail)\n- analysis confidence: low\n- source credibility: medium\n- freshness: Freshness unknown\n\n</details>\n\n> Draft for human review · Public sources only · Not an intelligence product\n"
+    },
+    {
+      "id": "2026-10-23_public-live-collect_chinanews-importnews-rss-4_jvm2",
+      "subscriptionId": "public-live-collect",
+      "subscriptionTitle": "Live public collect — China News Service RSS",
+      "createdAt": "2026-10-23T16:52:16.970Z",
+      "source": {
+        "sourceId": "chinanews-importnews-rss:4",
+        "label": "日本物价持续高企 日媒批评：高市内阁未能改善民众生活",
+        "url": "https://www.chinanews.com.cn/gj/2026/10-23/10719809.shtml",
+        "sourceText": "日本物价持续高企 日媒批评：高市内阁未能改善民众生活\n中新网10月23日电 综合日媒报道，日本总务省23日公布的数据显示，剔除生鲜食品后，日本9月核心消费价格指数(CPI)同比上涨2.1%，涨幅较8月的1.7%进一步扩大，为2025年12月以来再次超过日本政府和央行设定的2%目标水平。至此，日本核心CPI已连续61个月同比上涨。日媒担忧称，随着物价持续高企，日本家庭经济负担恐进一步加重。",
+        "collectedAt": "2026-10-23T16:50:05.216Z",
+        "tier": "unknown",
+        "channel_type": "wire",
+        "authority_weight": 0.5
+      },
+      "result": {
+        "mode": "llm",
+        "llmConfigured": true,
+        "llmProvider": "fallback",
+        "infoValue": {
+          "level": "medium",
+          "label_zh": "Medium info value (some detail or dual cues)",
+          "next_zh": [
+            "Add a related outbox excerpt as a second source (日本物价持续高企 日媒批评：高市内阁未能改善民众生活) and re-run to test cross-check",
+            "Add a second public excerpt on the same subject (or Use related as second source)",
+            "Add a same-topic public implementing notice and re-run with the meeting text",
+            "Add a second public source (implementing file or local restatement beyond the wire)"
+          ]
+        },
+        "matchedCards": [],
+        "briefing": {
+          "source_digest_zh": [
+            {
+              "point": "日本总务省10月23日公布，9月剔除生鲜食品的核心CPI同比涨2.1%，高于8月的1.7%",
+              "quote": "剔除生鲜食品后，日本9月核心消费价格指数(CPI)同比上涨2.1%，涨幅较8月的1.7%进一步扩大",
+              "source_label": "日本物价持续高企 日媒批评：高市内阁未能改善民众生活",
+              "source_url": "https://www.chinanews.com.cn/gj/2026/10-23/10719809.shtml"
+            },
+            {
+              "point": "为2025年12月以来再次超过政府和央行2%目标",
+              "quote": "为2025年12月以来再次超过日本政府和央行设定的2%目标水平",
+              "source_label": "日本物价持续高企 日媒批评：高市内阁未能改善民众生活",
+              "source_url": "https://www.chinanews.com.cn/gj/2026/10-23/10719809.shtml"
+            }
+          ],
+          "context_notes": [
+            {
+              "card": "(none)",
+              "note": "No ontology-lite cards matched. Stay close to the literal source; do not invent institutional jargon.",
+              "tag": "background"
+            }
+          ],
+          "info_triage": {
+            "framing": "civilian-public-source-triage",
+            "kinds": [
+              {
+                "kind": "economic_data",
+                "label_zh": "Economic data / indicators",
+                "score": 0.7,
+                "evidence": "2.1%"
+              }
+            ],
+            "primary_kind": "economic_data",
+            "importance": {
+              "grade": "P4",
+              "label_zh": "Low priority (weak signal or fragmentary excerpt)",
+              "score_0_to_1": 0.34,
+              "rationale": "Public-source triage from kind hits [economic_data] and drivers [signaling_band_medium, signaling_weighted_total>=0.5]. Not a secrecy marking.",
+              "drivers": [
+                "signaling_band_medium",
+                "signaling_weighted_total>=0.5"
+              ],
+              "tag": "hypothesis"
+            },
+            "tag": "hypothesis"
+          },
+          "signaling_scorecard": {
+            "method": "enumerate-then-weight",
+            "framing": "civilian-public-media-heuristics",
+            "rules": [
+              {
+                "id": "seq-party-before-state",
+                "category": "sequence",
+                "label_zh": "党的机关表述先于国务院/部委表述",
+                "label_en": "Party framing appears before State Council/ministry framing",
+                "weight": 0.08,
+                "status": "unclear",
+                "raw_score": 0.4,
+                "weighted_score": 0.032,
+                "tag": "hypothesis"
+              },
+              {
+                "id": "seq-meeting-to-document",
+                "category": "sequence",
+                "label_zh": "会议语言→文件语言的阶段线索",
+                "label_en": "Meeting-language vs document-stage cues",
+                "weight": 0.07,
+                "status": "unclear",
+                "raw_score": 0.4,
+                "weighted_score": 0.028,
+                "tag": "hypothesis"
+              },
+              {
+                "id": "seq-leader-title-order",
+                "category": "sequence",
+                "label_zh": "领导人/机构称谓排序可观察（协议序位；比较排序变化需要历史通稿，本轮暂不做）",
+                "label_en": "Observable leader/institution title ordering (protocol precedence; order-CHANGE detection needs a prior bulletin, not implemented yet)",
+                "weight": 0.04,
+                "status": "unclear",
+                "raw_score": 0.4,
+                "weighted_score": 0.016,
+                "tag": "hypothesis"
+              },
+              {
+                "id": "detail-named-instrument",
+                "category": "implementing_detail",
+                "label_zh": "出现意见/通知/办法/条例/细则等工具文件名",
+                "label_en": "Named implementing instrument (意见/通知/办法/条例/细则)",
+                "weight": 0.12,
+                "status": "miss",
+                "raw_score": 0,
+                "weighted_score": 0,
+                "tag": "hypothesis"
+              },
+              {
+                "id": "detail-promised-later",
+                "category": "implementing_detail",
+                "label_zh": "承诺另行制定细则但本文未附",
+                "label_en": "Promises later detailed rules without attaching them",
+                "weight": 0.05,
+                "status": "unclear",
+                "raw_score": 0.4,
+                "weighted_score": 0.02,
+                "tag": "hypothesis"
+              },
+              {
+                "id": "detail-slogan-only",
+                "category": "implementing_detail",
+                "label_zh": "仅有强调/坚持/推动等方向语、无工具文件",
+                "label_en": "Direction verbs only; no implementing instrument",
+                "weight": 0.06,
+                "status": "hit",
+                "raw_score": 1,
+                "weighted_score": 0.06,
+                "tag": "hypothesis"
+              },
+              {
+                "id": "press-xinhua-wire",
+                "category": "press_placement",
+                "label_zh": "新华社电头",
+                "label_en": "Xinhua wire dateline",
+                "weight": 0.07,
+                "status": "unclear",
+                "raw_score": 0.4,
+                "weighted_score": 0.028,
+                "tag": "hypothesis"
+              },
+              {
+                "id": "press-peoples-daily",
+                "category": "press_placement",
+                "label_zh": "人民日报署名/转载线索",
+                "label_en": "People's Daily byline/reprint cue",
+                "weight": 0.06,
+                "status": "unclear",
+                "raw_score": 0.4,
+                "weighted_score": 0.024,
+                "tag": "hypothesis"
+              },
+              {
+                "id": "press-front-page",
+                "category": "press_placement",
+                "label_zh": "头版/要闻位置明示",
+                "label_en": "Explicit front-page / 要闻 placement",
+                "weight": 0.08,
+                "status": "unclear",
+                "raw_score": 0.4,
+                "weighted_score": 0.032,
+                "tag": "hypothesis"
+              },
+              {
+                "id": "press-editorial-genre",
+                "category": "press_placement",
+                "label_zh": "社论/评论员文章文体",
+                "label_en": "Editorial / commentator genre",
+                "weight": 0.07,
+                "status": "unclear",
+                "raw_score": 0.4,
+                "weighted_score": 0.028,
+                "tag": "hypothesis"
+              },
+              {
+                "id": "press-authoritative-byline",
+                "category": "press_placement",
+                "label_zh": "党媒权威笔名（任仲平/钟声/国纪平/金观平）——高于普通署名的机构级信号",
+                "label_en": "Coded party-media authority byline (任仲平/钟声/国纪平/金观平) — institutional-level signal, not an ordinary byline",
+                "weight": 0.09,
+                "status": "unclear",
+                "raw_score": 0.4,
+                "weighted_score": 0.036,
+                "tag": "hypothesis"
+              },
+              {
+                "id": "verb-hierarchy-cues",
+                "category": "speech_verbs",
+                "label_zh": "指出/强调/要求等话语动词可分级阅读",
+                "label_en": "Speech-verb hierarchy cues (指出/强调/要求)",
+                "weight": 0.05,
+                "status": "unclear",
+                "raw_score": 0.4,
+                "weighted_score": 0.02,
+                "tag": "hypothesis"
+              },
+              {
+                "id": "attr-collective-center",
+                "category": "attribution",
+                "label_zh": "以党中央/会议集体归因而非个人演说",
+                "label_en": "Collective center/meeting attribution vs personal speech",
+                "weight": 0.04,
+                "status": "unclear",
+                "raw_score": 0.4,
+                "weighted_score": 0.016,
+                "tag": "hypothesis"
+              },
+              {
+                "id": "attr-ministry-issuer",
+                "category": "attribution",
+                "label_zh": "部委作为发文主体可识别",
+                "label_en": "Identifiable ministry as issuing body",
+                "weight": 0.04,
+                "status": "hit",
+                "raw_score": 1,
+                "weighted_score": 0.04,
+                "tag": "hypothesis"
+              },
+              {
+                "id": "attr-personal-leadership",
+                "category": "attribution",
+                "label_zh": "\"亲自\"个人化领导信号（亲自谋划/部署/推动/主持/出席）",
+                "label_en": "\"亲自\" (personally) personalized-leadership framing",
+                "weight": 0.05,
+                "status": "unclear",
+                "raw_score": 0.4,
+                "weighted_score": 0.02,
+                "tag": "hypothesis"
+              },
+              {
+                "id": "conc-numeric-targets",
+                "category": "concreteness",
+                "label_zh": "出现可核验数字目标/指标",
+                "label_en": "Verifiable numeric targets present",
+                "weight": 0.06,
+                "status": "hit",
+                "raw_score": 1,
+                "weighted_score": 0.06,
+                "tag": "hypothesis"
+              },
+              {
+                "id": "conc-timeline",
+                "category": "concreteness",
+                "label_zh": "出现明确时间表/年份节点",
+                "label_en": "Explicit timeline / year nodes",
+                "weight": 0.04,
+                "status": "hit",
+                "raw_score": 1,
+                "weighted_score": 0.04,
+                "tag": "hypothesis"
+              },
+              {
+                "id": "scope-pilot-vs-national",
+                "category": "rollout_scope",
+                "label_zh": "试点/先行 vs 全国推开用语",
+                "label_en": "Pilot vs nationwide rollout language",
+                "weight": 0.04,
+                "status": "unclear",
+                "raw_score": 0.4,
+                "weighted_score": 0.016,
+                "tag": "hypothesis"
+              },
+              {
+                "id": "tone-stability-prosperity",
+                "category": "tone_framing",
+                "label_zh": "稳定/安全与发展话语同现",
+                "label_en": "Stability/security co-occurs with development framing",
+                "weight": 0.03,
+                "status": "miss",
+                "raw_score": 0,
+                "weighted_score": 0,
+                "tag": "hypothesis"
+              },
+              {
+                "id": "tone-minimize-language",
+                "category": "tone_framing",
+                "label_zh": "弱化措辞（个别/极少数/不代表整体）— 刻意降低事件系统性",
+                "label_en": "Minimization wording (个别/极少数/不代表整体) — frames an event as non-systemic",
+                "weight": 0.04,
+                "status": "unclear",
+                "raw_score": 0.4,
+                "weighted_score": 0.016,
+                "tag": "hypothesis"
+              },
+              {
+                "id": "tone-resolve-language",
+                "category": "tone_framing",
+                "label_zh": "强化措辞（坚决维护/严厉打击/高度重视）— 展示管控能力和政治决心",
+                "label_en": "Resolve wording (坚决维护/严厉打击/高度重视) — demonstrates control/political will, not a specific measure",
+                "weight": 0.04,
+                "status": "unclear",
+                "raw_score": 0.4,
+                "weighted_score": 0.016,
+                "tag": "hypothesis"
+              },
+              {
+                "id": "diplo-severity-ladder",
+                "category": "diplomatic_severity",
+                "label_zh": "外交措辞升级阶梯命中（关切→严重关切→谴责→强烈谴责→抗议→严重抗议）",
+                "label_en": "Diplomatic severity-ladder phrase present (concern → serious concern → condemn → strongly condemn → protest → serious protest)",
+                "weight": 0.05,
+                "status": "unclear",
+                "raw_score": 0.4,
+                "weighted_score": 0.02,
+                "tag": "hypothesis"
+              },
+              {
+                "id": "diplo-outcome-euphemism",
+                "category": "diplomatic_severity",
+                "label_zh": "会谈成果委婉语阶梯命中（交换意见→坦率交谈→建设性对话→亲切友好）",
+                "label_en": "Meeting-outcome euphemism ladder present (exchanged views → candid talk → constructive dialogue → cordial)",
+                "weight": 0.04,
+                "status": "unclear",
+                "raw_score": 0.4,
+                "weighted_score": 0.016,
+                "tag": "hypothesis"
+              }
+            ],
+            "weighted_total": 0.584,
+            "weight_sum": 1.31,
+            "band": "medium",
+            "calibration": "Enumerated 23 public-media heuristics; observed=4, absent=2, unclear=17 → band=medium. Weights are hand-set editorial priors with no labelled corpus and no held-out validation: the band orders and flags, it does not measure. Hypothesis only — not proof of intent.",
+            "tag": "hypothesis"
+          },
+          "signaling_valves": {
+            "sequence": {
+              "status": "unclear",
+              "observation": "先后顺序: hit[—] miss[—]",
+              "reading": "Category roll-up from enumerated heuristics (hypothesis).",
+              "tag": "hypothesis"
+            },
+            "implementing_detail": {
+              "status": "observed",
+              "observation": "政策细则: hit[仅有强调/坚持/推动等方向语、无工具文件] miss[出现意见/通知/办法/条例/细则等工具文件名]",
+              "reading": "Category roll-up from enumerated heuristics (hypothesis).",
+              "tag": "hypothesis"
+            },
+            "press_placement": {
+              "status": "unclear",
+              "observation": "报刊位置: hit[—] miss[—]",
+              "reading": "Category roll-up from enumerated heuristics (hypothesis).",
+              "tag": "hypothesis"
+            },
+            "calibration": "Enumerated 23 public-media heuristics; observed=4, absent=2, unclear=17 → band=medium. Weights are hand-set editorial priors with no labelled corpus and no held-out validation: the band orders and flags, it does not measure. Hypothesis only — not proof of intent."
+          },
+          "briefing_en": {
+            "headline": "Japan's September core CPI rose 2.1% year-on-year, back above the BOJ's 2% target for the first time since December 2025 and the 61st straight monthly increase.",
+            "what": "Japan's Statistics Bureau (总务省) reported on 23 October that core CPI — excluding fresh food — rose 2.1% year-on-year in September, up from 1.7% in August. This is the first reading above the 2% target jointly set by the government and the Bank of Japan since December 2025, and extends the run of consecutive year-on-year increases to 61 months. The Chinese state wire (China News Service) frames the item around Japanese media concern that household budgets will be squeezed further, and its headline attributes the failure to improve living standards to the Takaichi cabinet; the body text itself carries no such attribution beyond a single line of 'media concern'.",
+            "context": "The paste is one point in a well-documented monthly series: August core CPI was 1.7% (60th consecutive month), July 1.8% (59th). Search context indicates the August dip was attributed by a Mitsubishi UFJ researcher to fiscal subsidies on electricity and gas, with the effect expected to fade once the subsidy ends — a mechanism consistent with September's rebound, though the paste gives no component breakdown. Full-year 2025 core CPI was reported at 3.1%, the fourth consecutive year above target.",
+            "so_what": "Read as a data point, not a verdict. Three things a reader should hold separately: (1) the 1.7%→2.1% move is a single month and the paste gives no sub-components, so whether this is fading subsidy base effects, renewed food/energy pass-through, or noise is unresolved — the search context's subsidy explanation is a plausible reading, not a confirmed one; (2) 'core' here excludes fresh food only, not energy, so it is not comparable to the US or Chinese core measures that strip energy too; (3) the headline's political attribution (cabinet failing households) is editorial framing from a Chinese state outlet citing unnamed Japanese media — the paste contains no polling, no household income data, and no government response, so it cannot support a claim about the cabinet's political standing. The genuinely notable fact is the return above target after a brief sub-2% window, which matters for BOJ normalization expectations more than for any single government's popularity.",
+            "confidence": "low",
+            "sources_used": [
+              "日本物价持续高企 日媒批评：高市内阁未能改善民众生活"
+            ]
+          },
+          "policy_outlook": {
+            "horizon": "near",
+            "scenarios": [
+              {
+                "label": "通胀重回目标上方，政策正常化讨论延续",
+                "likelihood": "medium",
+                "basis": "9月核心CPI 2.1%，为2025年12月以来首次超过2%；序列已连续61个月",
+                "trigger": "后续月份核心CPI持续位于2%上方，且分项显示非补贴类项目（食品、服务）为主要推手",
+                "alternative": "The core CPI increase may stem from temporary supply disruptions or seasonal effects, and the Bank of Japan could still regard inflation as within its tolerance band, thereby stalling any move toward policy normalization.",
+                "falsifier": "If the core CPI in October drops below 2% and the Bank of Japan keeps its policy rate unchanged without signaling any tightening, it would contradict the scenario.",
+                "tag": "hypothesis"
+              }
+            ],
+            "watchpoints": [
+              "总务省每月CPI速报中的能源与食品分项",
+              "电费燃气补贴是否续期或退出",
+              "日本央行政策会议对通胀措辞的变化",
+              "Re-check for a newer public text (source as-of 2025-12-01 looks stale)"
+            ]
+          },
+          "open_questions": [
+            "粘贴文本未给CPI分项，无法判断2.1%由食品、能源还是服务驱动 [search: 日本 2026年9月 コアCPI 内訳 エネルギー 食料]",
+            "8月能源补贴压低基数、9月回补的解释来自搜索摘要而非粘贴原文，需原始报道佐证 [search: 日本 電気ガス 補助金 終了 CPI 押し上げ 2026]",
+            "标题所称“日媒批评高市内阁”在正文中无具体媒体、无民调或家庭收入数据支撑，需查日媒原始报道 [search: 高市内閣 物価 支持率 世論調査 2026]",
+            "日本核心CPI剔除生鲜食品但保留能源，与中国、美国口径不同，跨國比较需注意 [search: 日本 コアCPI 定義 生鮮食品 エネルギー 含む]"
+          ],
+          "canada_nexus": {
+            "framing": "civilian-reader-interest-flag",
+            "level": "none",
+            "label_zh": "No Canada nexus cue",
+            "label_en": "No Canada nexus cue",
+            "hits": [],
+            "rationale": "No Canada-name or adjacency cue in the paste. Reader-interest flag only — not personal targeting.",
+            "tag": "hypothesis"
+          },
+          "canada_policy_link": {
+            "framing": "civilian-canada-public-policy-overlay",
+            "level": "none",
+            "label_zh": "No Canada public-policy overlay cue",
+            "hits": [],
+            "disclaimer_zh": "Reader-interest overlay of open Canadian policy themes — not legal advice and not an investigation of any person. Links point to government public pages; verify current consolidated text.",
+            "rationale": "No topical cue matched the Canada public-policy overlay lexicon.",
+            "tag": "hypothesis"
+          },
+          "substance_cut": {
+            "framing": "civilian-boilerplate-vs-substance",
+            "method": "strip-formula-then-list-verifiables",
+            "boilerplate_ratio_0_to_1": 0,
+            "substance_score_0_to_1": 0.56,
+            "band": "dense",
+            "label_zh": "Denser substance (multiple verifiable cue types)",
+            "nuggets": [
+              {
+                "kind": "numeric_target",
+                "label_zh": "Verifiable number / share",
+                "evidence": "日本9月核心消费价格指数(CPI)同比上涨2.1%",
+                "value_zh": "2.1%",
+                "value_en": "2.1%",
+                "tag": "hypothesis"
+              },
+              {
+                "kind": "numeric_target",
+                "label_zh": "Verifiable number / share",
+                "evidence": "涨幅较8月的1.7%进一步扩大",
+                "value_zh": "1.7%",
+                "value_en": "1.7%",
+                "tag": "hypothesis"
+              },
+              {
+                "kind": "numeric_target",
+                "label_zh": "Verifiable number / share",
+                "evidence": "为2025年12月以来再次超过日本政府和央行设定的2%目标水平",
+                "value_zh": "2%",
+                "value_en": "2%",
+                "tag": "hypothesis"
+              },
+              {
+                "kind": "named_sector_or_place",
+                "label_zh": "Named sector / place",
+                "evidence": "日本总务省23日公布的数据显示",
+                "value_zh": "数据",
+                "value_en": "data",
+                "tag": "hypothesis"
+              }
+            ],
+            "boilerplate_hits": [],
+            "empty_calories": [],
+            "analyst_prompt_zh": "Strip formula language; keep only: numbers, deadlines, named documents, responsible bodies, pilot scope, bans/red lines, funding, named sectors. Without these, treat as rhetoric skeleton until an implementing public text appears.",
+            "calibration": "Dense band: multiple verifiable cue types — still hypothesis until cross-checked.",
+            "tag": "hypothesis"
+          },
+          "desk_section": {
+            "framing": "civilian-briefing-desk-section",
+            "primary": "economy_investment",
+            "label_zh": "Economy & investment",
+            "label_en": "Economy & investment",
+            "secondary": [],
+            "evidence": [
+              "kind:economic_data"
+            ],
+            "hot_themes": [],
+            "rationale": "Routed by public-text cues + triage kind. Secondary: none.",
+            "tag": "hypothesis"
+          },
+          "ontology_lite": {
+            "framing": "civilian-ontology-lite",
+            "desk_primary": "economy_investment",
+            "hits": [],
+            "calibration": "Matched 0 cards, kept 0 (desk=economy_investment). Background/hypothesis only — not a formal ontology or secret knowledge.",
+            "tag": "hypothesis"
+          },
+          "source_class": {
+            "framing": "civilian-source-class",
+            "class": "unknown_public",
+            "label_zh": "Unclassified public text",
+            "evidence": [],
+            "rules": [
+              "Participates in corroboration and confidence factors by public-source tier"
+            ],
+            "tag": "hypothesis"
+          },
+          "corroboration": {
+            "framing": "civilian-multi-source-corroboration",
+            "method": "cross-source-subject-overlap",
+            "score_0_to_3": 0,
+            "source_count": 1,
+            "distinct_source_count": 1,
+            "cross_checked": false,
+            "shared_subjects": [],
+            "independent_issuers": [],
+            "label_zh": "Not cross-checked — 1 source only; nothing has been compared against a second source",
+            "label_en": "Not cross-checked (1 source)",
+            "drivers": [],
+            "single_source_cues": {
+              "framing": "civilian-single-source-substance-cues",
+              "count_0_to_3": 1,
+              "drivers": [
+                "numeric_or_dense_substance"
+              ],
+              "label_en": "Within-passage detail cues 1/3 (not corroboration)",
+              "note": "Wording cues inside the pasted passage. They describe how specific the text is (see substance_cut), not whether any independent source confirms it.",
+              "tag": "hypothesis"
+            },
+            "missing": [
+              "Second public source (independent issuer, same subject) to cross-check this passage",
+              "Named notice / measure / implementing detail"
+            ],
+            "tag": "hypothesis"
+          },
+          "source_credibility": {
+            "framing": "civilian-source-credibility",
+            "level": "medium",
+            "score_0_to_1": 0.315,
+            "factors": {
+              "provenance": "weak",
+              "source_class": "unknown_public",
+              "source_tier": "U",
+              "source_tier_weight_0_to_1": 0.35,
+              "channel_tier": "unknown",
+              "channel_authority_weight": 0.3
+            },
+            "source_tier": {
+              "framing": "civilian-curated-source-tier",
+              "tier": "U",
+              "prior_kind": "stated-editorial-prior",
+              "weight_0_to_1": 0.35,
+              "prior_basis_en": "Ranked low-mid: unattributed public text — readable, but not enough on its own to reach high.",
+              "label_zh": "U · unknown public text",
+              "label_en": "U · unknown public text",
+              "max_confidence": "medium",
+              "source_class": "unknown_public",
+              "rationale_zh": "Unclassified public text; mid-low prior — do not raise to high alone.",
+              "evidence": [],
+              "tag": "hypothesis"
+            },
+            "channel_tier": {
+              "tier": "unknown",
+              "label_en": "Unclassified channel",
+              "authority_weight": 0.3,
+              "basis_en": "No channel tier assigned — treat as low-mid prior until classified.",
+              "sources": []
+            },
+            "caps_applied": [],
+            "rationale": "Source credibility=medium from source_class=unknown_public, source_tier=U (stated editorial prior), channel_tier=unknown (No channel tier assigned — treat as low-mid prior until classified.), provenance=weak. Caps: none. Stated editorial priors — not fitted to labelled data.",
+            "tag": "hypothesis"
+          },
+          "analysis_confidence": {
+            "framing": "civilian-analysis-confidence",
+            "level": "low",
+            "score_0_to_1": 0.292,
+            "factors": {
+              "signaling_band": "medium",
+              "substance_band": "dense",
+              "corroboration_0_to_3": 0,
+              "cross_checked": false,
+              "distinct_source_count": 1,
+              "single_source_cue_count": 1
+            },
+            "caps_applied": [
+              "single_source_not_cross_checked_cap_low"
+            ],
+            "rationale": "Analysis confidence=low from signaling=medium, substance=dense, corroboration=minimal (not cross-checked (1 distinct source)), within-passage detail cues=one (not corroboration). Caps: single_source_not_cross_checked_cap_low. Bands come from hand-set rule cues with no labelled-data calibration — they order and flag, they do not measure. Not an event-probability forecast.",
+            "tag": "hypothesis"
+          },
+          "adoption": {
+            "framing": "civilian-detail-adoption",
+            "adopted": true,
+            "label_zh": "Adopted (verifiable detail/data)",
+            "reason_zh": "Found 3 actionable hard cue(s) with supporting context (4 cue(s) kept).",
+            "hard_nuggets": [
+              {
+                "kind": "numeric_target",
+                "label_zh": "Verifiable number / share",
+                "evidence": "日本9月核心消费价格指数(CPI)同比上涨2.1%",
+                "value_zh": "2.1%",
+                "value_en": "2.1%",
+                "tag": "hypothesis"
+              },
+              {
+                "kind": "numeric_target",
+                "label_zh": "Verifiable number / share",
+                "evidence": "涨幅较8月的1.7%进一步扩大",
+                "value_zh": "1.7%",
+                "value_en": "1.7%",
+                "tag": "hypothesis"
+              },
+              {
+                "kind": "numeric_target",
+                "label_zh": "Verifiable number / share",
+                "evidence": "为2025年12月以来再次超过日本政府和央行设定的2%目标水平",
+                "value_zh": "2%",
+                "value_en": "2%",
+                "tag": "hypothesis"
+              },
+              {
+                "kind": "named_sector_or_place",
+                "label_zh": "Named sector / place",
+                "evidence": "日本总务省23日公布的数据显示",
+                "value_zh": "数据",
+                "value_en": "data",
+                "tag": "hypothesis"
+              }
+            ],
+            "rejected_as": null,
+            "tag": "hypothesis"
+          },
+          "intake": {
+            "framing": "civilian-intake",
+            "label": "admit",
+            "first_cut": "admit",
+            "second_cut": null,
+            "second_cut_engine": "none",
+            "reason_en": "First cut: actionable hard detail — admit.",
+            "tag": "hypothesis"
+          },
+          "temporal": {
+            "framing": "civilian-temporal-freshness",
+            "briefed_at": "2026-10-23T16:52:14.934Z",
+            "collected_at": "2026-10-23T16:50:05.216Z",
+            "source_as_of": "2025-12-01",
+            "source_as_of_precision": "month",
+            "source_as_of_evidence": "2025年12月",
+            "source_as_of_method": "absolute_date",
+            "freshness": {
+              "band": "stale",
+              "label_en": "Stale (>90 days)",
+              "basis_en": "The source date is 326 day(s) before this briefing was drafted — treat as historical context unless a newer source is pasted.",
+              "age_days": 326
+            },
+            "forward_deadlines_en": [
+              "since December 2025"
+            ],
+            "tag": "hypothesis"
+          },
+          "content_analysis": {
+            "framing": "civilian-content-analysis",
+            "domain": "macro_finance",
+            "domain_label_en": "Economy and finance",
+            "background": "Macro-financial policy is transmitted through implementation vehicles — special-purpose bonds, refinancing programmes, delivery guarantees — whose effect depends on local fiscal capacity, and where debt and property risk are managed by reallocating burden rather than removing it.",
+            "so_what": "Without a named vehicle or allocation, the burden question stays open: central transfer, local bond quota and bank credit distribute the same nominal support very differently. Recipients gain a funded channel while the financing side absorbs the residual risk, so the distribution of burden matters more than the headline figure. The trade-off is stabilisation versus moral hazard: absorbing risk protects near-term delivery and confidence, while weakening the incentive for local authorities and developers to price risk in future. No institution is named as responsible, which leaves both delivery capacity and accountability for the timetable unresolved.",
+            "scenarios": [
+              {
+                "label": "Support is routed through local budgets and bond quotas, concentrating delivery in fiscally stronger provinces",
+                "likelihood": "medium",
+                "horizon": "6-18 months",
+                "basis": "Where the excerpt names no central transfer mechanism, delivery historically depends on local fiscal capacity, which widens regional divergence (hypothesis).",
+                "trigger": "Provincial bond issuance volumes, quota allocations, or published project lists skewed by region.",
+                "alternative": "A central transfer mechanism is named later, reducing regional divergence rather than leaving delivery to local fiscal capacity alone (hypothesis).",
+                "falsifier": "A named central transfer channel is published, or provincial bond issuance and project lists show even distribution rather than concentration in fiscally stronger provinces.",
+                "tag": "hypothesis"
+              },
+              {
+                "label": "An implementing document is published covering data",
+                "likelihood": "low",
+                "horizon": "since December 2025",
+                "basis": "The excerpt already commits to an instrument since December 2025, and funded commitments in public texts are usually followed by an administrative document (hypothesis).",
+                "trigger": "A named issuing body or a draft circulated for public comment.",
+                "alternative": "Competing reading: the commitment stays rhetorical and no administrative text is issued in the stated window (hypothesis).",
+                "falsifier": "No draft, document number, or named issuer appears before since December 2025, or a published text omits the funded/pilot element named here.",
+                "tag": "hypothesis"
+              }
+            ],
+            "watchpoints": [
+              "Which implementation vehicle is named: transfer, bond quota, or bank credit",
+              "Whether an allocation figure is attached",
+              "Provincial bond issuance and refinancing volumes, and regional skew in project lists",
+              "Housing-delivery completion rates and developer refinancing outcomes",
+              "Whether burden falls on central transfers, local budgets or bank balance sheets"
+            ],
+            "open_questions": [
+              "Which implementation vehicle carries this, and who bears the residual credit risk?",
+              "What allocation would accompany this commitment?",
+              "Which provinces have the fiscal capacity to co-fund, and which do not?",
+              "What eligibility conditions apply to developers or local financing vehicles?",
+              "What measurable milestone would show transmission to households or balance sheets?"
+            ],
+            "tag": "hypothesis"
+          },
+          "brief_quality": {
+            "framing": "civilian-brief-quality",
+            "level": "partial",
+            "label_en": "Partial brief — add a second public source and/or a dated dateline",
+            "missing": [
+              "second_public_source"
+            ],
+            "tag": "hypothesis"
+          },
+          "human_review": [
+            {
+              "id": "source_class",
+              "question_en": "No lexicon cue matched this excerpt's source class. Which is it?",
+              "options": [
+                {
+                  "value": "official_or_wire",
+                  "label_en": "Official / wire"
+                },
+                {
+                  "value": "policy_instrument",
+                  "label_en": "Policy instrument file"
+                },
+                {
+                  "value": "press_commentary",
+                  "label_en": "Press commentary"
+                },
+                {
+                  "value": "social_commentary",
+                  "label_en": "Social commentary / self-media"
+                },
+                {
+                  "value": "unknown_public",
+                  "label_en": "Unclassified public text"
+                }
+              ],
+              "system_pick": "unknown_public",
+              "system_pick_label_en": "Unclassified public text",
+              "status": "open"
+            }
+          ]
+        },
+        "gate": {
+          "passed": true,
+          "findings": []
+        },
+        "systemPromptChars": 22480,
+        "sourceCount": 1,
+        "relatedBriefs": [
+          {
+            "framing": "civilian-related-brief-discovery",
+            "id": "2026-10-23_public-live-collect_chinanews-importnews-rss-4_jbmv",
+            "label": "日本物价持续高企 日媒批评：高市内阁未能改善民众生活",
+            "createdAt": "2026-10-23T16:51:51.079Z",
+            "jsonFile": "2026-10-23_public-live-collect_chinanews-importnews-rss-4_jbmv.json",
+            "shared_keys": [
+              "nugget:data"
+            ],
+            "desk": "Economy & investment",
+            "what_preview": "Japan's Statistics Bureau (总务省) reported on 23 October that core CPI — CPI excluding fresh food — rose 2.1% year-on-year in September, up from 1.7% in August. T",
+            "corroboration_band": "minimal",
+            "canada_nexus": "none",
+            "note_en": "Same-topic candidate in the outbox — not independent corroboration until you merge the excerpts and re-run.",
+            "tag": "hypothesis"
+          },
+          {
+            "framing": "civilian-related-brief-discovery",
+            "id": "2026-10-07_public-live-collect_chinanews-finance-rss-3_j9ut",
+            "label": "国庆假期北京70个重点商圈入账156.8亿元",
+            "createdAt": "2026-10-07T18:45:03.269Z",
+            "jsonFile": "2026-10-07_public-live-collect_chinanews-finance-rss-3_j9ut.json",
+            "shared_keys": [
+              "nugget:data"
+            ],
+            "desk": "Economy & investment",
+            "what_preview": "The Beijing Municipal Commerce Bureau reported that during this year's National Day holiday, 127 enterprises under its key monitoring recorded cumulative sales ",
+            "corroboration_band": "minimal",
+            "canada_nexus": "none",
+            "note_en": "Same-topic candidate in the outbox — not independent corroboration until you merge the excerpts and re-run.",
+            "tag": "hypothesis"
+          },
+          {
+            "framing": "civilian-related-brief-discovery",
+            "id": "2026-10-23_public-live-collect_chinanews-finance-rss-4_j1ae",
+            "label": "广西“梧州制造”产品8小时直达香港",
+            "createdAt": "2026-10-23T16:51:37.670Z",
+            "jsonFile": "2026-10-23_public-live-collect_chinanews-finance-rss-4_j1ae.json",
+            "shared_keys": [
+              "desk:economy_investment",
+              "kind:economic_data"
+            ],
+            "desk": "Economy & investment",
+            "what_preview": "China News Service (Wuzhou, 23 Oct) reports that a local Wuzhou transport company used its own vehicles for the first time to carry \"Wuzhou-made\" products direc",
+            "corroboration_band": "minimal",
+            "canada_nexus": "none",
+            "note_en": "Same-topic candidate in the outbox — not independent corroboration until you merge the excerpts and re-run.",
+            "tag": "hypothesis"
+          },
+          {
+            "framing": "civilian-related-brief-discovery",
+            "id": "2026-10-23_public-live-collect_chinanews-finance-rss-3_ij5l",
+            "label": "今年前三季度唐山港京唐港区保税物流中心（B型）进口贸易额居中国首位",
+            "createdAt": "2026-10-23T16:51:14.169Z",
+            "jsonFile": "2026-10-23_public-live-collect_chinanews-finance-rss-3_ij5l.json",
+            "shared_keys": [
+              "desk:economy_investment",
+              "kind:economic_data"
+            ],
+            "desk": "Economy & investment",
+            "what_preview": "Jingtang Port Customs (京唐港海关) reported on 23 October that the Tangshan Port Jingtang Port Area bonded logistics center (Type B) recorded total import-export tra",
+            "corroboration_band": "minimal",
+            "canada_nexus": "none",
+            "note_en": "Same-topic candidate in the outbox — not independent corroboration until you merge the excerpts and re-run.",
+            "tag": "hypothesis"
+          },
+          {
+            "framing": "civilian-related-brief-discovery",
+            "id": "2026-10-23_public-live-collect_chinanews-finance-rss-4_i6t1",
+            "label": "广西“梧州制造”产品8小时直达香港",
+            "createdAt": "2026-10-23T16:50:58.165Z",
+            "jsonFile": "2026-10-23_public-live-collect_chinanews-finance-rss-4_i6t1.json",
+            "shared_keys": [
+              "desk:economy_investment",
+              "kind:economic_data"
+            ],
+            "desk": "Economy & investment",
+            "what_preview": "China News Service (Wuzhou, 23 Oct) reports that a local Wuzhou transport company used its own vehicles for the first time to carry \"Wuzhou-made\" products direc",
+            "corroboration_band": "minimal",
+            "canada_nexus": "none",
+            "note_en": "Same-topic candidate in the outbox — not independent corroboration until you merge the excerpts and re-run.",
+            "tag": "hypothesis"
+          },
+          {
+            "framing": "civilian-related-brief-discovery",
+            "id": "2026-10-23_public-live-collect_chinanews-finance-rss-3_hod4",
+            "label": "今年前三季度唐山港京唐港区保税物流中心（B型）进口贸易额居中国首位",
+            "createdAt": "2026-10-23T16:50:34.264Z",
+            "jsonFile": "2026-10-23_public-live-collect_chinanews-finance-rss-3_hod4.json",
+            "shared_keys": [
+              "desk:economy_investment",
+              "kind:economic_data"
+            ],
+            "desk": "Economy & investment",
+            "what_preview": "Jingtang Port Customs said on 23 October that in the first three quarters of the year the Jingtang Port Area bonded logistics center (Type B) in Tangshan, Hebei",
+            "corroboration_band": "minimal",
+            "canada_nexus": "none",
+            "note_en": "Same-topic candidate in the outbox — not independent corroboration until you merge the excerpts and re-run.",
+            "tag": "hypothesis"
+          }
+        ]
+      },
+      "provenance": "live",
+      "markdown": "# Japan's September core CPI rose 2.1% year-on-year, back above the BOJ's 2% target for the first time since December 2025 and the 61st straight monthly increase.\n\n_Live public collect — China News Service RSS_\n\n**Adopted · Partial brief — add a second public source and/or a dated dateline · Stale (>90 days) · analysis confidence low · source credibility medium.**\n\nSource: 日本物价持续高企 日媒批评：高市内阁未能改善民众生活 · https://www.chinanews.com.cn/gj/2026/10-23/10719809.shtml  \nBriefed 2026-10-23T16:52:14 · source as-of 2025-12-01 (month)\n\n## Source digest\n\n- 日本总务省10月23日公布，9月剔除生鲜食品的核心CPI同比涨2.1%，高于8月的1.7% 「剔除生鲜食品后，日本9月核心消费价格指数(CPI)同比上涨2.1%，涨幅较8月的1.7%进一步扩大」 _(日本物价持续高企 日媒批评：高市内阁未能改善民众生活)_\n- 为2025年12月以来再次超过政府和央行2%目标 「为2025年12月以来再次超过日本政府和央行设定的2%目标水平」 _(日本物价持续高企 日媒批评：高市内阁未能改善民众生活)_\n\n## What\n\nJapan's Statistics Bureau (总务省) reported on 23 October that core CPI — excluding fresh food — rose 2.1% year-on-year in September, up from 1.7% in August. This is the first reading above the 2% target jointly set by the government and the Bank of Japan since December 2025, and extends the run of consecutive year-on-year increases to 61 months. The Chinese state wire (China News Service) frames the item around Japanese media concern that household budgets will be squeezed further, and its headline attributes the failure to improve living standards to the Takaichi cabinet; the body text itself carries no such attribution beyond a single line of 'media concern'.\n\n## Context\n\nThe paste is one point in a well-documented monthly series: August core CPI was 1.7% (60th consecutive month), July 1.8% (59th). Search context indicates the August dip was attributed by a Mitsubishi UFJ researcher to fiscal subsidies on electricity and gas, with the effect expected to fade once the subsidy ends — a mechanism consistent with September's rebound, though the paste gives no component breakdown. Full-year 2025 core CPI was reported at 3.1%, the fourth consecutive year above target.\n\n## Key facts\n\n- **2.1%:** 日本9月核心消费价格指数(CPI)同比上涨2.1%\n- **1.7%:** 涨幅较8月的1.7%进一步扩大\n- **2%:** 为2025年12月以来再次超过日本政府和央行设定的2%目标水平\n- **data:** 日本总务省23日公布的数据显示\n\n## So what\n\nRead as a data point, not a verdict. Three things a reader should hold separately: (1) the 1.7%→2.1% move is a single month and the paste gives no sub-components, so whether this is fading subsidy base effects, renewed food/energy pass-through, or noise is unresolved — the search context's subsidy explanation is a plausible reading, not a confirmed one; (2) 'core' here excludes fresh food only, not energy, so it is not comparable to the US or Chinese core measures that strip energy too; (3) the headline's political attribution (cabinet failing households) is editorial framing from a Chinese state outlet citing unnamed Japanese media — the paste contains no polling, no household income data, and no government response, so it cannot support a claim about the cabinet's political standing. The genuinely notable fact is the return above target after a brief sub-2% window, which matters for BOJ normalization expectations more than for any single government's popularity.\n\n## Outlook (hypothesis) (provisional — single source / undated)\n\n- **[medium]** 通胀重回目标上方，政策正常化讨论延续\n  - Basis: 9月核心CPI 2.1%，为2025年12月以来首次超过2%；序列已连续61个月\n  - Trigger: 后续月份核心CPI持续位于2%上方，且分项显示非补贴类项目（食品、服务）为主要推手\n  - Alternative: The core CPI increase may stem from temporary supply disruptions or seasonal effects, and the Bank of Japan could still regard inflation as within its tolerance band, thereby stalling any move toward policy normalization.\n  - Falsifier: If the core CPI in October drops below 2% and the Bank of Japan keeps its policy rate unchanged without signaling any tightening, it would contradict the scenario.\n\n## Watchpoints\n\n- 总务省每月CPI速报中的能源与食品分项\n- 电费燃气补贴是否续期或退出\n- 日本央行政策会议对通胀措辞的变化\n- Re-check for a newer public text (source as-of 2025-12-01 looks stale)\n\n## Open questions\n\n- 粘贴文本未给CPI分项，无法判断2.1%由食品、能源还是服务驱动 [search: 日本 2026年9月 コアCPI 内訳 エネルギー 食料]\n- 8月能源补贴压低基数、9月回补的解释来自搜索摘要而非粘贴原文，需原始报道佐证 [search: 日本 電気ガス 補助金 終了 CPI 押し上げ 2026]\n- 标题所称“日媒批评高市内阁”在正文中无具体媒体、无民调或家庭收入数据支撑，需查日媒原始报道 [search: 高市内閣 物価 支持率 世論調査 2026]\n- 日本核心CPI剔除生鲜食品但保留能源，与中国、美国口径不同，跨國比较需注意 [search: 日本 コアCPI 定義 生鮮食品 エネルギー 含む]\n\n## Cross-source check\n\nCorroboration minimal — Not cross-checked (1 source)\n\n<details>\n<summary>Analysis details (id, mode, triage, confidence factors — not the briefing body)</summary>\n\n- id: 2026-10-23_public-live-collect_chinanews-importnews-rss-4_jvm2\n- created: 2026-10-23T16:52:16.970Z\n- mode: llm\n- sources in run: 1\n- desk: Economy & investment\n- triage: economic_data / P4\n- intake: admit\n- brief quality: partial (missing: second_public_source)\n- analysis confidence: low\n- source credibility: medium\n- freshness: Stale (>90 days)\n- domain: Economy and finance\n\n</details>\n\n> Draft for human review · Public sources only · Not an intelligence product\n"
+    },
+    {
+      "id": "2026-10-23_public-live-collect_chinanews-importnews-rss-3_jj42",
+      "subscriptionId": "public-live-collect",
+      "subscriptionTitle": "Live public collect — China News Service RSS",
+      "createdAt": "2026-10-23T16:52:00.770Z",
+      "source": {
+        "sourceId": "chinanews-importnews-rss:3",
+        "label": "证监会就私募投资母基金管理新规征求意见",
+        "url": "https://www.chinanews.com.cn/cj/2026/10-23/10719877.shtml",
+        "sourceText": "证监会就私募投资母基金管理新规征求意见\n中新网10月23日电 据“证监会发布”微信公众号消息，为进一步规范私募投资母基金业务活动，促进私募投资母基金规范健康发展，中国证监会根据《中华人民共和国证券投资基金法》《私募投资基金监督管理条例》(以下简称《私募条例》)等法律法规，起草了《私募投资母基金管理规定》(以下简称《母基金规定》)征求意见稿，现向社会公开征求意见。",
+        "collectedAt": "2026-10-23T16:50:05.216Z",
+        "tier": "unknown",
+        "channel_type": "wire",
+        "authority_weight": 0.5
+      },
+      "result": {
+        "mode": "llm",
+        "llmConfigured": true,
+        "llmProvider": "fallback",
+        "infoValue": {
+          "level": "medium",
+          "label_zh": "Medium info value (some detail or dual cues)",
+          "next_zh": [
+            "Add a related outbox excerpt as a second source (证监会就私募投资母基金管理新规征求意见) and re-run to test cross-check",
+            "Add a second public excerpt on the same subject (or Use related as second source)",
+            "Add a dated dateline or set source published date before treating Outlook as current",
+            "Add a same-topic public implementing notice and re-run with the meeting text"
+          ]
+        },
+        "matchedCards": [
+          "policy-signaling-valves"
+        ],
+        "briefing": {
+          "source_digest_zh": [
+            {
+              "point": "立法依据为《证券投资基金法》与《私募投资基金监督管理条例》",
+              "quote": "根据《中华人民共和国证券投资基金法》《私募投资基金监督管理条例》",
+              "source_label": "证监会就私募投资母基金管理新规征求意见",
+              "source_url": "https://www.chinanews.com.cn/cj/2026/10-23/10719877.shtml"
+            }
+          ],
+          "context_notes": [
+            {
+              "card": "policy-signaling-valves",
+              "note": "Civic ontology-lite [method] desk=all · matched=条例, 意见 · sources: Observable public PRC media/reporting conventions (open press patterns); China Media Project (pen-name bylines); Gao Yang / David Cowhig's Translation Blog (diplomatic jargon ladders); Asia Society Policy Institute (亲自 personal-leadership framing); see docs/DP-V3.md §4 for the full research trail. Tag=hypothesis only — not proven secret fact.",
+              "tag": "hypothesis"
+            }
+          ],
+          "info_triage": {
+            "framing": "civilian-public-source-triage",
+            "kinds": [
+              {
+                "kind": "implementing_instrument",
+                "label_zh": "Policy instrument / implementing file",
+                "score": 0.9,
+                "evidence": "意见"
+              }
+            ],
+            "primary_kind": "implementing_instrument",
+            "importance": {
+              "grade": "P2",
+              "label_zh": "High priority (clear policy direction; high tracking value)",
+              "score_0_to_1": 0.56,
+              "rationale": "Public-source triage from kind hits [implementing_instrument] and drivers [implementing_instrument, diaspora_or_bri_priority, signaling_band_medium, signaling_weighted_total>=0.5]. Not a secrecy marking.",
+              "drivers": [
+                "implementing_instrument",
+                "diaspora_or_bri_priority",
+                "signaling_band_medium",
+                "signaling_weighted_total>=0.5"
+              ],
+              "tag": "hypothesis"
+            },
+            "tag": "hypothesis"
+          },
+          "signaling_scorecard": {
+            "method": "enumerate-then-weight",
+            "framing": "civilian-public-media-heuristics",
+            "rules": [
+              {
+                "id": "seq-party-before-state",
+                "category": "sequence",
+                "label_zh": "党的机关表述先于国务院/部委表述",
+                "label_en": "Party framing appears before State Council/ministry framing",
+                "weight": 0.08,
+                "status": "unclear",
+                "raw_score": 0.4,
+                "weighted_score": 0.032,
+                "tag": "hypothesis"
+              },
+              {
+                "id": "seq-meeting-to-document",
+                "category": "sequence",
+                "label_zh": "会议语言→文件语言的阶段线索",
+                "label_en": "Meeting-language vs document-stage cues",
+                "weight": 0.07,
+                "status": "unclear",
+                "raw_score": 0.4,
+                "weighted_score": 0.028,
+                "tag": "hypothesis"
+              },
+              {
+                "id": "seq-leader-title-order",
+                "category": "sequence",
+                "label_zh": "领导人/机构称谓排序可观察（协议序位；比较排序变化需要历史通稿，本轮暂不做）",
+                "label_en": "Observable leader/institution title ordering (protocol precedence; order-CHANGE detection needs a prior bulletin, not implemented yet)",
+                "weight": 0.04,
+                "status": "unclear",
+                "raw_score": 0.4,
+                "weighted_score": 0.016,
+                "tag": "hypothesis"
+              },
+              {
+                "id": "detail-named-instrument",
+                "category": "implementing_detail",
+                "label_zh": "出现意见/通知/办法/条例/细则等工具文件名",
+                "label_en": "Named implementing instrument (意见/通知/办法/条例/细则)",
+                "weight": 0.12,
+                "status": "hit",
+                "raw_score": 1,
+                "weighted_score": 0.12,
+                "tag": "hypothesis"
+              },
+              {
+                "id": "detail-promised-later",
+                "category": "implementing_detail",
+                "label_zh": "承诺另行制定细则但本文未附",
+                "label_en": "Promises later detailed rules without attaching them",
+                "weight": 0.05,
+                "status": "unclear",
+                "raw_score": 0.4,
+                "weighted_score": 0.02,
+                "tag": "hypothesis"
+              },
+              {
+                "id": "detail-slogan-only",
+                "category": "implementing_detail",
+                "label_zh": "仅有强调/坚持/推动等方向语、无工具文件",
+                "label_en": "Direction verbs only; no implementing instrument",
+                "weight": 0.06,
+                "status": "miss",
+                "raw_score": 0,
+                "weighted_score": 0,
+                "tag": "hypothesis"
+              },
+              {
+                "id": "press-xinhua-wire",
+                "category": "press_placement",
+                "label_zh": "新华社电头",
+                "label_en": "Xinhua wire dateline",
+                "weight": 0.07,
+                "status": "unclear",
+                "raw_score": 0.4,
+                "weighted_score": 0.028,
+                "tag": "hypothesis"
+              },
+              {
+                "id": "press-peoples-daily",
+                "category": "press_placement",
+                "label_zh": "人民日报署名/转载线索",
+                "label_en": "People's Daily byline/reprint cue",
+                "weight": 0.06,
+                "status": "unclear",
+                "raw_score": 0.4,
+                "weighted_score": 0.024,
+                "tag": "hypothesis"
+              },
+              {
+                "id": "press-front-page",
+                "category": "press_placement",
+                "label_zh": "头版/要闻位置明示",
+                "label_en": "Explicit front-page / 要闻 placement",
+                "weight": 0.08,
+                "status": "unclear",
+                "raw_score": 0.4,
+                "weighted_score": 0.032,
+                "tag": "hypothesis"
+              },
+              {
+                "id": "press-editorial-genre",
+                "category": "press_placement",
+                "label_zh": "社论/评论员文章文体",
+                "label_en": "Editorial / commentator genre",
+                "weight": 0.07,
+                "status": "unclear",
+                "raw_score": 0.4,
+                "weighted_score": 0.028,
+                "tag": "hypothesis"
+              },
+              {
+                "id": "press-authoritative-byline",
+                "category": "press_placement",
+                "label_zh": "党媒权威笔名（任仲平/钟声/国纪平/金观平）——高于普通署名的机构级信号",
+                "label_en": "Coded party-media authority byline (任仲平/钟声/国纪平/金观平) — institutional-level signal, not an ordinary byline",
+                "weight": 0.09,
+                "status": "unclear",
+                "raw_score": 0.4,
+                "weighted_score": 0.036,
+                "tag": "hypothesis"
+              },
+              {
+                "id": "verb-hierarchy-cues",
+                "category": "speech_verbs",
+                "label_zh": "指出/强调/要求等话语动词可分级阅读",
+                "label_en": "Speech-verb hierarchy cues (指出/强调/要求)",
+                "weight": 0.05,
+                "status": "unclear",
+                "raw_score": 0.4,
+                "weighted_score": 0.02,
+                "tag": "hypothesis"
+              },
+              {
+                "id": "attr-collective-center",
+                "category": "attribution",
+                "label_zh": "以党中央/会议集体归因而非个人演说",
+                "label_en": "Collective center/meeting attribution vs personal speech",
+                "weight": 0.04,
+                "status": "unclear",
+                "raw_score": 0.4,
+                "weighted_score": 0.016,
+                "tag": "hypothesis"
+              },
+              {
+                "id": "attr-ministry-issuer",
+                "category": "attribution",
+                "label_zh": "部委作为发文主体可识别",
+                "label_en": "Identifiable ministry as issuing body",
+                "weight": 0.04,
+                "status": "unclear",
+                "raw_score": 0.4,
+                "weighted_score": 0.016,
+                "tag": "hypothesis"
+              },
+              {
+                "id": "attr-personal-leadership",
+                "category": "attribution",
+                "label_zh": "\"亲自\"个人化领导信号（亲自谋划/部署/推动/主持/出席）",
+                "label_en": "\"亲自\" (personally) personalized-leadership framing",
+                "weight": 0.05,
+                "status": "unclear",
+                "raw_score": 0.4,
+                "weighted_score": 0.02,
+                "tag": "hypothesis"
+              },
+              {
+                "id": "conc-numeric-targets",
+                "category": "concreteness",
+                "label_zh": "出现可核验数字目标/指标",
+                "label_en": "Verifiable numeric targets present",
+                "weight": 0.06,
+                "status": "miss",
+                "raw_score": 0,
+                "weighted_score": 0,
+                "tag": "hypothesis"
+              },
+              {
+                "id": "conc-timeline",
+                "category": "concreteness",
+                "label_zh": "出现明确时间表/年份节点",
+                "label_en": "Explicit timeline / year nodes",
+                "weight": 0.04,
+                "status": "unclear",
+                "raw_score": 0.4,
+                "weighted_score": 0.016,
+                "tag": "hypothesis"
+              },
+              {
+                "id": "scope-pilot-vs-national",
+                "category": "rollout_scope",
+                "label_zh": "试点/先行 vs 全国推开用语",
+                "label_en": "Pilot vs nationwide rollout language",
+                "weight": 0.04,
+                "status": "unclear",
+                "raw_score": 0.4,
+                "weighted_score": 0.016,
+                "tag": "hypothesis"
+              },
+              {
+                "id": "tone-stability-prosperity",
+                "category": "tone_framing",
+                "label_zh": "稳定/安全与发展话语同现",
+                "label_en": "Stability/security co-occurs with development framing",
+                "weight": 0.03,
+                "status": "unclear",
+                "raw_score": 0.4,
+                "weighted_score": 0.012,
+                "tag": "hypothesis"
+              },
+              {
+                "id": "tone-minimize-language",
+                "category": "tone_framing",
+                "label_zh": "弱化措辞（个别/极少数/不代表整体）— 刻意降低事件系统性",
+                "label_en": "Minimization wording (个别/极少数/不代表整体) — frames an event as non-systemic",
+                "weight": 0.04,
+                "status": "unclear",
+                "raw_score": 0.4,
+                "weighted_score": 0.016,
+                "tag": "hypothesis"
+              },
+              {
+                "id": "tone-resolve-language",
+                "category": "tone_framing",
+                "label_zh": "强化措辞（坚决维护/严厉打击/高度重视）— 展示管控能力和政治决心",
+                "label_en": "Resolve wording (坚决维护/严厉打击/高度重视) — demonstrates control/political will, not a specific measure",
+                "weight": 0.04,
+                "status": "unclear",
+                "raw_score": 0.4,
+                "weighted_score": 0.016,
+                "tag": "hypothesis"
+              },
+              {
+                "id": "diplo-severity-ladder",
+                "category": "diplomatic_severity",
+                "label_zh": "外交措辞升级阶梯命中（关切→严重关切→谴责→强烈谴责→抗议→严重抗议）",
+                "label_en": "Diplomatic severity-ladder phrase present (concern → serious concern → condemn → strongly condemn → protest → serious protest)",
+                "weight": 0.05,
+                "status": "unclear",
+                "raw_score": 0.4,
+                "weighted_score": 0.02,
+                "tag": "hypothesis"
+              },
+              {
+                "id": "diplo-outcome-euphemism",
+                "category": "diplomatic_severity",
+                "label_zh": "会谈成果委婉语阶梯命中（交换意见→坦率交谈→建设性对话→亲切友好）",
+                "label_en": "Meeting-outcome euphemism ladder present (exchanged views → candid talk → constructive dialogue → cordial)",
+                "weight": 0.04,
+                "status": "unclear",
+                "raw_score": 0.4,
+                "weighted_score": 0.016,
+                "tag": "hypothesis"
+              }
+            ],
+            "weighted_total": 0.548,
+            "weight_sum": 1.31,
+            "band": "medium",
+            "calibration": "Enumerated 23 public-media heuristics; observed=1, absent=2, unclear=20 → band=medium. Weights are hand-set editorial priors with no labelled corpus and no held-out validation: the band orders and flags, it does not measure. Hypothesis only — not proof of intent.",
+            "tag": "hypothesis"
+          },
+          "signaling_valves": {
+            "sequence": {
+              "status": "unclear",
+              "observation": "先后顺序: hit[—] miss[—]",
+              "reading": "Category roll-up from enumerated heuristics (hypothesis).",
+              "tag": "hypothesis"
+            },
+            "implementing_detail": {
+              "status": "observed",
+              "observation": "政策细则: hit[出现意见/通知/办法/条例/细则等工具文件名] miss[仅有强调/坚持/推动等方向语、无工具文件]",
+              "reading": "Category roll-up from enumerated heuristics (hypothesis).",
+              "tag": "hypothesis"
+            },
+            "press_placement": {
+              "status": "unclear",
+              "observation": "报刊位置: hit[—] miss[—]",
+              "reading": "Category roll-up from enumerated heuristics (hypothesis).",
+              "tag": "hypothesis"
+            },
+            "calibration": "Enumerated 23 public-media heuristics; observed=1, absent=2, unclear=20 → band=medium. Weights are hand-set editorial priors with no labelled corpus and no held-out validation: the band orders and flags, it does not measure. Hypothesis only — not proof of intent."
+          },
+          "briefing_en": {
+            "headline": "China's securities regulator drafted a rule on private-fund fund-of-funds (母基金) management and opened it for public comment, without releasing the text's thresholds or deadline.",
+            "what": "The CSRC said it drafted the 《私募投资母基金管理规定》 (Private Investment Fund-of-Funds Management Provisions) as a consultation draft, citing the Securities Investment Fund Law and the 私募投资基金监督管理条例 (Private Investment Fund Supervision and Administration Regulation) as legal basis, and invited public comment. The notice, carried via the CSRC's WeChat account and relayed by China News Service (dateline 23 October), gives no article count, no fund-size thresholds, no comment deadline, and no effective date.",
+            "context": "This is one item in a longer sequence of CSRC rulemaking under the 私募条例, which supplies the administrative-regulation layer beneath which ministry-level rules (办法/规定) are being filled in piece by piece. External search context indicates the CSRC also consulted in September 2026 on a 《私募投资基金募集监督管理办法（征求意见稿）》 with a comment window closing 4 October 2026, and that industry commentary ties fund-of-funds rules to the post-2018 资管新规 restrictions on nested (嵌套) investment structures — both are background, not content of this paste.",
+            "so_what": "Substance cut is thin: the paste names an instrument and its legal parent but carries no operative parameter, so it should be read as a procedural milestone, not a policy shift. The analytically useful question is what a fund-of-funds rule would regulate that existing private-fund rules do not — most plausibly layering/nesting limits, look-through disclosure to underlying funds, and investor-qualification pass-through — but the paste does not say which, so any such reading is a hypothesis to be tested against the published text. A second, equally live reading is that this is routine codification with limited market effect. Note also that a consultation draft is an instruction to produce a final rule, not the rule itself; the operative signal will be the article text, the comment deadline, and any transition period.",
+            "confidence": "low",
+            "sources_used": [
+              "证监会就私募投资母基金管理新规征求意见"
+            ]
+          },
+          "policy_outlook": {
+            "horizon": "near",
+            "scenarios": [
+              {
+                "label": "Continuity: final rule follows after comment period with layering/look-through provisions",
+                "likelihood": "low",
+                "basis": "Named instrument plus explicit statutory parent (私募条例); CSRC is visibly filling in the private-fund rule chain in sequence",
+                "trigger": "Publication of the full consultation text with articles on nested investment, look-through, or investor qualification, followed by a final 规定",
+                "alternative": "The excerpt merely announces a draft consultation; it does not indicate that the final rule will include layering or look-through provisions, suggesting the CSRC may postpone or omit such measures.",
+                "falsifier": "The final 规定, published after the consultation period, contains no provisions on look-through accounting or investor qualification thresholds.",
+                "tag": "hypothesis"
+              }
+            ],
+            "watchpoints": [
+              "Full text of 《私募投资母基金管理规定（征求意见稿）》 and its comment deadline on csrc.gov.cn",
+              "Whether the text addresses 嵌套/多层投资 limits and look-through disclosure",
+              "Whether a transition period (过渡期) is set for existing fund-of-funds products",
+              "Sequencing relative to the September 2026 募集监督管理办法 consultation",
+              "Confirm publication or meeting date — paste has no dated dateline"
+            ],
+            "tag": "hypothesis"
+          },
+          "open_questions": [
+            "The paste gives no comment deadline or effective date, so the timeline is unknown [search: 私募投资母基金管理规定 征求意见 截止时间]",
+            "No article text is available, so it is unknown whether the rule sets fund-size thresholds, investor minimums, or nesting limits [search: 私募投资母基金管理规定 征求意见稿 全文 嵌套 穿透]",
+            "Whether this rule is a first for fund-of-funds at ministry level, or replaces prior 基金中基金 guidance, needs a baseline [search: 基金中基金 私募 监管规定 此前 指引]",
+            "The scale of the private fund-of-funds segment affected is not in the paste [search: 私募 母基金 FOF 规模 只数 中国证券投资基金业协会]"
+          ],
+          "canada_nexus": {
+            "framing": "civilian-reader-interest-flag",
+            "level": "none",
+            "label_zh": "No Canada nexus cue",
+            "label_en": "No Canada nexus cue",
+            "hits": [],
+            "rationale": "No Canada-name or adjacency cue in the paste. Reader-interest flag only — not personal targeting.",
+            "tag": "hypothesis"
+          },
+          "canada_policy_link": {
+            "framing": "civilian-canada-public-policy-overlay",
+            "level": "none",
+            "label_zh": "No Canada public-policy overlay cue",
+            "hits": [],
+            "disclaimer_zh": "Reader-interest overlay of open Canadian policy themes — not legal advice and not an investigation of any person. Links point to government public pages; verify current consolidated text.",
+            "rationale": "No topical cue matched the Canada public-policy overlay lexicon.",
+            "tag": "hypothesis"
+          },
+          "substance_cut": {
+            "framing": "civilian-boilerplate-vs-substance",
+            "method": "strip-formula-then-list-verifiables",
+            "boilerplate_ratio_0_to_1": 0,
+            "substance_score_0_to_1": 0.2,
+            "band": "mixed",
+            "label_zh": "Mixed substance and formula language",
+            "nuggets": [
+              {
+                "kind": "named_instrument",
+                "label_zh": "Named policy instrument",
+                "evidence": "证监会就私募投资母基金管理新规征求意见",
+                "value_zh": "意见",
+                "value_en": "opinion",
+                "tag": "hypothesis"
+              },
+              {
+                "kind": "named_instrument",
+                "label_zh": "Named policy instrument",
+                "evidence": "私募投资基金监督管理条例》(以下简称《私募条例》)等法律法规",
+                "value_zh": "私募投资基金监督管理条例",
+                "value_en": "a regulation",
+                "tag": "hypothesis"
+              }
+            ],
+            "boilerplate_hits": [],
+            "empty_calories": [],
+            "analyst_prompt_zh": "Strip formula language; keep only: numbers, deadlines, named documents, responsible bodies, pilot scope, bans/red lines, funding, named sectors. Without these, treat as rhetoric skeleton until an implementing public text appears.",
+            "calibration": "Mixed band: lead the briefing with nuggets; treat unmatched slogans as atmosphere only.",
+            "tag": "hypothesis"
+          },
+          "desk_section": {
+            "framing": "civilian-briefing-desk-section",
+            "primary": "economy_investment",
+            "label_zh": "Economy & investment",
+            "label_en": "Economy & investment",
+            "secondary": [],
+            "evidence": [
+              "投资",
+              "kind:implementing_instrument"
+            ],
+            "hot_themes": [],
+            "rationale": "Routed by public-text cues + triage kind. Secondary: none.",
+            "tag": "hypothesis"
+          },
+          "ontology_lite": {
+            "framing": "civilian-ontology-lite",
+            "desk_primary": "economy_investment",
+            "hits": [
+              {
+                "id": "policy-signaling-valves",
+                "type": "method",
+                "desk": [
+                  "all"
+                ],
+                "tag": "hypothesis",
+                "score": 1.65,
+                "matched_keywords": [
+                  "条例",
+                  "意见"
+                ],
+                "updated": "2026-09-22",
+                "sources": "Observable public PRC media/reporting conventions (open press patterns); China Media Project (pen-name bylines); Gao Yang / David Cowhig's Translation Blog (diplomatic jargon ladders); Asia Society Policy Institute (亲自 personal-leadership framing); see docs/DP-V3.md §4 for the full research trail"
+              }
+            ],
+            "calibration": "Matched 1 cards, kept 1 (desk=economy_investment). Background/hypothesis only — not a formal ontology or secret knowledge.",
+            "tag": "hypothesis"
+          },
+          "source_class": {
+            "framing": "civilian-source-class",
+            "class": "policy_instrument",
+            "label_zh": "Policy instrument file",
+            "evidence": [
+              "instrument_lexicon"
+            ],
+            "rules": [
+              "Participates in corroboration and confidence factors by public-source tier"
+            ],
+            "tag": "hypothesis"
+          },
+          "corroboration": {
+            "framing": "civilian-multi-source-corroboration",
+            "method": "cross-source-subject-overlap",
+            "score_0_to_3": 1,
+            "source_count": 1,
+            "distinct_source_count": 1,
+            "cross_checked": false,
+            "shared_subjects": [],
+            "independent_issuers": [],
+            "label_zh": "Not cross-checked — 1 source only; it names a public record a reviewer can pull",
+            "label_en": "Not cross-checked (1 source, traceable record named)",
+            "drivers": [
+              "single_source_names_traceable_record"
+            ],
+            "single_source_cues": {
+              "framing": "civilian-single-source-substance-cues",
+              "count_0_to_3": 1,
+              "drivers": [
+                "named_or_cue_instrument"
+              ],
+              "label_en": "Within-passage detail cues 1/3 (not corroboration)",
+              "note": "Wording cues inside the pasted passage. They describe how specific the text is (see substance_cut), not whether any independent source confirms it.",
+              "tag": "hypothesis"
+            },
+            "missing": [
+              "Second public source (independent issuer, same subject) to cross-check this passage"
+            ],
+            "tag": "hypothesis"
+          },
+          "source_credibility": {
+            "framing": "civilian-source-credibility",
+            "level": "medium",
+            "score_0_to_1": 0.64,
+            "factors": {
+              "provenance": "weak",
+              "source_class": "policy_instrument",
+              "source_tier": "A",
+              "source_tier_weight_0_to_1": 1,
+              "channel_tier": "unknown",
+              "channel_authority_weight": 0.3
+            },
+            "source_tier": {
+              "framing": "civilian-curated-source-tier",
+              "tier": "A",
+              "prior_kind": "stated-editorial-prior",
+              "weight_0_to_1": 1,
+              "prior_basis_en": "Ranked first by editorial judgement: a named instrument is the most citable public record.",
+              "label_zh": "A · named policy instrument",
+              "label_en": "A · named policy instrument",
+              "max_confidence": "high",
+              "source_class": "policy_instrument",
+              "rationale_zh": "Named notice/measure/implementing-instrument tier.",
+              "evidence": [],
+              "tag": "hypothesis"
+            },
+            "channel_tier": {
+              "tier": "unknown",
+              "label_en": "Unclassified channel",
+              "authority_weight": 0.3,
+              "basis_en": "No channel tier assigned — treat as low-mid prior until classified.",
+              "sources": []
+            },
+            "caps_applied": [
+              "weak_provenance_cap_medium"
+            ],
+            "rationale": "Source credibility=medium from source_class=policy_instrument, source_tier=A (stated editorial prior), channel_tier=unknown (No channel tier assigned — treat as low-mid prior until classified.), provenance=weak. Caps: weak_provenance_cap_medium. Stated editorial priors — not fitted to labelled data.",
+            "tag": "hypothesis"
+          },
+          "analysis_confidence": {
+            "framing": "civilian-analysis-confidence",
+            "level": "low",
+            "score_0_to_1": 0.272,
+            "factors": {
+              "signaling_band": "medium",
+              "substance_band": "mixed",
+              "corroboration_0_to_3": 1,
+              "cross_checked": false,
+              "distinct_source_count": 1,
+              "single_source_cue_count": 1
+            },
+            "caps_applied": [
+              "single_source_not_cross_checked_cap_low"
+            ],
+            "rationale": "Analysis confidence=low from signaling=medium, substance=mixed, corroboration=weak (not cross-checked (1 distinct source)), within-passage detail cues=one (not corroboration). Caps: single_source_not_cross_checked_cap_low. Bands come from hand-set rule cues with no labelled-data calibration — they order and flag, they do not measure. Not an event-probability forecast.",
+            "tag": "hypothesis"
+          },
+          "adoption": {
+            "framing": "civilian-detail-adoption",
+            "adopted": true,
+            "label_zh": "Adopted (verifiable detail/data)",
+            "reason_zh": "Found 2 actionable hard cue(s) with supporting context (2 cue(s) kept).",
+            "hard_nuggets": [
+              {
+                "kind": "named_instrument",
+                "label_zh": "Named policy instrument",
+                "evidence": "证监会就私募投资母基金管理新规征求意见",
+                "value_zh": "意见",
+                "value_en": "opinion",
+                "tag": "hypothesis"
+              },
+              {
+                "kind": "named_instrument",
+                "label_zh": "Named policy instrument",
+                "evidence": "私募投资基金监督管理条例》(以下简称《私募条例》)等法律法规",
+                "value_zh": "私募投资基金监督管理条例",
+                "value_en": "a regulation",
+                "tag": "hypothesis"
+              }
+            ],
+            "rejected_as": null,
+            "tag": "hypothesis"
+          },
+          "intake": {
+            "framing": "civilian-intake",
+            "label": "admit",
+            "first_cut": "admit",
+            "second_cut": null,
+            "second_cut_engine": "none",
+            "reason_en": "First cut: actionable hard detail — admit.",
+            "tag": "hypothesis"
+          },
+          "temporal": {
+            "framing": "civilian-temporal-freshness",
+            "briefed_at": "2026-10-23T16:51:58.836Z",
+            "collected_at": "2026-10-23T16:50:05.216Z",
+            "source_as_of_precision": "none",
+            "source_as_of_method": "none",
+            "freshness": {
+              "band": "unknown",
+              "label_en": "Freshness unknown",
+              "basis_en": "No dated dateline in the paste (and no collected/source date provided) — do not infer how current the excerpt is."
+            },
+            "forward_deadlines_en": [],
+            "tag": "hypothesis"
+          },
+          "content_analysis": {
+            "framing": "civilian-content-analysis",
+            "domain": "macro_finance",
+            "domain_label_en": "Economy and finance",
+            "background": "Macro-financial policy is transmitted through implementation vehicles — special-purpose bonds, refinancing programmes, delivery guarantees — whose effect depends on local fiscal capacity, and where debt and property risk are managed by reallocating burden rather than removing it.",
+            "so_what": "Without a named vehicle or allocation, the burden question stays open: central transfer, local bond quota and bank credit distribute the same nominal support very differently. Recipients gain a funded channel while the financing side absorbs the residual risk, so the distribution of burden matters more than the headline figure. The trade-off is stabilisation versus moral hazard: absorbing risk protects near-term delivery and confidence, while weakening the incentive for local authorities and developers to price risk in future. Regulation is promised without a date, which leaves the timetable to administrative discretion.",
+            "scenarios": [
+              {
+                "label": "Support is routed through local budgets and bond quotas, concentrating delivery in fiscally stronger provinces",
+                "likelihood": "low",
+                "horizon": "6-18 months",
+                "basis": "Where the excerpt names no central transfer mechanism, delivery historically depends on local fiscal capacity, which widens regional divergence (hypothesis).",
+                "trigger": "Provincial bond issuance volumes, quota allocations, or published project lists skewed by region.",
+                "alternative": "A central transfer mechanism is named later, reducing regional divergence rather than leaving delivery to local fiscal capacity alone (hypothesis).",
+                "falsifier": "A named central transfer channel is published, or provincial bond issuance and project lists show even distribution rather than concentration in fiscally stronger provinces.",
+                "tag": "hypothesis"
+              },
+              {
+                "label": "Regulation is published naming the transmission vehicle, quota allocation and eligibility",
+                "likelihood": "low",
+                "basis": "The excerpt already commits to regulation, and funded commitments in public texts are usually followed by an administrative document (hypothesis).",
+                "trigger": "A named issuing body, a draft circulated for public comment, or a document number appearing in an official gazette.",
+                "alternative": "Competing reading: the commitment stays rhetorical and no administrative text is issued in the stated window (hypothesis).",
+                "falsifier": "No draft, document number, or named issuer appears, or a published text omits the funded/pilot element named here.",
+                "tag": "hypothesis"
+              }
+            ],
+            "watchpoints": [
+              "Which vehicle carries regulation — central transfer, special-purpose bond quota, or bank credit",
+              "Whether an allocation figure is attached",
+              "Provincial bond issuance and refinancing volumes, and regional skew in project lists",
+              "Housing-delivery completion rates and developer refinancing outcomes",
+              "Whether burden falls on central transfers, local budgets or bank balance sheets"
+            ],
+            "open_questions": [
+              "Which implementation vehicle carries this, and who bears the residual credit risk?",
+              "What allocation would accompany this commitment?",
+              "Which provinces have the fiscal capacity to co-fund, and which do not?",
+              "What eligibility conditions apply to developers or local financing vehicles?",
+              "What measurable milestone would show transmission to households or balance sheets?"
+            ],
+            "tag": "hypothesis"
+          },
+          "brief_quality": {
+            "framing": "civilian-brief-quality",
+            "level": "partial",
+            "label_en": "Partial brief — add a second public source and/or a dated dateline",
+            "missing": [
+              "second_public_source",
+              "source_as_of"
+            ],
+            "tag": "hypothesis"
+          },
+          "human_review": []
+        },
+        "gate": {
+          "passed": true,
+          "findings": []
+        },
+        "systemPromptChars": 25146,
+        "sourceCount": 1,
+        "relatedBriefs": [
+          {
+            "framing": "civilian-related-brief-discovery",
+            "id": "2026-10-23_public-live-collect_chinanews-importnews-rss-3_is6p",
+            "label": "证监会就私募投资母基金管理新规征求意见",
+            "createdAt": "2026-10-23T16:51:25.873Z",
+            "jsonFile": "2026-10-23_public-live-collect_chinanews-importnews-rss-3_is6p.json",
+            "shared_keys": [
+              "nugget:opinion",
+              "nugget:a regulation"
+            ],
+            "desk": "Economy & investment",
+            "what_preview": "The CSRC published a consultation draft of the 《私募投资母基金管理规定》 (Private Investment Fund-of-Funds Management Provisions) via its WeChat account, carried by China N",
+            "corroboration_band": "weak",
+            "canada_nexus": "none",
+            "note_en": "Same-topic candidate in the outbox — not independent corroboration until you merge the excerpts and re-run.",
+            "tag": "hypothesis"
+          },
+          {
+            "framing": "civilian-related-brief-discovery",
+            "id": "2026-10-20_public-live-collect_chinanews-politics-rss-1_rejb",
+            "label": "刘海星分别会见意大利、阿联酋客人",
+            "createdAt": "2026-10-20T16:39:07.607Z",
+            "jsonFile": "2026-10-20_public-live-collect_chinanews-politics-rss-1_rejb.json",
+            "shared_keys": [
+              "nugget:opinion"
+            ],
+            "desk": "Economy & investment",
+            "what_preview": "Xinhua's 20 October wire reports that Liu Haixing, head of the International Department of the CPC Central Committee (IDCPC), separately received in Beijing two",
+            "corroboration_band": "minimal",
+            "canada_nexus": "none",
+            "note_en": "Same-topic candidate in the outbox — not independent corroboration until you merge the excerpts and re-run.",
+            "tag": "hypothesis"
+          },
+          {
+            "framing": "civilian-related-brief-discovery",
+            "id": "2026-09-30_public-live-collect_chinanews-importnews-rss-2_kdxw",
+            "label": "国务院办公厅印发《关于发展体育赛事激发消费活力的意见》",
+            "createdAt": "2026-09-30T17:52:14.228Z",
+            "jsonFile": "2026-09-30_public-live-collect_chinanews-importnews-rss-2_kdxw.json",
+            "shared_keys": [
+              "nugget:opinion"
+            ],
+            "desk": "Economy & investment",
+            "what_preview": "The State Council General Office (国务院办公厅) has issued a policy 意见 titled 《关于发展体育赛事激发消费活力的意见》 ('Opinions on Developing Sports Events to Stimulate Consumption Vita",
+            "corroboration_band": "weak",
+            "canada_nexus": "none",
+            "note_en": "Same-topic candidate in the outbox — not independent corroboration until you merge the excerpts and re-run.",
+            "tag": "hypothesis"
+          },
+          {
+            "framing": "civilian-related-brief-discovery",
+            "id": "2026-10-09_public-live-collect_chinanews-importnews-rss-1_byfp",
+            "label": "外交部驻港公署发言人：人口贩运的“锅”香港不背",
+            "createdAt": "2026-10-09T18:14:42.709Z",
+            "jsonFile": "2026-10-09_public-live-collect_chinanews-importnews-rss-1_byfp.json",
+            "shared_keys": [
+              "nugget:a regulation"
+            ],
+            "desk": "Economy & investment",
+            "what_preview": "The spokesperson for the Office of the Commissioner of the Ministry of Foreign Affairs in the Hong Kong SAR issued a statement (carried via the office's WeChat ",
+            "corroboration_band": "weak",
+            "canada_nexus": "none",
+            "note_en": "Same-topic candidate in the outbox — not independent corroboration until you merge the excerpts and re-run.",
+            "tag": "hypothesis"
+          },
+          {
+            "framing": "civilian-related-brief-discovery",
+            "id": "2026-10-09_public-live-collect_chinanews-politics-rss-4_af6v",
+            "label": "外交部驻港公署发言人：人口贩运的“锅”香港不背",
+            "createdAt": "2026-10-09T18:13:31.111Z",
+            "jsonFile": "2026-10-09_public-live-collect_chinanews-politics-rss-4_af6v.json",
+            "shared_keys": [
+              "nugget:a regulation"
+            ],
+            "desk": "Economy & investment",
+            "what_preview": "The spokesperson for the Office of the Commissioner of the Ministry of Foreign Affairs in the Hong Kong SAR issued a statement (carried via the office's WeChat ",
+            "corroboration_band": "weak",
+            "canada_nexus": "none",
+            "note_en": "Same-topic candidate in the outbox — not independent corroboration until you merge the excerpts and re-run.",
+            "tag": "hypothesis"
+          },
+          {
+            "framing": "civilian-related-brief-discovery",
+            "id": "2026-10-22_public-live-collect_chinanews-importnews-rss-2_cm1c",
+            "label": "中国央行等多部门发文：金融支持国际科技创新中心建设",
+            "createdAt": "2026-10-22T16:58:57.552Z",
+            "jsonFile": "2026-10-22_public-live-collect_chinanews-importnews-rss-2_cm1c.json",
+            "shared_keys": [
+              "desk:economy_investment",
+              "kind:implementing_instrument"
+            ],
+            "desk": "Economy & investment",
+            "what_preview": "A China News Service wire dated 22 October 2026 reports that, during the 2026 Financial Street Forum annual meeting, the People's Bank of China, together with t",
+            "corroboration_band": "weak",
+            "canada_nexus": "none",
+            "note_en": "Same-topic candidate in the outbox — not independent corroboration until you merge the excerpts and re-run.",
+            "tag": "hypothesis"
+          }
+        ]
+      },
+      "provenance": "live",
+      "markdown": "# China's securities regulator drafted a rule on private-fund fund-of-funds (母基金) management and opened it for public comment, without releasing the text's thresholds or deadline.\n\n_Live public collect — China News Service RSS_\n\n**Adopted · Partial brief — add a second public source and/or a dated dateline · Freshness unknown · analysis confidence low · source credibility medium.**\n\nSource: 证监会就私募投资母基金管理新规征求意见 · https://www.chinanews.com.cn/cj/2026/10-23/10719877.shtml  \nBriefed 2026-10-23T16:51:58 · source as-of unknown (none)\n\n## Source digest\n\n- 立法依据为《证券投资基金法》与《私募投资基金监督管理条例》 「根据《中华人民共和国证券投资基金法》《私募投资基金监督管理条例》」 _(证监会就私募投资母基金管理新规征求意见)_\n\n## What\n\nThe CSRC said it drafted the 《私募投资母基金管理规定》 (Private Investment Fund-of-Funds Management Provisions) as a consultation draft, citing the Securities Investment Fund Law and the 私募投资基金监督管理条例 (Private Investment Fund Supervision and Administration Regulation) as legal basis, and invited public comment. The notice, carried via the CSRC's WeChat account and relayed by China News Service (dateline 23 October), gives no article count, no fund-size thresholds, no comment deadline, and no effective date.\n\n## Context\n\nThis is one item in a longer sequence of CSRC rulemaking under the 私募条例, which supplies the administrative-regulation layer beneath which ministry-level rules (办法/规定) are being filled in piece by piece. External search context indicates the CSRC also consulted in September 2026 on a 《私募投资基金募集监督管理办法（征求意见稿）》 with a comment window closing 4 October 2026, and that industry commentary ties fund-of-funds rules to the post-2018 资管新规 restrictions on nested (嵌套) investment structures — both are background, not content of this paste.\n\n## Key facts\n\n- **opinion:** 证监会就私募投资母基金管理新规征求意见\n- **a regulation:** 私募投资基金监督管理条例》(以下简称《私募条例》)等法律法规\n\n## So what\n\nSubstance cut is thin: the paste names an instrument and its legal parent but carries no operative parameter, so it should be read as a procedural milestone, not a policy shift. The analytically useful question is what a fund-of-funds rule would regulate that existing private-fund rules do not — most plausibly layering/nesting limits, look-through disclosure to underlying funds, and investor-qualification pass-through — but the paste does not say which, so any such reading is a hypothesis to be tested against the published text. A second, equally live reading is that this is routine codification with limited market effect. Note also that a consultation draft is an instruction to produce a final rule, not the rule itself; the operative signal will be the article text, the comment deadline, and any transition period.\n\n## Outlook (hypothesis) (provisional — single source / undated)\n\n- **[low]** Continuity: final rule follows after comment period with layering/look-through provisions\n  - Basis: Named instrument plus explicit statutory parent (私募条例); CSRC is visibly filling in the private-fund rule chain in sequence\n  - Trigger: Publication of the full consultation text with articles on nested investment, look-through, or investor qualification, followed by a final 规定\n  - Alternative: The excerpt merely announces a draft consultation; it does not indicate that the final rule will include layering or look-through provisions, suggesting the CSRC may postpone or omit such measures.\n  - Falsifier: The final 规定, published after the consultation period, contains no provisions on look-through accounting or investor qualification thresholds.\n\n## Watchpoints\n\n- Full text of 《私募投资母基金管理规定（征求意见稿）》 and its comment deadline on csrc.gov.cn\n- Whether the text addresses 嵌套/多层投资 limits and look-through disclosure\n- Whether a transition period (过渡期) is set for existing fund-of-funds products\n- Sequencing relative to the September 2026 募集监督管理办法 consultation\n- Confirm publication or meeting date — paste has no dated dateline\n\n## Open questions\n\n- The paste gives no comment deadline or effective date, so the timeline is unknown [search: 私募投资母基金管理规定 征求意见 截止时间]\n- No article text is available, so it is unknown whether the rule sets fund-size thresholds, investor minimums, or nesting limits [search: 私募投资母基金管理规定 征求意见稿 全文 嵌套 穿透]\n- Whether this rule is a first for fund-of-funds at ministry level, or replaces prior 基金中基金 guidance, needs a baseline [search: 基金中基金 私募 监管规定 此前 指引]\n- The scale of the private fund-of-funds segment affected is not in the paste [search: 私募 母基金 FOF 规模 只数 中国证券投资基金业协会]\n\n## Cross-source check\n\nCorroboration weak — Not cross-checked (1 source, traceable record named); from one source naming a public record a reviewer can pull\n\n<details>\n<summary>Analysis details (id, mode, triage, confidence factors — not the briefing body)</summary>\n\n- id: 2026-10-23_public-live-collect_chinanews-importnews-rss-3_jj42\n- created: 2026-10-23T16:52:00.770Z\n- mode: llm\n- sources in run: 1\n- desk: Economy & investment\n- triage: implementing_instrument / P2\n- intake: admit\n- brief quality: partial (missing: second_public_source, source_as_of)\n- analysis confidence: low\n- source credibility: medium (no independent URL to verify this specific excerpt — not a comment on the issuing body's standing)\n- freshness: Freshness unknown\n- domain: Economy and finance\n\n</details>\n\n> Draft for human review · Public sources only · Not an intelligence product\n"
     },
     {
       "id": "2026-10-23_public-live-collect_chinanews-importnews-rss-4_jbmv",
